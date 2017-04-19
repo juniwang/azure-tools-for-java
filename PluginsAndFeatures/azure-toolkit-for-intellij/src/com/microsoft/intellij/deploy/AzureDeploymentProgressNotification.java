@@ -136,7 +136,6 @@ public final class AzureDeploymentProgressNotification {
     public void deployToDockerContainer(AzureDockerImageInstance dockerImageInstance, String url) {
         Date startDate = new Date();
         Map<String, String> postEventProperties = new HashMap<String, String>();
-        postEventProperties.put("DockerApiName", dockerImageInstance.host.apiUrl);
         postEventProperties.put("DockerFileOption", dockerImageInstance.predefinedDockerfile);
         String descriptionTask =  String.format("Publishing %s into Docker host %s at port(s) %s", new File(dockerImageInstance.artifactPath).getName(), dockerImageInstance.host.name, dockerImageInstance.dockerPortSettings);
         try {

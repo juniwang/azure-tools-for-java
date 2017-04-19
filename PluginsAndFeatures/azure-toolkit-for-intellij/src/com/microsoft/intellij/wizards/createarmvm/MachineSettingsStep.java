@@ -44,6 +44,7 @@ import com.microsoft.intellij.AzurePlugin;
 import com.microsoft.intellij.util.PluginUtil;
 import com.microsoft.intellij.wizards.VMWizardModel;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
+import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -56,6 +57,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -76,6 +78,7 @@ public class MachineSettingsStep extends WizardStep<VMWizardModel> {
     private JCheckBox certificateCheckBox;
     private JPanel certificatePanel;
     private JPanel passwordPanel;
+    private JXHyperlink pricingLink;
 
     Project project;
     VMWizardModel model;
@@ -173,6 +176,8 @@ public class MachineSettingsStep extends WizardStep<VMWizardModel> {
                 });
             }
         });
+        pricingLink.setURI(URI.create("https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/"));
+        pricingLink.setText("Pricing");
     }
 
     @Override

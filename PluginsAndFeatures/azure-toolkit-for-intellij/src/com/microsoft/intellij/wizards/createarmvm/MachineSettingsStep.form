@@ -66,6 +66,8 @@
                 <rowspec value="top:4dlu:noGrow"/>
                 <rowspec value="center:max(d;4px):noGrow"/>
                 <colspec value="fill:p:grow"/>
+                <colspec value="left:4dlu:noGrow"/>
+                <colspec value="fill:max(d;4px):noGrow"/>
                 <constraints/>
                 <properties>
                   <minimumSize width="400" height="357"/>
@@ -86,7 +88,7 @@
                   </component>
                   <component id="80aea" class="javax.swing.JLabel">
                     <constraints>
-                      <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="3" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                       <forms/>
                     </constraints>
                     <properties>
@@ -96,26 +98,16 @@
                   </component>
                   <component id="a2767" class="javax.swing.JTextField" binding="vmNameTextField">
                     <constraints>
-                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                      <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
                       </grid>
                       <forms defaultalign-horz="false"/>
                     </constraints>
                     <properties/>
                   </component>
-                  <component id="9c20" class="javax.swing.JLabel">
-                    <constraints>
-                      <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                      <forms/>
-                    </constraints>
-                    <properties>
-                      <labelFor value="acec"/>
-                      <text value="User name:"/>
-                    </properties>
-                  </component>
                   <component id="acec" class="javax.swing.JTextField" binding="vmUserTextField">
                     <constraints>
-                      <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                      <grid row="7" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
                       </grid>
                       <forms defaultalign-horz="false"/>
@@ -131,7 +123,7 @@
                   </component>
                   <component id="3ed3e" class="javax.swing.JCheckBox" binding="passwordCheckBox">
                     <constraints>
-                      <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="14" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                       <forms/>
                     </constraints>
                     <properties>
@@ -142,7 +134,7 @@
                   </component>
                   <component id="7ca75" class="javax.swing.JCheckBox" binding="certificateCheckBox">
                     <constraints>
-                      <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="9" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                       <forms/>
                     </constraints>
                     <properties>
@@ -159,7 +151,7 @@
                     <colspec value="left:4dlu:noGrow"/>
                     <colspec value="fill:max(d;4px):noGrow"/>
                     <constraints>
-                      <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <grid row="12" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                       <forms defaultalign-horz="false"/>
                     </constraints>
                     <properties/>
@@ -203,7 +195,7 @@
                     <rowspec value="center:max(d;4px):noGrow"/>
                     <colspec value="fill:p:grow"/>
                     <constraints>
-                      <grid row="16" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="16" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                       <forms defaultalign-vert="false"/>
                     </constraints>
                     <properties/>
@@ -251,6 +243,25 @@
                       </component>
                     </children>
                   </grid>
+                  <component id="8d41e" class="org.jdesktop.swingx.JXHyperlink" binding="pricingLink">
+                    <constraints>
+                      <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms/>
+                    </constraints>
+                    <properties>
+                      <text value="Pricing"/>
+                    </properties>
+                  </component>
+                  <component id="9c20" class="javax.swing.JLabel">
+                    <constraints>
+                      <grid row="6" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms/>
+                    </constraints>
+                    <properties>
+                      <labelFor value="acec"/>
+                      <text value="User name:"/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
             </children>

@@ -330,7 +330,7 @@ public class AzureNewDockerLoginStep extends AzureNewDockerWizardStep {
       @Override
       public boolean verify(JComponent input) {
         String text = dockerHostNewKeyvaultTextField.getText();
-        if (text == null || text.isEmpty() || !AzureDockerValidationUtils.validateDockerHostKeyvaultName(text, dockerManager)) {
+        if (text == null || text.isEmpty() || !AzureDockerValidationUtils.validateDockerHostKeyvaultName(text, dockerManager, false)) {
           dockerHostNewKeyvaultLabel.setVisible(true);
           setDialogButtonsState(false);
           return false;
@@ -381,6 +381,11 @@ public class AzureNewDockerLoginStep extends AzureNewDockerWizardStep {
       newHost.certVault.hostName = null;
       newHost.hasKeyVault = true;
     } else {
+      // reset key vault info
+      newHost.hasKeyVault = false;
+      newHost.certVault.name = null;
+      newHost.certVault.uri = null;
+
       dockerHostImportKeyvaultComboLabel.setVisible(false);
       // User name
       String vmUsername = dockerHostUsernameTextField.getText();
@@ -495,7 +500,7 @@ public class AzureNewDockerLoginStep extends AzureNewDockerWizardStep {
     // create new key vault for storing the credentials
     if (dockerHostSaveCredsCheckBox.isSelected()) {
       if (dockerHostNewKeyvaultTextField.getText() == null || dockerHostNewKeyvaultTextField.getText().isEmpty() ||
-          !AzureDockerValidationUtils.validateDockerHostKeyvaultName(dockerHostNewKeyvaultTextField.getText(), dockerManager)) {
+          !AzureDockerValidationUtils.validateDockerHostKeyvaultName(dockerHostNewKeyvaultTextField.getText(), dockerManager, true)) {
         ValidationInfo info = AzureDockerUIResources.validateComponent("Incorrect Azure Key Vault", rootConfigureContainerPanel, dockerHostNewKeyvaultTextField, dockerHostNewKeyvaultLabel);
         setDialogButtonsState(false);
         return info;

@@ -238,8 +238,8 @@ public class AzureDockerValidationUtils {
     return "Port settings should be an number between 1025 and 65535";
   }
 
-  public static boolean validateDockerHostKeyvaultName(String name, AzureDockerHostsManager dockerManager) {
-    return (name != null && name.length() >= 3 && name.length() <= 24 && name.matches("^[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]$") && AzureDockerUtils.checkKeyvaultNameAvailability(name));
+  public static boolean validateDockerHostKeyvaultName(String name, AzureDockerHostsManager dockerManager, boolean checkUrl) {
+    return (name != null && name.length() >= 3 && name.length() <= 24 && name.matches("^[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]$") && (!checkUrl || AzureDockerUtils.checkKeyvaultNameAvailability(name)));
   }
 
   public static String getDockerHostKeyvaultNameTip() {

@@ -442,62 +442,6 @@ public class AzureDockerUtils {
               });
       if (DEBUG) System.out.format("\tDone getting AzureDockerHostsManage Docker key vault details: %s\n", new Date().toString());
 
-//
-//
-//
-//
-//      for (AzureDockerSubscription dockerSubscription : azureDockerSubscriptions) {
-//        Observable.from(dockerSubscription.azureClient.vaults().list()).flatMap(vault -> {
-//            return Observable.create(
-//                new Observable.OnSubscribe<AzureDockerCertVault>() {
-//                  @Override
-//                  public void call(Subscriber<? super AzureDockerCertVault> vaultSubscriber) {
-//                    if (DEBUG) System.out.format("\tGet AzureDockerHostsManage Docker vault details for: %s at %s\n", vault.name(), new Date().toString());
-//
-//                    try {
-//                      // TODO: clean the work around for bug with getting vault props for a listed vault
-//                      Vault vaultWithInner = dockerSubscription.azureClient.vaults().getById(vault.id());
-//
-//                      AzureDockerCertVault certVault = new AzureDockerCertVault();
-//                      certVault.name = vaultWithInner.name();
-//                      certVault.resourceGroupName = vaultWithInner.resourceGroupName();
-//                      certVault.userId = dockerSubscription.userId;
-//                      certVault.servicePrincipalId = dockerSubscription.servicePrincipalId;
-//                      certVault.region = vaultWithInner.regionName();
-//                      certVault.uri = vaultWithInner.vaultUri();
-//                      AzureDockerCertVault certVaultTemp = AzureDockerCertVaultOps.getVault(certVault, dockerSubscription.keyVaultClient);
-//                      if (certVaultTemp == null) {
-//                        try {
-//                          // try to assign read permissions to the key vault in case it was created with a different service principal
-//                          AzureDockerCertVaultOps.setVaultPermissionsRead(dockerSubscription.azureClient, certVault);
-//                          certVault = AzureDockerCertVaultOps.getVault(certVault, dockerSubscription.keyVaultClient);
-//                        } catch (Exception ignored) {}
-//                      } else {
-//                        certVault = certVaultTemp;
-//                      }
-//
-//                      if (certVault != null && certVault.hostName != null) {
-//                        vaultSubscriber.onNext(certVault);
-//                      }
-//                    } catch (Exception e) {
-//                      e.printStackTrace();
-//                    }
-//                    vaultSubscriber.onCompleted();
-//                  }
-//                }).subscribeOn(Schedulers.io());
-//        }, 5).subscribeOn(Schedulers.io())
-//          .toBlocking().subscribe(new Action1<AzureDockerCertVault>() {
-//          @Override
-//          public void call(AzureDockerCertVault certVault) {
-//            if (certVault != null && certVault.hostName != null && certVault.name != null) {
-//              if (DEBUG)
-//                System.out.format("\t\t...adding Docker vault details: %s at %s\n", certVault.name, new Date().toString());
-//              dockerVaultDetails.put(certVault.name, certVault);
-//            }
-//          }
-//        });
-//        if (DEBUG) System.out.format("\tDone getting AzureDockerHostsManage Docker key vault details: %s\n", new Date().toString());
-//      }
     } catch (Exception e) {
       e.printStackTrace();
       DefaultLoader.getUIHelper().showError(e.getMessage(), "Error loading key vault details");

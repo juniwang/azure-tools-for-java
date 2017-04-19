@@ -585,7 +585,7 @@ public class AzureNewDockerLoginPage extends WizardPage {
 		dockerHostNewKeyvaultTextField.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent event) {
-				if (AzureDockerValidationUtils.validateDockerHostKeyvaultName(((Text) event.getSource()).getText(), dockerManager)) {
+				if (AzureDockerValidationUtils.validateDockerHostKeyvaultName(((Text) event.getSource()).getText(), dockerManager, false)) {
 					errDispatcher.removeMessage("dockerHostNewKeyvaultTextField", dockerHostNewKeyvaultTextField);
 					setErrorMessage(null);
 					setPageComplete(doValidate());
@@ -629,6 +629,11 @@ public class AzureNewDockerLoginPage extends WizardPage {
 				newHost.hasKeyVault = true;
 			}
 		} else {
+			// reset key vault info
+			newHost.hasKeyVault = false;
+			newHost.certVault.name = null;
+			newHost.certVault.uri = null;
+
 			// User name
 			String vmUsername = dockerHostUsernameTextField.getText();
 			if (vmUsername == null || vmUsername.isEmpty() || !AzureDockerValidationUtils.validateDockerHostUserName(vmUsername)) {
@@ -743,7 +748,7 @@ public class AzureNewDockerLoginPage extends WizardPage {
 		// create new key vault for storing the credentials
 		if (dockerHostSaveCredsCheckBox.getSelection()) {
 			String newKeyvault = dockerHostNewKeyvaultTextField.getText();
-			if (newKeyvault == null || newKeyvault.isEmpty() || !AzureDockerValidationUtils.validateDockerHostKeyvaultName(newKeyvault, dockerManager)) {
+			if (newKeyvault == null || newKeyvault.isEmpty() || !AzureDockerValidationUtils.validateDockerHostKeyvaultName(newKeyvault, dockerManager, true)) {
 				errDispatcher.addMessage("dockerHostNewKeyvaultTextField", AzureDockerValidationUtils.getDockerHostPortTip(), null, IMessageProvider.ERROR, dockerHostNewKeyvaultTextField);
 				setErrorMessage("Invalid Key Vault name");
 				return false;

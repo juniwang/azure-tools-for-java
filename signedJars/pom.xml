@@ -1,0 +1,61 @@
+<!--
+  ~ /**
+  ~  * Copyright (c) Microsoft Corporation
+  ~  * <p/>
+  ~  * All rights reserved.
+  ~  * <p/>
+  ~  * MIT License
+  ~  * <p/>
+  ~  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+  ~  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+  ~  * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+  ~  * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~  * <p/>
+  ~  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+  ~  * the Software.
+  ~  * <p/>
+  ~  * THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+  ~  * THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+  ~  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~  * SOFTWARE.
+  ~  */
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.microsoft.azuretools</groupId>
+    <artifactId>azuretools-signed-jars</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
+    <properties>
+        <artifact.name>${artifactId}-${version}.jar</artifact.name>
+        <azuretools-core.name>azuretools-core-3.0.0-SNAPSHOT.jar</azuretools-core.name>
+        <azureexplorer-common.name>azure-explorer-common-3.0.0-SNAPSHOT.jar</azureexplorer-common.name>
+        <hdinsightnode-common.name>hdinsight-node-common-3.0.0-SNAPSHOT.jar</hdinsightnode-common.name>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <!--... phase=package, goal=run-->
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <copy file="${project.basedir}/${azureexplorer-common.name}" tofile="${basedir}/../PluginsAndFeatures/azure-toolkit-for-eclipse/com.microsoft.azuretools.core/resources/${azureexplorer-common.name}" overwrite="true" />
+                                <copy file="${project.basedir}/${azuretools-core.name}" tofile="${basedir}/../PluginsAndFeatures/azure-toolkit-for-eclipse/com.microsoft.azuretools.core/resources/${azuretools-core.name}" overwrite="true" />
+                                <!--<copy file="${project.basedir}/${hdinsightnode-common.name}" tofile="${basedir}/../PluginsAndFeatures/azure-toolkit-for-eclipse/com.microsoft.azuretools.core/resources/${hdinsightnode-common.name}" overwrite="true" />-->
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

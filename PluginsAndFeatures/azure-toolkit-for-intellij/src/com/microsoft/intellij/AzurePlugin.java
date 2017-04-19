@@ -22,8 +22,9 @@
 package com.microsoft.intellij;
 
 import com.intellij.ide.plugins.cl.PluginClassLoader;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.impl.ActionMenuItem;
+import com.intellij.openapi.actionSystem.impl.actionholder.ActionRef;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -39,11 +40,7 @@ import com.microsoft.azuretools.authmanage.CommonSettings;
 import com.microsoft.azuretools.azurecommons.deploy.DeploymentEventArgs;
 import com.microsoft.azuretools.azurecommons.deploy.DeploymentEventListener;
 import com.microsoft.azuretools.azurecommons.helpers.StringHelper;
-import com.microsoft.azuretools.azurecommons.util.FileUtil;
-import com.microsoft.azuretools.azurecommons.util.GetHashMac;
-import com.microsoft.azuretools.azurecommons.util.ParserXMLUtility;
-import com.microsoft.azuretools.azurecommons.util.Utils;
-import com.microsoft.azuretools.azurecommons.util.WAEclipseHelperMethods;
+import com.microsoft.azuretools.azurecommons.util.*;
 import com.microsoft.azuretools.azurecommons.xmlhandling.DataOperations;
 import com.microsoft.intellij.common.CommonConst;
 import com.microsoft.intellij.ui.libraries.AILibraryHandler;
@@ -53,14 +50,20 @@ import com.microsoft.intellij.util.AppInsightsCustomEvent;
 import com.microsoft.intellij.util.PluginHelper;
 import com.microsoft.intellij.util.PluginUtil;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.w3c.dom.Document;
 
+import javax.swing.*;
 import javax.swing.event.EventListenerList;
+import java.awt.*;
+import java.awt.event.AWTEventListener;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -163,6 +166,62 @@ public class AzurePlugin extends AbstractProjectComponent {
             copyResourceFile(message("dataFileName"), dataFile);
             setValues(dataFile);
         }
+
+        registerTelemetryEventListener();
+    }
+
+    private void registerTelemetryEventListener() {
+        final long eventMask = AWTEvent.MOUSE_EVENT_MASK;
+        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+            @Override
+            public void eventDispatched(final AWTEvent event) {
+                final MouseEvent mouseEvent = (MouseEvent) event;
+                if (mouseEvent.getID() != MouseEvent.MOUSE_CLICKED && mouseEvent.getID() != MouseEvent.MOUSE_PRESSED)
+                    return;
+
+                final Map<String, String> properties = new HashMap<>();
+
+                if (event.getSource() instanceof ActionMenuItem) {
+                    final ActionMenuItem item = (ActionMenuItem) event.getSource();
+                    ActionRef actionRef;
+                    for (final Field field : FieldUtils.getAllFields(item.getClass())) {
+                        if (field.getType().isAssignableFrom(ActionRef.class)) {
+                            try {
+                                actionRef = (ActionRef) FieldUtils.readField(field, item, true);
+                                AnAction anAction = actionRef.getAction();
+                                if (anAction != null && anAction.getClass().getCanonicalName().contains("microsoft")) {
+                                    properties.put("when", String.valueOf(mouseEvent.getWhen()));
+                                    properties.put("text", item.getText());
+                                    properties.put("actionCommand", item.getActionCommand());
+                                    properties.put("action", anAction.getClass().getCanonicalName());
+                                    properties.put("place", "MainMenu");
+                                }
+                            } catch (IllegalAccessException e) {
+                            }
+                            break;
+                        }
+                    }
+                } else if (event.getSource() instanceof JMenuItem) {
+                    final JMenuItem menuItem = (JMenuItem) event.getSource();
+                    boolean isMicrosoft = false;
+                    for (ActionListener actionListener : menuItem.getActionListeners()) {
+                        if (actionListener.getClass().getName().contains("microsoft")) {
+                            isMicrosoft = true;
+                            break;
+                        }
+                    }
+                    if (isMicrosoft) {
+                        properties.put("text", menuItem.getText());
+                        properties.put("place", "PopupMenu");
+                        properties.put("when", String.valueOf(mouseEvent.getWhen()));
+                    }
+                }
+
+                if (!properties.isEmpty()) {
+                    AppInsightsCustomEvent.create("AzurePlugin.Intellij.Menu", "", properties);
+                }
+            }
+        }, eventMask);
     }
 
     private void initializeAIRegistry() {
@@ -354,6 +413,7 @@ public class AzurePlugin extends AbstractProjectComponent {
     public static void log(String message) {
         LOG.info(message);
     }
+
     private static final String HTML_ZIP_FILE_NAME = "/hdinsight_jobview_html.zip";
 
     private boolean isFirstInstallationByVersion() {

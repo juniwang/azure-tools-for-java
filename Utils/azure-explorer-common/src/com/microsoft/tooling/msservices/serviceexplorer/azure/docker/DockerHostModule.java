@@ -25,6 +25,9 @@ import com.microsoft.azure.docker.AzureDockerHostsManager;
 import com.microsoft.azure.docker.model.DockerHost;
 import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.utils.AzureUIRefreshCore;
+import com.microsoft.azuretools.utils.AzureUIRefreshEvent;
+import com.microsoft.azuretools.utils.AzureUIRefreshListener;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
 import com.microsoft.tooling.msservices.serviceexplorer.AzureRefreshableNode;
@@ -40,6 +43,21 @@ public class DockerHostModule extends AzureRefreshableNode {
   public DockerHostModule(Node parent) {
     super(DOCKER_HOST_MODULE_ID, BASE_MODULE_NAME, parent, DOCKER_HOST_ICON);
     dockerManager = null;
+  }
+
+  private void createListener() {
+    String id = "DockerHostModule";
+    AzureUIRefreshListener listener = new AzureUIRefreshListener() {
+      @Override
+      public void run() {
+        if (event.object == null &&
+            (event.opsType == AzureUIRefreshEvent.EventType.UPDATE || event.opsType == AzureUIRefreshEvent.EventType.REMOVE)) {
+          load(true);
+        }
+      }
+    };
+    AzureUIRefreshCore.addOnNextListener(id, listener);
+
   }
 
 //  @Override

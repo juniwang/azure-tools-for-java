@@ -29,13 +29,13 @@ public enum KnownDockerVirtualMachineImage {
   /** UbuntuServer 16.04LTS. */
   UBUNTU_SERVER_16_04_LTS("Canonical", "UbuntuServer", "16.04.0-LTS", "latest"),
   /** UbuntuServer 14.04LTS. */
-  UBUNTU_SERVER_14_04_LTS("Canonical", "UbuntuServer", "14.04.4-LTS", "latest"),
-  /** CoreOS CoreOS Stable */
-  COREOS_STABLE_LATEST("CoreOS", "CoreOS", "Stable", "latest" /* 899.17.0 */),
-  /** OpenLogic CentOS 7.2 */
-  OPENLOGIC_CENTOS_7_2("OpenLogic", "CentOS", "7.2", "latest" /* 7.2.20160620 */),
-  /** Ubuntu_Snappy_Core 15.04 */
-  UBUNTU_SNAPPY_CORE_15_04("Canonical", "Ubuntu_Snappy_Core", "15.04", "latest");
+  UBUNTU_SERVER_14_04_LTS("Canonical", "UbuntuServer", "14.04.4-LTS", "latest");
+//  /** CoreOS CoreOS Stable */
+//  COREOS_STABLE_LATEST("CoreOS", "CoreOS", "Stable", "latest" /* 899.17.0 */),
+//  /** OpenLogic CentOS 7.2 */
+//  OPENLOGIC_CENTOS_7_2("OpenLogic", "CentOS", "7.2", "latest" /* 7.2.20160620 */),
+//  /** Ubuntu_Snappy_Core 15.04 */
+//  UBUNTU_SNAPPY_CORE_15_04("Canonical", "Ubuntu_Snappy_Core", "15.04", "latest");
 
   private final String publisher;
   private final String offer;

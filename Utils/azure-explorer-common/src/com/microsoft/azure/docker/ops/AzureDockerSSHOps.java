@@ -60,11 +60,17 @@ public class AzureDockerSSHOps {
   }
 
   public static String executeCommand(String command, Session session, Boolean getExitStatus) {
+    return executeCommand(command, session, getExitStatus, false);
+  }
+
+  public static String executeCommand(String command, Session session, Boolean getExitStatus, Boolean withErr) {
     String result = "";
+    String resultErr = "";
     try {
       Channel channel = session.openChannel("exec");
       ((ChannelExec)channel).setCommand(command);
       InputStream commandOutput = channel.getInputStream();
+      InputStream commandErr = ((ChannelExec) channel).getErrStream();
       channel.connect();
       byte[] tmp  = new byte[4096];
       while(true){
@@ -73,10 +79,19 @@ public class AzureDockerSSHOps {
           if(i<0)break;
           result += new String(tmp, 0, i);
         }
+        while(commandErr.available()>0){
+          int i=commandErr.read(tmp, 0, 4096);
+          if(i<0)break;
+          resultErr += new String(tmp, 0, i);
+        }
         if(channel.isClosed()){
           if(commandOutput.available()>0) continue;
-          if (getExitStatus)
-            result += "exit-status: "+channel.getExitStatus();
+          if (getExitStatus) {
+            result += "exit-status: " + channel.getExitStatus();
+            if (withErr) {
+              result += "\n With error:\n" + resultErr;
+            }
+          }
           break;
         }
         try{Thread.sleep(100);}catch(Exception ee){}

@@ -345,7 +345,7 @@ public class AzureConfigureDockerContainerStep extends AzureSelectDockerWizardSt
   @Override
   public boolean onFinish() {
     setFinishButtonState(false);
-    return doValidate(false) == null  && super.onFinish();
+    return model.doValidate() == null  && super.onFinish();
   }
 
   @Override

@@ -68,12 +68,12 @@ public class AzureDockerUtils {
         return KnownDockerVirtualMachineImage.UBUNTU_SERVER_14_04_LTS;
       case UBUNTU_SERVER_16_04_LTS:
         return KnownDockerVirtualMachineImage.UBUNTU_SERVER_16_04_LTS;
-      case UBUNTU_SNAPPY_CORE_15_04:
-        return KnownDockerVirtualMachineImage.UBUNTU_SNAPPY_CORE_15_04;
-      case COREOS_STABLE_LATEST:
-        return KnownDockerVirtualMachineImage.COREOS_STABLE_LATEST;
-      case OPENLOGIC_CENTOS_7_2:
-        return KnownDockerVirtualMachineImage.OPENLOGIC_CENTOS_7_2;
+//      case UBUNTU_SNAPPY_CORE_15_04:
+//        return KnownDockerVirtualMachineImage.UBUNTU_SNAPPY_CORE_15_04;
+//      case COREOS_STABLE_LATEST:
+//        return KnownDockerVirtualMachineImage.COREOS_STABLE_LATEST;
+//      case OPENLOGIC_CENTOS_7_2:
+//        return KnownDockerVirtualMachineImage.OPENLOGIC_CENTOS_7_2;
       default:
         return KnownDockerVirtualMachineImage.UBUNTU_SERVER_16_04_LTS;
     }
@@ -215,7 +215,7 @@ public class AzureDockerUtils {
     if (storageAccounts != null) {
       for (AzureDockerStorageAccount storageAccount : storageAccounts) {
         if (vmImageSizeType != null) {
-          if (storageAccount.skuType.toLowerCase().equals(vmImageSizeType.toLowerCase())) {
+          if (storageAccount.skuType.toLowerCase().startsWith(vmImageSizeType.toLowerCase())) {
             result.add(storageAccount.name);
           }
         } else {

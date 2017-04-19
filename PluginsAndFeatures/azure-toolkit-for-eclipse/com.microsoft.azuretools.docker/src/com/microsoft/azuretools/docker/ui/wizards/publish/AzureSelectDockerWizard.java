@@ -100,7 +100,12 @@ public class AzureSelectDockerWizard extends Wizard {
 	}
 	
 	public boolean doValidate() {
-		return azureSelectDockerHostPage.doValidate() && azureConfigureDockerContainerStep.doValidate();
+		return azureSelectDockerHostPage.doValidate() && 
+				azureConfigureDockerContainerStep.doValidate() &&
+				(dockerImageDescription.hasNewDockerHost || 
+	            dockerImageDescription.host.state == DockerHost.DockerHostVMState.RUNNING ||
+	            DefaultLoader.getUIHelper().showConfirmation(String.format("The selected Docker host %s state is %s and publishing could fail.\n\n Do you want to continue?", dockerImageDescription.host.name, dockerImageDescription.host.state),
+	                "Docker Host Not in Running State", new String[]{"Yes", "No"}, null));
 	}
 
 	public AzureDockerImageInstance getDockerImageInstance() {
@@ -231,7 +236,6 @@ public class AzureSelectDockerWizard extends Wizard {
 
 					msg = "Connecting to Azure...";
 					AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 5, msg);
-					Thread.sleep(15000);
 
 					AzureManager azureAuthManager = AuthMethodManager.getInstance().getAzureManager();
 		            // not signed in

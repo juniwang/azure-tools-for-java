@@ -26,7 +26,12 @@ import com.microsoft.azure.docker.ops.AzureDockerCertVaultOps;
 import com.microsoft.azure.docker.ops.utils.AzureDockerUtils;
 import com.microsoft.azure.keyvault.KeyVaultClient;
 import com.microsoft.azure.management.keyvault.Vault;
+import com.microsoft.azuretools.authmanage.SubscriptionManager;
+import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.utils.AzureUIRefreshCore;
+import com.microsoft.azuretools.utils.AzureUIRefreshEvent;
+import com.microsoft.azuretools.utils.AzureUIRefreshListener;
 import com.microsoft.azuretools.utils.Pair;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 
@@ -64,6 +69,35 @@ public class AzureDockerHostsManager {
     return instance;
   }
 
+  public static void resetAzureDockerHostsManager() {
+    if (instance != null) {
+      instance.subscriptionsList = null;
+      instance.subscriptionsMap = null;
+      instance.vaultsMap = null;
+      instance.dockerVaultsMap = null;
+      instance.dockerHostsMap = null;
+      instance.dockerHostsList = null;
+      instance.dockerNetworkMap = null;
+      instance.dockerStorageAccountMap = null;
+      instance = null;
+    }
+  }
+
+  private void createAzureDockerHostsManagerListener() {
+    String id = "AzureDockerHostsManager";
+
+    AzureUIRefreshListener listener = new AzureUIRefreshListener() {
+      @Override
+      public void run() {
+        if (event.object == null &&
+            (event.opsType == AzureUIRefreshEvent.EventType.UPDATE || event.opsType == AzureUIRefreshEvent.EventType.REMOVE)) {
+          resetAzureDockerHostsManager();
+        }
+      }
+    };
+    AzureUIRefreshCore.addOnNextListener(id, listener);
+  }
+
   public static AzureDockerHostsManager getAzureDockerHostsManager() {
     return instance;
   }
@@ -72,7 +106,7 @@ public class AzureDockerHostsManager {
     if (instance == null) {
       instance = new AzureDockerHostsManager(azureAuthManager);
     } else {
-      if (azureAuthManager != null && instance.azureAuthManager != azureAuthManager) {
+      if (azureAuthManager != null && (instance.azureAuthManager != azureAuthManager || subscriptionsChanged(azureAuthManager))) {
         instance.azureAuthManager = azureAuthManager;
         instance.userId = azureAuthManager.getCurrentUserId();
         instance.forceRefreshSubscriptions();
@@ -82,9 +116,25 @@ public class AzureDockerHostsManager {
     return instance;
   }
 
+  private static boolean subscriptionsChanged(AzureManager azureAuthManager) {
+    try {
+      SubscriptionManager subscriptionManager = azureAuthManager.getSubscriptionManager();
+      List<SubscriptionDetail> subscriptions = subscriptionManager.getSubscriptionDetails();
+      if (instance.subscriptionsMap == null || instance.subscriptionsMap.isEmpty()) {
+        return true;
+      }
+      for (SubscriptionDetail subscriptionDetail : subscriptions) {
+        if (subscriptionDetail.isSelected() != instance.subscriptionsMap.get(subscriptionDetail.getSubscriptionId()).isSelected)
+          return true;
+      }
+      return false;
+    } catch (Exception ignored) {return true;}
+  }
+
   private AzureDockerHostsManager(AzureManager azureAuthManager) throws Exception {
     this.azureAuthManager = azureAuthManager;
     this.userId = azureAuthManager.getCurrentUserId();
+    createAzureDockerHostsManagerListener();
   }
 
   public AzureDockerHostsManager forceRefresh(AzureManager azureAuthManager) {
@@ -376,6 +426,13 @@ public class AzureDockerHostsManager {
    */
   public DockerHost getDockerHostForURL(String apiURL) {
     return dockerHostsMap.get(apiURL);
+  }
+
+  public void updateDockerHost(DockerHost host) {
+    if (host != null) {
+      dockerHostsMap.put(host.apiUrl, host);
+      dockerHostsList = new ArrayList<>(dockerHostsMap.values());
+    }
   }
 
   public List<String> getDockerVMStates() {

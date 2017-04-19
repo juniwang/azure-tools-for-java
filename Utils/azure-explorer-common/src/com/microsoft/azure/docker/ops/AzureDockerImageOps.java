@@ -52,7 +52,7 @@ public class AzureDockerImageOps {
       }
 
       if (DEBUG) System.out.format("Start executing docker rmi %s\n", dockerImage.name);
-      String cmdOut1 = AzureDockerSSHOps.executeCommand("docker rmi " + dockerImage.name, session, true);
+      String cmdOut1 = AzureDockerSSHOps.executeCommand("docker rmi " + dockerImage.name, session, true, true);
       if (DEBUG) System.out.println(cmdOut1);
       if (!cmdOut1.contains(CMD_SUCCESS)) {
         String title = "Docker Image Error";
@@ -83,7 +83,7 @@ public class AzureDockerImageOps {
       String dockerImageDir = DEFAULT_DOCKER_IMAGES_DIRECTORY + "/" + dockerImage.name;
       String cmd1 = String.format("docker build -t %s -f %s/Dockerfile %s/ \n", dockerImage.name, dockerImageDir, dockerImageDir);
       if (DEBUG) System.out.format("Start executing: %s\n", cmd1);
-      String cmdOut1 = AzureDockerSSHOps.executeCommand(cmd1, session, true);
+      String cmdOut1 = AzureDockerSSHOps.executeCommand(cmd1, session, true, true);
       if (!cmdOut1.contains(CMD_SUCCESS)) {
         String title = "Docker Image Error";
         String msg = String.format("Docker image %s failed to create: %s", dockerImage.name, cmdOut1);

@@ -89,37 +89,46 @@ public class DockerHostNode extends AzureRefreshableNode {
       Azure azureClient = dockerManager.getSubscriptionsMap().get(dockerHost.sid).azureClient;
       VirtualMachine vm = azureClient.virtualMachines().getByResourceGroup(dockerHost.hostVM.resourceGroupName, dockerHost.hostVM.name);
       if (vm != null) {
-        DockerHost updatedDockerHost = AzureDockerVMOps.getDockerHost(vm, dockerManager.getDockerVaultsMap());
-        if (updatedDockerHost != null) {
-          updatedDockerHost.sid = dockerHost.sid;
-          updatedDockerHost.hostVM.sid = dockerHost.hostVM.sid;
-          if (updatedDockerHost.certVault == null) {
-            updatedDockerHost.certVault = dockerHost.certVault;
-            updatedDockerHost.hasPwdLogIn = dockerHost.hasPwdLogIn;
-            updatedDockerHost.hasSSHLogIn = dockerHost.hasSSHLogIn;
-            updatedDockerHost.isTLSSecured = dockerHost.isTLSSecured;
-          }
-          dockerHost = updatedDockerHost;
-
-          if (dockerHost.certVault != null) {
-            try { // it might throw here if the credentials are invalid
-              Map<String, DockerImage> dockerImages = AzureDockerImageOps.getImages(dockerHost);
-              Map<String, DockerContainer> dockerContainers = AzureDockerContainerOps.getContainers(dockerHost);
-              AzureDockerContainerOps.setContainersAndImages(dockerContainers, dockerImages);
-              dockerHost.dockerImages = dockerImages;
-            } catch (Exception e) {
-              DefaultLoader.getUIHelper().logError(e.getMessage(), e);
-            }
-          }
-          setIconPath(getDockerHostIcon());
-
-          for (DockerImage dockerImage : updatedDockerHost.dockerImages.values()) {
-            addChildNode(new DockerImageNode(this, dockerManager, updatedDockerHost, dockerImage));
-          }
-        }
+        refreshDockerHostInstance(vm);
       }
     } catch (Exception e) {
       DefaultLoader.getUIHelper().logError(e.getMessage(), e);
+    }
+  }
+
+  private void refreshDockerHostInstance(VirtualMachine vm) {
+    if (vm != null) {
+      DockerHost updatedDockerHost = AzureDockerVMOps.getDockerHost(vm, dockerManager.getDockerVaultsMap());
+      if (updatedDockerHost != null) {
+        updatedDockerHost.sid = dockerHost.sid;
+        updatedDockerHost.hostVM.sid = dockerHost.hostVM.sid;
+        if (updatedDockerHost.certVault == null) {
+          updatedDockerHost.certVault = dockerHost.certVault;
+          updatedDockerHost.hasPwdLogIn = dockerHost.hasPwdLogIn;
+          updatedDockerHost.hasSSHLogIn = dockerHost.hasSSHLogIn;
+          updatedDockerHost.isTLSSecured = dockerHost.isTLSSecured;
+        }
+        dockerManager.updateDockerHost(updatedDockerHost);
+        dockerHost = updatedDockerHost;
+
+        if (dockerHost.certVault != null) {
+          try { // it might throw here if the credentials are invalid
+            Map<String, DockerImage> dockerImages = AzureDockerImageOps.getImages(dockerHost);
+            Map<String, DockerContainer> dockerContainers = AzureDockerContainerOps.getContainers(dockerHost);
+            AzureDockerContainerOps.setContainersAndImages(dockerContainers, dockerImages);
+            dockerHost.dockerImages = dockerImages;
+          } catch (Exception e) {
+            DefaultLoader.getUIHelper().logError(e.getMessage(), e);
+          }
+        }
+        setIconPath(getDockerHostIcon());
+
+        for (DockerImage dockerImage : updatedDockerHost.dockerImages.values()) {
+          try {
+            addChildNode(new DockerImageNode(this, dockerManager, updatedDockerHost, dockerImage));
+          } catch (Exception ignored) {}
+        }
+      }
     }
   }
 
@@ -167,7 +176,7 @@ public class DockerHostNode extends AzureRefreshableNode {
               if (vm != null) {
                 vm.start();
                 setIconPath(DOCKERHOST_RUN_ICON_PATH);
-                refreshItems();
+                refreshDockerHostInstance(vm);
               }
             } catch (Exception e) {
               DefaultLoader.getUIHelper().logError(e.getMessage(), e);
@@ -176,7 +185,7 @@ public class DockerHostNode extends AzureRefreshableNode {
         });
       }
     });
-    addAction(ACTION_RESTART,new RestartDockerHostAction());
+    addAction(ACTION_RESTART, ACTION_START_ICON, new RestartDockerHostAction());
     addAction(ACTION_SHUTDOWN, ACTION_SHUTDOWN_ICON, new ShutdownDockerHostAction());
     super.loadActions();
   }
@@ -210,6 +219,7 @@ public class DockerHostNode extends AzureRefreshableNode {
         if (vm != null) {
           vm.restart();
           setIconPath(DOCKERHOST_RUN_ICON_PATH);
+          refreshDockerHostInstance(vm);
         }
       } catch (Exception ee) {
         DefaultLoader.getUIHelper().logError(ee.getMessage(), ee);
@@ -238,15 +248,18 @@ public class DockerHostNode extends AzureRefreshableNode {
         for (NodeAction nodeAction : getNodeActions()) {
           nodeAction.setEnabled(false);
         }
+        getNodeActionByName(ACTION_START).setEnabled(true);
         getNodeActionByName(ACTION_RESTART).setEnabled(true);
 
         Azure azureClient = dockerManager.getSubscriptionsMap().get(dockerHost.sid).azureClient;
         VirtualMachine vm = azureClient.virtualMachines().getByResourceGroup(dockerHost.hostVM.resourceGroupName, dockerHost.hostVM.name);
         if (vm != null) {
           vm.powerOff();
+          refreshDockerHostInstance(vm);
         }
-        getNodeActionByName(ACTION_START).setEnabled(true);
-        getNodeActionByName(ACTION_RESTART).setEnabled(false);
+        for (NodeAction nodeAction : getNodeActions()) {
+          nodeAction.setEnabled(true);
+        }
       } catch (Exception ee) {
         DefaultLoader.getUIHelper().logError(ee.getMessage(), ee);
       }

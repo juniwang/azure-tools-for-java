@@ -44,6 +44,10 @@ public class DockerContainerNode extends AzureRefreshableNode {
   private static final String DOCKER_CONTAINER_WEB_RUN_ICON = "DockerInstanceRunning2_16.png";
   private static final String DOCKER_CONTAINER_WEB_STOP_ICON = "DockerInstanceStopped2_16.png";
 
+  private static final String ACTION_STOP_ICON = "Stop.png";
+  private static final String ACTION_START_ICON = "Start.png";
+  private static final String ACTION_DELETE_ICON = "Delete.png";
+
   public static final String ACTION_START = "Start";
   public static final String ACTION_DELETE = "Delete";
   public static final String ACTION_DOCKER_CONNECT = "Connect";
@@ -142,7 +146,7 @@ public class DockerContainerNode extends AzureRefreshableNode {
         });
       }
     });
-    addAction(ACTION_STOP, DOCKER_CONTAINER_WEB_STOP_ICON, new NodeActionListener() {
+    addAction(ACTION_STOP, ACTION_STOP_ICON, new NodeActionListener() {
       @Override
       public void actionPerformed(NodeActionEvent e) {
         DefaultLoader.getIdeHelper().runInBackground(null, "Stopping Docker Container", false, true, "Stopping Docker Container...", new Runnable() {
@@ -155,7 +159,7 @@ public class DockerContainerNode extends AzureRefreshableNode {
         });
       }
     });
-    addAction(ACTION_START, DOCKER_CONTAINER_WEB_RUN_ICON, new NodeActionListener() {
+    addAction(ACTION_START, ACTION_START_ICON, new NodeActionListener() {
       @Override
       public void actionPerformed(NodeActionEvent e) {
         DefaultLoader.getIdeHelper().runInBackground(null, "Starting Docker Container", false, true, "Starting Docker Container...", new Runnable() {
@@ -184,7 +188,7 @@ public class DockerContainerNode extends AzureRefreshableNode {
         });
       }
     });
-    addAction(ACTION_RESTART, DOCKER_CONTAINER_WEB_RUN_ICON, new NodeActionListener() {
+    addAction(ACTION_RESTART, ACTION_START_ICON, new NodeActionListener() {
       @Override
       public void actionPerformed(NodeActionEvent e) {
         DefaultLoader.getIdeHelper().runInBackground(null, "Restarting Docker Container", false, true, "Restarting Docker Container...", new Runnable() {
@@ -198,7 +202,7 @@ public class DockerContainerNode extends AzureRefreshableNode {
         });
       }
     });
-    addAction(ACTION_DELETE,new DeleteDockerContainerAction());
+    addAction(ACTION_DELETE, ACTION_DELETE_ICON, new DeleteDockerContainerAction());
     super.loadActions();
   }
 

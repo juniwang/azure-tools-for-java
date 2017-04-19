@@ -141,9 +141,14 @@ public class AzureDockerCertVaultOps {
         Vault.DefinitionStages.WithGroup withGroup = azureClient.vaults()
             .define(certVault.name)
             .withRegion(certVault.region);
-        Vault.DefinitionStages.WithAccessPolicy withAccessPolicy = certVault.resourceGroupName.contains("@") ?
-            withGroup.withExistingResourceGroup(certVault.resourceGroupName.split("@")[0]) :
-            withGroup.withNewResourceGroup(certVault.resourceGroupName);
+        Vault.DefinitionStages.WithAccessPolicy withAccessPolicy;
+        if (certVault.resourceGroupName.contains("@")) {
+          // use existing resource group as selected by the user
+          withAccessPolicy = withGroup.withExistingResourceGroup(certVault.resourceGroupName.split("@")[0]);
+          certVault.resourceGroupName = certVault.resourceGroupName.split("@")[0];
+        } else {
+          withAccessPolicy = withGroup.withNewResourceGroup(certVault.resourceGroupName);
+        }
 
         Vault.DefinitionStages.WithCreate withCreate = certVault.servicePrincipalId != null ?
             withAccessPolicy.defineAccessPolicy()

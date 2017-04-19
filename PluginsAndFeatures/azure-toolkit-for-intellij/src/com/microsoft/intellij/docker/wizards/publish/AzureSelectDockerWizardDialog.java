@@ -27,6 +27,7 @@ import com.intellij.ui.wizard.WizardDialog;
 import com.jcraft.jsch.Session;
 import com.microsoft.azure.docker.model.AzureDockerImageInstance;
 import com.microsoft.azure.docker.model.AzureDockerPreferredSettings;
+import com.microsoft.azure.docker.model.DockerHost;
 import com.microsoft.azure.docker.model.EditableDockerHost;
 import com.microsoft.azure.docker.ops.AzureDockerSSHOps;
 import com.microsoft.azure.docker.ops.utils.AzureDockerUtils;
@@ -132,9 +133,11 @@ public class AzureSelectDockerWizardDialog extends WizardDialog<AzureSelectDocke
 
                     if (loginCredsDialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
                       // Update Docker host log in credentials
-                      dockerImageInstance.host.certVault = editableDockerHost.updatedDockerHost.certVault;
-                      dockerImageInstance.host.hasPwdLogIn = editableDockerHost.updatedDockerHost.hasPwdLogIn;
-                      dockerImageInstance.host.hasSSHLogIn = editableDockerHost.updatedDockerHost.hasSSHLogIn;
+                      DockerHost dockerHost = model.getDockerHostsManager().getDockerHostForURL(dockerImageInstance.host.apiUrl);
+                      dockerHost.certVault = editableDockerHost.updatedDockerHost.certVault;
+                      dockerHost.hasPwdLogIn = editableDockerHost.updatedDockerHost.hasPwdLogIn;
+                      dockerHost.hasSSHLogIn = editableDockerHost.updatedDockerHost.hasSSHLogIn;
+                      dockerImageInstance.host = dockerHost;
 //                    AzureDockerVMOps.updateDockerHostVM(model.getDockerHostsManager().getSubscriptionsMap().get(model.getDockerImageDescription().sid).azureClient, editableDockerHost.updatedDockerHost);
                     } else {
                       return;

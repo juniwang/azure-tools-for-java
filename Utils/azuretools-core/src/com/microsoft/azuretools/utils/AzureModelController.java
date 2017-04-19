@@ -85,7 +85,10 @@ public class AzureModelController {
         azureModel.setSubscriptionToResourceGroupMap(null);
         azureModel.setResourceGroupToWebAppMap(null);
         azureModel.setResourceGroupToAppServicePlanMap(null);
+
         // TODO: notify subscribers
+
+        AzureUIRefreshCore.removeAll();
     }
 
     private static synchronized void subscriptionSelectionChanged(IProgressIndicator progressIndicator) throws IOException, AuthException {

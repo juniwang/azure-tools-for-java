@@ -53,28 +53,33 @@ public class DeleteDockerHostAction extends NodeActionListener {
 
   @Override
   public void actionPerformed(NodeActionEvent e) {
-    Azure azureClient = dockerManager.getSubscriptionsMap().get(dockerHost.sid).azureClient;
-    int option = AzureDockerUIResources.deleteAzureDockerHostConfirmationDialog(azureClient, dockerHost);
+    try {
+      dockerHost = dockerManager.getDockerHostForURL(dockerHost.apiUrl);
+      Azure azureClient = dockerManager.getSubscriptionsMap().get(dockerHost.sid).azureClient;
+      int option = AzureDockerUIResources.deleteAzureDockerHostConfirmationDialog(azureClient, dockerHost);
 
-    if (option !=1 && option != 2) {
-      if (AzureDockerUtils.DEBUG) System.out.format("User canceled delete Docker host op: %d\n", option);
-      return;
+      if (option != 1 && option != 2) {
+        if (AzureDockerUtils.DEBUG) System.out.format("User canceled delete Docker host op: %d\n", option);
+        return;
+      }
+
+      DefaultLoader.getIdeHelper().invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          // instruct parent node to remove this node
+          dockerHostNode.getParent().removeDirectChildNode(dockerHostNode);
+        }
+      });
+
+      AzureDockerUIResources.deleteDockerHost(project, azureClient, dockerHost, option, new Runnable() {
+        @Override
+        public void run() {
+          dockerManager.getDockerHostsList().remove(dockerHost);
+        }
+      });
+    } catch (Exception ex) {
+      DefaultLoader.getUIHelper().logError("DeleteDockerHostAction", ex);
     }
-
-    DefaultLoader.getIdeHelper().invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // instruct parent node to remove this node
-        dockerHostNode.getParent().removeDirectChildNode(dockerHostNode);
-      }
-    });
-
-    AzureDockerUIResources.deleteDockerHost(project, azureClient, dockerHost, option, new Runnable() {
-      @Override
-      public void run() {
-        dockerManager.getDockerHostsList().remove(dockerHost);
-      }
-    });
   }
 }
 

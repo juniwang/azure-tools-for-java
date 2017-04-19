@@ -257,15 +257,6 @@ public class AzureDockerUIResources {
     try {
       AzureDockerUIResources.CANCELED = false;
 
-      Module module = PluginUtil.getSelectedModule();
-      List<Module> modules = Arrays.asList(ModuleManager.getInstance(project).getModules());
-
-      if (module == null && modules.isEmpty()) {
-        Messages.showErrorDialog(message("noModule"), message("error"));
-      } else if (module == null) {
-        module = modules.iterator().next();
-      }
-
       AzureManager azureAuthManager = AuthMethodManager.getInstance().getAzureManager();
       // not signed in
       if (azureAuthManager == null) {

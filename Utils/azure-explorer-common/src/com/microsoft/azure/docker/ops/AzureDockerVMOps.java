@@ -135,16 +135,20 @@ public class AzureDockerVMOps {
             defStage1.withRootPassword(newHost.certVault.vmPwd);
       }
       // todo - temporary not using managed disks as we do not support them yet for docker hosts
-      VirtualMachine.DefinitionStages.WithCreate defStage3 = defStage2.withUnmanagedDisks().withNewStorageAccount(newHost.hostVM.storageAccountName);
+      VirtualMachine.DefinitionStages.WithCreate defStage3 = null;
       if (newHost.hostVM.storageAccountName.contains("@")) {
         // Existing storage account
         for (StorageAccount item : azureClient.storageAccounts().list()) {
           String storageAccountName = item.name() + "@";
           if (storageAccountName.equals(newHost.hostVM.storageAccountName)) {
-            defStage3 = defStage2.withExistingStorageAccount(item);
+            defStage3 = defStage2.withUnmanagedDisks().withExistingStorageAccount(item);
             break;
           }
         }
+        if (defStage3 == null)
+          throw new AzureDockerException("Can't find storage account " + newHost.hostVM.storageAccountName.split("@")[0]);
+      } else {
+        defStage3 = defStage2.withUnmanagedDisks().withNewStorageAccount(newHost.hostVM.storageAccountName);
       }
       defStage3 = defStage3.withSize(newHost.hostVM.vmSize);
 
@@ -195,8 +199,13 @@ public class AzureDockerVMOps {
       if (vm.storageProfile().imageReference() != null) {
         dockerVM.osHost = new AzureOSHost(vm.storageProfile().imageReference());
       }
-      dockerVM.storageAccountName = vm.storageProfile().osDisk().vhd().uri().split("[.]")[0].split("/")[2];
-      dockerVM.storageAccountType = AzureDockerUtils.getStorageTypeForVMSize(dockerVM.vmSize);
+      if (vm.storageProfile().osDisk().managedDisk() != null) {
+        dockerVM.storageAccountName = vm.storageProfile().osDisk().name();
+        dockerVM.storageAccountType = "Managed disk";
+      } else {
+        dockerVM.storageAccountName = vm.storageProfile().osDisk().vhd().uri().split("[.]")[0].split("/")[2];
+        dockerVM.storageAccountType = AzureDockerUtils.getStorageTypeForVMSize(dockerVM.vmSize);
+      }
       // "PowerState/running" -> "RUNNING"
       String powerState = (vm.powerState() != null) ? vm.powerState().toString() : "UNKNOWN/UNKNOWN";
       dockerVM.state =  powerState.contains("/") ? powerState.split("/")[1].toUpperCase() : "UNKNOWN";

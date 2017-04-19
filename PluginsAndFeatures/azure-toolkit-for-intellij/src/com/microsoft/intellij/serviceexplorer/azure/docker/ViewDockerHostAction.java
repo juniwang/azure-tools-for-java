@@ -59,6 +59,7 @@ public class ViewDockerHostAction extends NodeActionListener {
 
   @Override
   public void actionPerformed(NodeActionEvent e) {
+    dockerHost = dockerManager.getDockerHostForURL(dockerHost.apiUrl);
     AzureViewDockerDialog viewDockerDialog = new AzureViewDockerDialog(project, dockerHost, dockerManager);
     viewDockerDialog.show();
 

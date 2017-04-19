@@ -79,7 +79,7 @@ public class AzureLibrary {
                     "applicationinsights-core-1.0.3.jar",
                     "applicationinsights-management-1.0.3.jar",
                     "applicationinsights-web-1.0.3.jar",
-                    "guava-18.0.jar",
+                    "guava-20.0.jar",
                     "httpcore-4.3.3.jar",
                     "httpclient-4.3.6.jar",
                     "commons-io-2.5.jar",

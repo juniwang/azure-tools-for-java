@@ -27,6 +27,8 @@ import com.microsoft.azuretools.authmanage.ISubscriptionSelectionListener;
 import com.microsoft.azuretools.authmanage.SubscriptionManager;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.utils.AzureUIRefreshCore;
+import com.microsoft.azuretools.utils.AzureUIRefreshEvent;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.azuretools.azurecommons.helpers.NotNull;
 import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
@@ -190,6 +192,12 @@ public class AzureModule extends AzureRefreshableNode {
         setName(composeName());
         for (Node child : getChildNodes()) {
             child.removeAllChildNodes();
+        }
+//        AzureUIRefreshCore.removeAll();
+        if (AzureUIRefreshCore.publisher != null) {
+            // trigger a force update/reload
+            AzureUIRefreshCore.publisher.onNext(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.UPDATE, null));
+            AzureUIRefreshCore.publisher.onCompleted();
         }
     }
 }

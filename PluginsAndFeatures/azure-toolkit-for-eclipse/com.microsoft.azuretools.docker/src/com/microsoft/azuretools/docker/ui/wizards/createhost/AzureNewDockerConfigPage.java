@@ -34,6 +34,7 @@ import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azuretools.core.Activator;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 
+import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -60,9 +61,11 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.HyperlinkSettings;
 import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.ManagedForm;
@@ -204,7 +207,7 @@ public class AzureNewDockerConfigPage extends WizardPage {
 		
 		vmKindComposite = new Composite(hostDetailsTabFolder, SWT.NONE);
 		vmKindTableItem.setControl(vmKindComposite);
-		vmKindComposite.setLayout(new GridLayout(2, false));
+		vmKindComposite.setLayout(new GridLayout(3, false));
 		
 		Label lblNewLabel_1 = new Label(vmKindComposite, SWT.NONE);
 		lblNewLabel_1.setText("Host OS:");
@@ -213,6 +216,7 @@ public class AzureNewDockerConfigPage extends WizardPage {
 		GridData gd_dockerHostOSTypeComboBox = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_dockerHostOSTypeComboBox.widthHint = 200;
 		dockerHostOSTypeComboBox.setLayoutData(gd_dockerHostOSTypeComboBox);
+		new Label(vmKindComposite, SWT.NONE);
 		
 		Label lblSize = new Label(vmKindComposite, SWT.NONE);
 		lblSize.setText("Size:");
@@ -222,10 +226,25 @@ public class AzureNewDockerConfigPage extends WizardPage {
 		gd_dockerHostVMSizeComboBox.widthHint = 200;
 		dockerHostVMSizeComboBox.setLayoutData(gd_dockerHostVMSizeComboBox);
 		
+		Link dockerPricingHyperlink = new Link(vmKindComposite, SWT.NONE);
+		dockerPricingHyperlink.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+		    	try {
+		            PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser().openURL(new URL("https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/"));
+		        } catch (Exception ex) {
+		            DefaultLoader.getUIHelper().logError(ex.getMessage(), ex);
+		        }
+			}
+		});
+		dockerPricingHyperlink.setText("<a>Pricing</a>");
+		GridData gd_dockerPricingHyperlink = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 2);
+		dockerPricingHyperlink.setLayoutData(gd_dockerPricingHyperlink);
+
 		dockerHostVMPreferredSizesCheckBox = new Button(vmKindComposite, SWT.CHECK);
-		dockerHostVMPreferredSizesCheckBox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		dockerHostVMPreferredSizesCheckBox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
 		dockerHostVMPreferredSizesCheckBox.setText("Show preferred sizes only");
-		
+				
 		rgTableItem = new TabItem(hostDetailsTabFolder, SWT.NONE);
 		rgTableItem.setText("Resource Group");
 		
@@ -767,8 +786,10 @@ public class AzureNewDockerConfigPage extends WizardPage {
 		dockerSelectStorageComboBox.removeAll();
 		String vmImageSize = (String) dockerHostVMSizeComboBox.getText();
 		if (vmImageSize != null) {
-			String vmImageType = vmImageSize.contains("_D") ? "Premium_LRS" : "Standard_LRS";
-			for (String storageAccName : dockerManager.getAvailableStorageAccounts(currentSubscription.id, vmImageType)) {
+			List<String> storageAccountsList = dockerManager.getAvailableStorageAccounts(currentSubscription.id, "Standard");
+			if (vmImageSize.contains("_D"))
+				storageAccountsList.addAll(dockerManager.getAvailableStorageAccounts(currentSubscription.id, "Premium"));
+			for (String storageAccName : storageAccountsList) {
 				dockerSelectStorageComboBox.add(storageAccName);
 			}
 		}

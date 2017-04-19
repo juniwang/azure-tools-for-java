@@ -40,11 +40,15 @@ import com.microsoft.intellij.docker.utils.AzureDockerUIResources;
 import com.microsoft.azure.docker.ops.utils.AzureDockerValidationUtils;
 import com.microsoft.intellij.docker.wizards.createhost.AzureNewDockerWizardModel;
 import com.microsoft.intellij.docker.wizards.createhost.AzureNewDockerWizardStep;
+import com.microsoft.tooling.msservices.components.DefaultLoader;
+import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -88,6 +92,7 @@ public class AzureNewDockerHostStep extends AzureNewDockerWizardStep {
   private JPanel storagePanel;
   private JLabel dockerLocationLabel;
   private JCheckBox dockerHostVMPreferredSizesCheckBox;
+  private JXHyperlink dockerPricingHyperlink;
 
   private String preferredLocation;
   private final String SELECT_REGION = "<select region>";
@@ -151,6 +156,16 @@ public class AzureNewDockerHostStep extends AzureNewDockerWizardStep {
     updateDockerHostRGGroup();
     updateDockerHostVnetGroup();
     updateDockerHostStorageGroup();
+    dockerPricingHyperlink.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent event) {
+        try {
+          Desktop.getDesktop().browse(URI.create("https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/"));
+        } catch (Exception e) {
+          DefaultLoader.getUIHelper().logError("Unexpected exception: " + e.getMessage(), e);
+        }
+      }
+    });
   }
 
   private void updateDockerLocationGroup() {
@@ -531,8 +546,10 @@ public class AzureNewDockerHostStep extends AzureNewDockerWizardStep {
     String vmImageSize = (String) dockerHostVMSizeComboBox.getSelectedItem();
     DefaultComboBoxModel<String> dockerHostStorageComboModel;
     if (vmImageSize != null) {
-      String vmImageType = vmImageSize.contains("_D") ? "Premium_LRS" : "Standard_LRS";
-      dockerHostStorageComboModel = new DefaultComboBoxModel<>(new Vector<>(dockerManager.getAvailableStorageAccounts(subscription.id, vmImageType)));
+      List<String> storageAccountsList = dockerManager.getAvailableStorageAccounts(subscription.id, "Standard");
+      if (vmImageSize.contains("_D"))
+        storageAccountsList.addAll(dockerManager.getAvailableStorageAccounts(subscription.id, "Premium"));
+      dockerHostStorageComboModel = new DefaultComboBoxModel<>(new Vector<>(storageAccountsList));
     } else {
       dockerHostStorageComboModel = new DefaultComboBoxModel<>();
     }

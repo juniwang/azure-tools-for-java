@@ -29,6 +29,7 @@ import com.microsoft.azure.docker.model.AzureDockerImageInstance;
 import com.microsoft.azure.docker.model.DockerHost;
 import com.microsoft.intellij.docker.wizards.publish.forms.AzureConfigureDockerContainerStep;
 import com.microsoft.intellij.docker.wizards.publish.forms.AzureSelectDockerHostStep;
+import com.microsoft.tooling.msservices.components.DefaultLoader;
 
 public class AzureSelectDockerWizardModel extends WizardModel {
   private Project project;
@@ -100,6 +101,14 @@ public class AzureSelectDockerWizardModel extends WizardModel {
     if (validationInfo != null) {
       finishedOK = false;
       return validationInfo;
+    }
+    if (!dockerImageDescription.hasNewDockerHost &&
+        dockerImageDescription.host.state != DockerHost.DockerHostVMState.RUNNING &&
+        !DefaultLoader.getUIHelper().showConfirmation(String.format("The selected Docker host %s state is %s and publishing could fail.\n\n Do you want to continue?", dockerImageDescription.host.name, dockerImageDescription.host.state),
+            "Docker Host Not in Running State", new String[]{"Yes", "No"}, null)) {
+      ValidationInfo info = new ValidationInfo("Invalid Docker host selection", selectDockerHostForm.getPreferredFocusedComponent());
+      finishedOK = false;
+      return info;
     }
     finishedOK = true;
 

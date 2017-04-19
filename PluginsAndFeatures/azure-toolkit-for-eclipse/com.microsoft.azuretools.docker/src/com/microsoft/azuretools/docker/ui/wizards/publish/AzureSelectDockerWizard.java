@@ -207,7 +207,6 @@ public class AzureSelectDockerWizard extends Wizard {
 		AzureDeploymentProgressNotification.createAzureDeploymentProgressNotification(deploymentName, jobDescription);
 		
 		Map<String, String> postEventProperties = new HashMap<String, String>();
-		postEventProperties.put("DockerApiName", dockerImageInstance.host.apiUrl);
 		postEventProperties.put("DockerFileOption", dockerImageInstance.predefinedDockerfile);
 		
 		Job createDockerHostJob = new Job(jobDescription) {

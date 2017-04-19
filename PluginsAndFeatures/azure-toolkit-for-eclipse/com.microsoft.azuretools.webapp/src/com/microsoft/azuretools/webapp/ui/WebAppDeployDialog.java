@@ -522,7 +522,6 @@ public class WebAppDeployDialog extends TitleAreaDialog {
                 String errorMessage = "Error";
                 Map<String, String> postEventProperties = new HashMap<String, String>();
                 postEventProperties.put("Java App Name", project.getName());
-                postEventProperties.put("WebApp URI", sitePath);
                 
                 monitor.beginTask(message, IProgressMonitor.UNKNOWN);
                 try {

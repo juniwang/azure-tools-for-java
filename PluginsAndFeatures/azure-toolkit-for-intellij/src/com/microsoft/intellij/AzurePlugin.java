@@ -189,7 +189,7 @@ public class AzurePlugin extends AbstractProjectComponent {
                             try {
                                 actionRef = (ActionRef) FieldUtils.readField(field, item, true);
                                 AnAction anAction = actionRef.getAction();
-                                if (anAction != null && anAction.getClass().getCanonicalName().contains("microsoft")) {
+                                if (anAction != null && anAction.getClass().getName().contains("microsoft")) {
                                     properties.put("when", String.valueOf(mouseEvent.getWhen()));
                                     properties.put("text", item.getText());
                                     properties.put("actionCommand", item.getActionCommand());

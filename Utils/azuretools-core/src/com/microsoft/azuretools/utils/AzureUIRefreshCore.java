@@ -21,22 +21,44 @@
  */
 package com.microsoft.azuretools.utils;
 
+import rx.Observable;
 import rx.Subscriber;
-import rx.Subscription;
-import rx.subjects.PublishSubject;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AzureUIRefreshCore {
-  public static PublishSubject<AzureUIRefreshEvent> publisher;
-  public static Map<String, Subscription> listenersRx;
+  public static final boolean RUN_LISTENER_EVENT_OPS = false;
+  public static Map<String, AzureUIRefreshListener> listeners;
+
+  public static synchronized void addListener(String id, AzureUIRefreshListener listener) {
+    if (listeners == null) {
+      listeners = new HashMap<>();
+    }
+    listeners.put(id, listener);
+    if (RUN_LISTENER_EVENT_OPS) execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, id));
+  }
+
+  public static synchronized void execute(AzureUIRefreshEvent event) {
+    if (listeners != null && !listeners.isEmpty()) {
+      Observable.from(listeners.values()).flatMap((listener) ->
+          Observable.create( subscriber -> {
+              listener.setEvent(event);
+              listener.run();
+              subscriber.onNext(listener);
+              subscriber.onCompleted();
+          })
+      ).subscribeOn(Schedulers.io()).toBlocking().subscribe();
+    }
+  }
 
   public static synchronized void removeListener(String id) {
-    if (listenersRx != null && publisher != null) {
+    if (listeners != null) {
       try {
-        Subscription listener = listenersRx.remove(id);
-        listener.unsubscribe();
+        if (RUN_LISTENER_EVENT_OPS) execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.REMOVE, id));
+        listeners.remove(id);
       } catch (Exception ex) {
         ex.printStackTrace();
       }
@@ -44,54 +66,11 @@ public class AzureUIRefreshCore {
   }
 
   public static synchronized void removeAll() {
-    if (listenersRx != null && publisher != null) {
-      // signal to all the subscribers/listeners that they need to reset
-      publisher.onNext(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.REMOVE, null));
-      publisher.onCompleted();
-      try {
-        for (String id : listenersRx.keySet()) {
-          Subscription listener = listenersRx.remove(id);
-          listener.unsubscribe();
-        }
-      } catch (Exception ex) {
-        ex.printStackTrace();
+    if (listeners != null) {
+      for (String id : listeners.keySet()) {
+        removeListener(id);
       }
-      listenersRx = null;
-      publisher = null;
+      listeners = null;
     }
-  }
-
-  public static synchronized Subscription addOnNextListener(String id, AzureUIRefreshListener onNext) {
-    if (publisher == null) {
-      publisher = PublishSubject.create();
-      listenersRx = new HashMap<>();
-    }
-
-    Subscription currentListener = listenersRx.get(id);
-    if (currentListener != null) {
-      try {
-        currentListener.unsubscribe();
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-    }
-
-    Subscription newSubscriber = publisher.subscribe(new Subscriber<AzureUIRefreshEvent>() {
-      @Override
-      public void onCompleted() {}
-
-      @Override
-      public void onError(Throwable throwable) {}
-
-      @Override
-      public void onNext(AzureUIRefreshEvent event) {
-        onNext.setEvent(event);
-        onNext.run();
-      }
-    });
-
-    listenersRx.put(id, newSubscriber);
-
-    return newSubscriber;
   }
 }

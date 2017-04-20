@@ -42,6 +42,8 @@ import com.microsoft.azuretools.core.utils.PluginUtil;
 import com.microsoft.azuretools.docker.ui.dialogs.AzureInputDockerLoginCredsDialog;
 import com.microsoft.azuretools.docker.utils.AzureDockerUIResources;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.utils.AzureUIRefreshCore;
+import com.microsoft.azuretools.utils.AzureUIRefreshEvent;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 
 import java.io.File;
@@ -144,8 +146,12 @@ public class AzureSelectDockerWizard extends Wizard {
 		if (dockerPreferredSettings == null) {
 			dockerPreferredSettings = new AzureDockerPreferredSettings();
 		}
+
 		dockerPreferredSettings.dockerApiName = dockerImageDescription.host.apiUrl;
 		dockerPreferredSettings.dockerfileOption = dockerImageDescription.predefinedDockerfile;
+		dockerPreferredSettings.region = dockerImageDescription.host.hostVM.region;
+		dockerPreferredSettings.vmSize = dockerImageDescription.host.hostVM.vmSize;
+		dockerPreferredSettings.vmOS = dockerImageDescription.host.hostOSType.name();
 		dockerManager.setDockerPreferredSettings(dockerPreferredSettings);
 
 		DefaultLoader.getIdeHelper().runInBackground(project, "Deploying Docker Container on Azure", false, true, "Deploying Web app to a Docker host on Azure...", new Runnable() {
@@ -278,6 +284,29 @@ public class AzureSelectDockerWizard extends Wizard {
 		                AzureDockerVMOps.installDocker(dockerImageInstance.host);
 		                AzureDockerUIResources.printDebugMessage(this, "Done configuring Docker host: " + new Date().toString());
 
+		                msg = String.format("Updating Docker hosts ...");
+						AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 5, msg);
+			            AzureDockerUIResources.printDebugMessage(this, "Refreshing docker hosts: " + new Date().toString());
+//			            dockerManager.refreshDockerHostDetails();
+			            VirtualMachine vm = azureClient.virtualMachines().getByResourceGroup(dockerImageInstance.host.hostVM.resourceGroupName, dockerImageInstance.host.hostVM.name);
+			            if (vm != null) {
+			                DockerHost updatedHost = AzureDockerVMOps.getDockerHost(vm, dockerManager.getDockerVaultsMap());
+			                if (updatedHost != null) {
+			                    updatedHost.sid = dockerImageInstance.host.sid;
+			                    updatedHost.hostVM.sid = dockerImageInstance.host.hostVM.sid;
+			                    if (updatedHost.certVault == null) {
+			                        updatedHost.certVault = dockerImageInstance.host.certVault;
+			                        updatedHost.hasPwdLogIn = dockerImageInstance.host.hasPwdLogIn;
+			                        updatedHost.hasSSHLogIn = dockerImageInstance.host.hasSSHLogIn;
+			                        updatedHost.isTLSSecured = dockerImageInstance.host.isTLSSecured;
+			                    }
+								dockerManager.addDockerHostDetails(updatedHost);
+								if (AzureUIRefreshCore.listeners != null) {
+									AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, updatedHost));
+								}
+			                }
+			            }
+			            AzureDockerUIResources.printDebugMessage(this, "Done refreshing Docker hosts: " + new Date().toString());
 		                AzureDockerUIResources.printDebugMessage(this, "Finished setting up Docker host");
 		            } else {
 		                msg = String.format("Using virtual machine %s ...", dockerImageInstance.host.name);
@@ -344,28 +373,6 @@ public class AzureSelectDockerWizard extends Wizard {
 						return Status.CANCEL_STATUS;
 					}
 					
-
-		            msg = String.format("Updating Docker hosts ...");
-					AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 5, msg);
-		            AzureDockerUIResources.printDebugMessage(this, "Refreshing docker hosts: " + new Date().toString());
-//		            dockerManager.refreshDockerHostDetails();
-		            VirtualMachine vm = azureClient.virtualMachines().getByResourceGroup(dockerImageInstance.host.hostVM.resourceGroupName, dockerImageInstance.host.hostVM.name);
-		            if (vm != null) {
-		                DockerHost updatedHost = AzureDockerVMOps.getDockerHost(vm, dockerManager.getDockerVaultsMap());
-		                if (updatedHost != null) {
-		                    updatedHost.sid = dockerImageInstance.host.sid;
-		                    updatedHost.hostVM.sid = dockerImageInstance.host.hostVM.sid;
-		                    if (updatedHost.certVault == null) {
-		                        updatedHost.certVault = dockerImageInstance.host.certVault;
-		                        updatedHost.hasPwdLogIn = dockerImageInstance.host.hasPwdLogIn;
-		                        updatedHost.hasSSHLogIn = dockerImageInstance.host.hasSSHLogIn;
-		                        updatedHost.isTLSSecured = dockerImageInstance.host.isTLSSecured;
-		                    }
-		                    dockerManager.addDockerHostDetails(dockerImageInstance.host);
-		                }
-		            }
-		            AzureDockerUIResources.printDebugMessage(this, "Done refreshing Docker hosts: " + new Date().toString());
-
 					AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 100, "");
 					
 					try {

@@ -43,6 +43,8 @@ public class DockerHostModule extends AzureRefreshableNode {
   public DockerHostModule(Node parent) {
     super(DOCKER_HOST_MODULE_ID, BASE_MODULE_NAME, parent, DOCKER_HOST_ICON);
     dockerManager = null;
+
+    createListener();
   }
 
   private void createListener() {
@@ -53,10 +55,33 @@ public class DockerHostModule extends AzureRefreshableNode {
         if (event.object == null &&
             (event.opsType == AzureUIRefreshEvent.EventType.UPDATE || event.opsType == AzureUIRefreshEvent.EventType.REMOVE)) {
           load(true);
+        } else if (event.object != null && event.object.getClass().toString().equals(DockerHost.class.toString())) {
+          DockerHost dockerHost = (DockerHost) event.object;
+          switch (event.opsType) {
+            case ADD:
+              DefaultLoader.getIdeHelper().invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  try {
+                      addChildNode(new DockerHostNode(DockerHostModule.this, dockerManager, dockerHost));
+                  } catch (Exception ex) {
+                    DefaultLoader.getUIHelper().logError("DockerHostModule::createListener ADD", ex);
+                    ex.printStackTrace();
+                  }
+                }
+              });
+              break;
+            case UPDATE:
+              break;
+            case REMOVE:
+              break;
+            default:
+              break;
+          }
         }
       }
     };
-    AzureUIRefreshCore.addOnNextListener(id, listener);
+    AzureUIRefreshCore.addListener(id, listener);
 
   }
 

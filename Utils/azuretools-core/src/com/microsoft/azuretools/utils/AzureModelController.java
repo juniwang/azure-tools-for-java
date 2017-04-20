@@ -46,6 +46,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
+
 /**
  * Created by vlashch on 1/9/17.
  */
@@ -312,13 +314,19 @@ public class AzureModelController {
         // presume addNewResourceGroup goes first
         List<WebApp> l = new LinkedList<>();
         l.add(webApp);
-        AzureModel.getInstance().getResourceGroupToWebAppMap().put(rg, l);
-        // TODO:notify subscribers
+        if (AzureUIRefreshCore.listeners != null) {
+            AzureModel.getInstance().getResourceGroupToWebAppMap().put(rg, l);
+            // TODO:notify subscribers
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, new WebAppDetails(rg, webApp, null, null)));
+        }
     }
 
     public static void addNewWebAppToExistingResourceGroup(ResourceGroup rg, WebApp webApp) {
         AzureModel.getInstance().getResourceGroupToWebAppMap().get(rg).add(webApp);
         // TODO:notify subscribers
+        if (AzureUIRefreshCore.listeners != null) {
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, new WebAppDetails(rg, webApp, null, null)));
+        }
     }
 
     public static void removeWebAppFromResourceGroup(ResourceGroup rg, WebApp webApp) {
@@ -332,6 +340,9 @@ public class AzureModelController {
 //        }
         AzureModel.getInstance().getResourceGroupToWebAppMap().get(rg).remove(webApp);
         // TODO:notify subscribers
+        if (AzureUIRefreshCore.listeners != null) {
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.REMOVE, new WebAppDetails(rg, webApp, null, null)));
+        }
     }
 
     public static void addNewAppServicePlanToJustCreatedResourceGroup(ResourceGroup rg, AppServicePlan appServicePlan) {
@@ -342,12 +353,14 @@ public class AzureModelController {
         }
         AzureModel.getInstance().getResourceGroupToAppServicePlanMap().put(rg, l);
         // TODO:notify subscribers
+        System.out.println("WEBAPP - IN AzureModelController::addNewAppServicePlanToJustCreatedResourceGroup");
     }
 
     public static void addNewAppServicePlanToExistingResourceGroup(ResourceGroup rg, AppServicePlan appServicePlan) {
         // presume addNewResourceGroup call goes first
         AzureModel.getInstance().getResourceGroupToAppServicePlanMap().get(rg).add(appServicePlan);
         // TODO:notify subscribers
+        System.out.println("WEBAPP - IN AzureModelController::addNewAppServicePlanToExistingResourceGroup");
     }
 
 }

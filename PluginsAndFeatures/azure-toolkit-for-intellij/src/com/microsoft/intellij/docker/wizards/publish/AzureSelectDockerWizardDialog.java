@@ -105,6 +105,9 @@ public class AzureSelectDockerWizardDialog extends WizardDialog<AzureSelectDocke
     }
     dockerPreferredSettings.dockerApiName = dockerImageInstance.host.apiUrl;
     dockerPreferredSettings.dockerfileOption = dockerImageInstance.predefinedDockerfile;
+    dockerPreferredSettings.region = dockerImageInstance.host.hostVM.region;
+    dockerPreferredSettings.vmSize = dockerImageInstance.host.hostVM.vmSize;
+    dockerPreferredSettings.vmOS = dockerImageInstance.host.hostOSType.name();
     model.getDockerHostsManager().setDockerPreferredSettings(dockerPreferredSettings);
 
     DefaultLoader.getIdeHelper().runInBackground(model.getProject(), "Deploying Docker Container on Azure", false, true, "Deploying Web app to a Docker host on Azure...", new Runnable() {

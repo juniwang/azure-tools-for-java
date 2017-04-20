@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 import com.microsoft.azure.docker.AzureDockerHostsManager;
+import com.microsoft.azure.docker.model.AzureDockerPreferredSettings;
 import com.microsoft.azure.docker.model.DockerHost;
 import com.microsoft.azure.docker.ops.AzureDockerVMOps;
 import com.microsoft.azure.docker.ops.utils.AzureDockerUtils;
@@ -42,6 +43,8 @@ import com.microsoft.azure.keyvault.KeyVaultClient;
 import com.microsoft.azure.management.Azure;
 import com.microsoft.azure.management.compute.VirtualMachine;
 import com.microsoft.azuretools.docker.utils.AzureDockerUIResources;
+import com.microsoft.azuretools.utils.AzureUIRefreshCore;
+import com.microsoft.azuretools.utils.AzureUIRefreshEvent;
 
 public class AzureNewDockerWizard extends Wizard {
 	private static final Logger log =  Logger.getLogger(AzureNewDockerWizard.class.getName());
@@ -97,6 +100,17 @@ public class AzureNewDockerWizard extends Wizard {
 	}
 
 	public void createHost() {
+		AzureDockerPreferredSettings dockerPreferredSettings = dockerManager.getDockerPreferredSettings();
+
+		if (dockerPreferredSettings == null) {
+			dockerPreferredSettings = new AzureDockerPreferredSettings();
+		}
+		dockerPreferredSettings.dockerApiName = newHost.apiUrl;
+		dockerPreferredSettings.region = newHost.hostVM.region;
+		dockerPreferredSettings.vmSize = newHost.hostVM.vmSize;
+		dockerPreferredSettings.vmOS = newHost.hostOSType.name();
+		dockerManager.setDockerPreferredSettings(dockerPreferredSettings);
+
 		Job createDockerHostJob = new Job("Creating Docker virtual machine " + newHost.name) {
 			@Override
 			protected IStatus run(IProgressMonitor progressMonitor) {
@@ -170,7 +184,10 @@ public class AzureNewDockerWizard extends Wizard {
 								updatedHost.hasSSHLogIn = dockerHost.hasSSHLogIn;
 								updatedHost.isTLSSecured = dockerHost.isTLSSecured;
 							}
-							dockerManager.addDockerHostDetails(dockerHost);
+							dockerManager.addDockerHostDetails(updatedHost);
+							if (AzureUIRefreshCore.listeners != null) {
+								AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, updatedHost));
+							}
 						}
 					}
 					if (AzureDockerUtils.DEBUG) System.out.println("Done refreshing Docker hosts details: " + new Date().toString());

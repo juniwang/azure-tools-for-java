@@ -73,6 +73,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
 
 public class WebAppDeployDialog extends DialogWrapper {
@@ -155,13 +156,6 @@ public class WebAppDeployDialog extends DialogWrapper {
                 .addExtraActions(refreshAction);
 
         panelTable = tableToolbarDecorator.createPanel();
-    }
-
-    static class WebAppDetails {
-        public SubscriptionDetail subscriptionDetail;
-        public ResourceGroup resourceGroup;
-        public AppServicePlan appServicePlan;
-        public WebApp webApp;
     }
 
     private Map<String, WebAppDetails> webAppWebAppDetailsMap = new HashMap<>();

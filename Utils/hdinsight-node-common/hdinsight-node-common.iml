@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -10,7 +10,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="azuretools-core" exported="" />
+    <orderEntry type="module" module-name="azuretools-core" />
+    <orderEntry type="library" name="Maven: com.squareup.retrofit2:retrofit:2.1.0" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.3.0" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.8.0" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure-client-authentication:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:adal4j:1.1.2" level="project" />
@@ -81,7 +84,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="Maven: org.jsoup:jsoup:1.9.1" level="project" />
-    <orderEntry type="module" module-name="azure-explorer-common" exported="" />
+    <orderEntry type="module" module-name="azure-explorer-common" />
     <orderEntry type="library" name="Maven: com.jcraft:jsch:0.1.54" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.5" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.7" level="project" />
@@ -93,9 +96,6 @@
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure-mgmt-storage:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure-client-runtime:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.rest:client-runtime:1.0.1" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.retrofit2:retrofit:2.0.2" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.8.0" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okhttp3:logging-interceptor:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp-urlconnection:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.retrofit2:converter-jackson:2.1.0" level="project" />

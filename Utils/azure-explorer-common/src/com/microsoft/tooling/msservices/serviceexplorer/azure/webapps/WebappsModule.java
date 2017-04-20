@@ -24,8 +24,7 @@ package com.microsoft.tooling.msservices.serviceexplorer.azure.webapps;
 import com.microsoft.azure.management.appservice.WebApp;
 import com.microsoft.azure.management.resources.ResourceGroup;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
-import com.microsoft.azuretools.utils.AzureModel;
-import com.microsoft.azuretools.utils.AzureModelController;
+import com.microsoft.azuretools.utils.*;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
 import com.microsoft.tooling.msservices.serviceexplorer.AzureRefreshableNode;
@@ -33,6 +32,8 @@ import com.microsoft.tooling.msservices.serviceexplorer.Node;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
 
 public class WebappsModule extends AzureRefreshableNode {
 	private static final String WEBAPPS_MODULE_ID = WebappsModule.class.getName();
@@ -43,6 +44,7 @@ public class WebappsModule extends AzureRefreshableNode {
 
 	public WebappsModule(Node parent) {
 		super(WEBAPPS_MODULE_ID, BASE_MODULE_NAME, parent, WEB_RUN_ICON);
+		createListener();
 	}
 
 	@Override
@@ -78,11 +80,50 @@ public class WebappsModule extends AzureRefreshableNode {
 
 				for (ResourceGroup rg : srgMap.get(sd)) {
 					for (WebApp webApp : rgwaMap.get(rg)) {
-						addChildNode(new WebappNode(this, sd.getSubscriptionId(), webApp, rg,
+						addChildNode(new WebappNode(this, webApp, rg,
 								RUN_STATUS.equalsIgnoreCase(webApp.inner().state()) ? WEB_RUN_ICON : WEB_STOP_ICON));
 					}
 				}
 			}
 		}
 	}
+
+	private void createListener() {
+		String id = "WebappsModule";
+		AzureUIRefreshListener listener = new AzureUIRefreshListener() {
+			@Override
+			public void run() {
+				if (event.object == null &&
+						(event.opsType == AzureUIRefreshEvent.EventType.UPDATE || event.opsType == AzureUIRefreshEvent.EventType.REMOVE)) {
+					load(true);
+				} else if (event.object != null && event.object.getClass().toString().equals(WebAppDetails.class.toString())) {
+					WebAppDetails webAppDetails = (WebAppDetails) event.object;
+					switch (event.opsType) {
+						case ADD:
+							DefaultLoader.getIdeHelper().invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									try {
+										addChildNode(new WebappNode(WebappsModule.this, webAppDetails.webApp, webAppDetails.resourceGroup,
+												RUN_STATUS.equalsIgnoreCase(webAppDetails.webApp.inner().state()) ? WEB_RUN_ICON : WEB_STOP_ICON));
+									} catch (Exception ex) {
+										DefaultLoader.getUIHelper().logError("WebappsModule::createListener ADD", ex);
+										ex.printStackTrace();
+									}
+								}
+							});
+							break;
+						case UPDATE:
+							break;
+						case REMOVE:
+							break;
+						default:
+							break;
+					}
+				}
+			}
+		};
+		AzureUIRefreshCore.addListener(id, listener);
+	}
+
 }

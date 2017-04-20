@@ -684,4 +684,21 @@ public class WebAppUtils {
             }
         }
     }
+
+    public static class WebAppDetails {
+        public SubscriptionDetail subscriptionDetail;
+        public ResourceGroup resourceGroup;
+        public AppServicePlan appServicePlan;
+        public WebApp webApp;
+
+        public WebAppDetails() {}
+
+        public WebAppDetails(ResourceGroup resourceGroup, WebApp webApp, AppServicePlan appServicePlan, SubscriptionDetail subscriptionDetail) {
+            this.resourceGroup = resourceGroup;
+            this.webApp = webApp;
+            this.appServicePlan = appServicePlan;
+            this.subscriptionDetail = subscriptionDetail;
+        }
+    }
+
 }

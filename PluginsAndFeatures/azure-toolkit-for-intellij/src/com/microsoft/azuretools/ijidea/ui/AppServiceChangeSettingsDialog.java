@@ -42,13 +42,15 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
+import static com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
+
 /**
  * Created by vlashch on 1/30/17.
  */
 public class AppServiceChangeSettingsDialog extends AppServiceCreateDialog {
     private static final Logger LOGGER = Logger.getInstance(AppServiceChangeSettingsDialog.class);
 
-    public static AppServiceChangeSettingsDialog go(WebAppDeployDialog.WebAppDetails wad, Project project){
+    public static AppServiceChangeSettingsDialog go(WebAppDetails wad, Project project){
         AppServiceChangeSettingsDialog d = new AppServiceChangeSettingsDialog(project, wad);
         d.show();
         if (d.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
@@ -57,7 +59,7 @@ public class AppServiceChangeSettingsDialog extends AppServiceCreateDialog {
         return null;
     }
 
-    protected AppServiceChangeSettingsDialog(Project project, WebAppDeployDialog.WebAppDetails wad) {
+    protected AppServiceChangeSettingsDialog(Project project, WebAppDetails wad) {
         super(project);
 
         setTitle("Change App Service Settings");

@@ -442,7 +442,7 @@ public class WebAppDeployDialog extends DialogWrapper {
 
                         } catch (Exception ex) {
                             ex.printStackTrace();
-                            LOGGER.error("deleteAppService : Task.Modal ", ex);
+                            //LOGGER.error("deleteAppService : Task.Modal ", ex);
                             ApplicationManager.getApplication().invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
@@ -455,7 +455,7 @@ public class WebAppDeployDialog extends DialogWrapper {
                 });
             } catch (Exception e) {
                 e.printStackTrace();
-                LOGGER.error("deleteAppService", e);
+                //LOGGER.error("deleteAppService", e);
                 ErrorWindow.show(project, e.getMessage(), "Delete App Service Error");
             }
         }
@@ -573,7 +573,7 @@ public class WebAppDeployDialog extends DialogWrapper {
                 } catch (IOException | InterruptedException ex) {
                     postEventProperties.put("PublishError", ex.getMessage());
                     ex.printStackTrace();
-                    LOGGER.error("deploy", ex);
+                    //LOGGER.error("deploy", ex);
                     ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {

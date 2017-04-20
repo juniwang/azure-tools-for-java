@@ -171,7 +171,7 @@ public class SignInWindow extends DialogWrapper {
                 authFileTextField.setText(filepath);
             } catch (IOException ex) {
                 ex.printStackTrace();
-                LOGGER.error("doSelectCredFilepath", ex);
+                //LOGGER.error("doSelectCredFilepath", ex);
                 ErrorWindow.show(project, ex.getMessage(), "File Path Error");
             }
         }
@@ -187,7 +187,7 @@ public class SignInWindow extends DialogWrapper {
             accountEmail = adAuthManager.getAccountEmail();
         } catch (Exception ex) {
             ex.printStackTrace();
-            LOGGER.error("doSignIn", ex);
+            //LOGGER.error("doSignIn", ex);
             ErrorWindow.show(project, ex.getMessage(), "Sign In Error");
         }
     }
@@ -203,7 +203,7 @@ public class SignInWindow extends DialogWrapper {
                         AdAuthManager.getInstance().signIn();
                     } catch (AuthCanceledException ex) {
                         System.out.println(ex.getMessage());
-                    } catch (IOException ex) {
+                    } catch (Exception ex) {
                         ApplicationManager.getApplication().invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -222,7 +222,7 @@ public class SignInWindow extends DialogWrapper {
             AdAuthManager.getInstance().signOut();
         } catch (Exception ex) {
             ex.printStackTrace();
-            LOGGER.error("doSingOut", ex);
+            //LOGGER.error("doSingOut", ex);
             ErrorWindow.show(project, ex.getMessage(), "Sign Out Error");
         }
     }
@@ -255,7 +255,7 @@ public class SignInWindow extends DialogWrapper {
                         subscriptionManager.getSubscriptionDetails();
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        LOGGER.error("doCreateServicePrincipal::Task.Modal", ex);
+                        //LOGGER.error("doCreateServicePrincipal::Task.Modal", ex);
                         ApplicationManager.getApplication().invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -312,7 +312,7 @@ public class SignInWindow extends DialogWrapper {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            LOGGER.error("doCreateServicePrincipal", ex);
+            //LOGGER.error("doCreateServicePrincipal", ex);
             ErrorWindow.show(project, ex.getMessage(), "Get Subscription Error");
 
         } finally {

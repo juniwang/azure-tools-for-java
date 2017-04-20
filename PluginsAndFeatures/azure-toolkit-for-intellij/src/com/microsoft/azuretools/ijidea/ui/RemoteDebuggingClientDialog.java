@@ -327,8 +327,8 @@ public class RemoteDebuggingClientDialog  extends DialogWrapper {
                 try {
                     worker.work(progressIndicator);
                 } catch(Exception ex) {
-                    //ex.printStackTrace();
-                    LOGGER.error("work@IWorker@run@ProgressManager@runWithProgress@RemoteDebuggingClientDialog", ex);
+                    ex.printStackTrace();
+                    //LOGGER.error("work@IWorker@run@ProgressManager@runWithProgress@RemoteDebuggingClientDialog", ex);
                     ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {

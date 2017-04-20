@@ -134,6 +134,10 @@
             class="com.microsoft.azuretools.core.ui.WANewCertificate"
             commandId="com.microsoft.azuretools.core.ui.WANewCertificate">
         </handler>
+        <handler
+            class="com.microsoft.azuretools.core.ui.AzureSamples"
+            commandId="com.microsoft.azuretools.core.ui.AzureSamplesCmd">
+      </handler>
     </extension>
 <!--
     <extension point="org.eclipse.ui.bindings">

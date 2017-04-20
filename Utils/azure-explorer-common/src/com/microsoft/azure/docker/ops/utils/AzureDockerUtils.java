@@ -423,7 +423,6 @@ public class AzureDockerUtils {
                 } catch (Exception e) {
                   e.printStackTrace();
                 }
-                vaultSubscriber.onCompleted();
               }
             });
             vaultSubscriber.onCompleted();

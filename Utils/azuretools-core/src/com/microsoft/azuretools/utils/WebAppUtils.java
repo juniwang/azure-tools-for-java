@@ -584,7 +584,6 @@ public class WebAppUtils {
         public String jdkDownloadUrl;
 
         public abstract void collectData();
-
     }
 
     public static WebApp createAppService(IProgressIndicator progressIndicator, CreateAppServiceModel model) throws IOException, WebAppException, InterruptedException, AzureCmdException {
@@ -594,47 +593,36 @@ public class WebAppUtils {
         if (azureManager == null) { return null; }
 
         Azure azure = azureManager.getAzure(model.subscriptionDetail.getSubscriptionId());
-        WebApp.DefinitionStages.Blank definitionStages = azure.webApps().define(model.webAppName);
-//        WebApp.DefinitionStages.WithAppServicePlan ds1;
-        WebAppBase.DefinitionStages.WithCreate<WebApp> withCreate;
+
+        AppServicePlan appServicePlan = null;
         if (model.isAppServicePlanCreateNew) {
-            WebApp.DefinitionStages.NewAppServicePlanWithGroup ds1 = definitionStages.withRegion(model.appServicePlanLocationCreateNew.name());
-            WebApp.DefinitionStages.WithNewAppServicePlan ds2;
+            AppServicePlan.DefinitionStages.WithGroup ds1 = azure.appServices().appServicePlans()
+                    .define(model.appServicePlanNameCreateNew)
+                    .withRegion(model.appServicePlanLocationCreateNew.name());
+            AppServicePlan.DefinitionStages.WithPricingTier ds2;
             if (model.isResourceGroupCreateNew) {
                 ds2 = ds1.withNewResourceGroup(model.resourceGroupNameCreateNew);
             } else {
                 ds2 = ds1.withExistingResourceGroup(model.resourceGroup);
             }
-            withCreate = ds2.withNewWindowsPlan(model.appServicePricingTierCreateNew);
+            appServicePlan = ds2.withPricingTier(model.appServicePricingTierCreateNew).withOperatingSystem(OperatingSystem.WINDOWS).create();
         } else {
-            WebApp.DefinitionStages.ExistingWindowsPlanWithGroup ds1 = definitionStages.withExistingWindowsPlan(model.appServicePlan);
-            if (model.isResourceGroupCreateNew) {
-                withCreate = ds1.withNewResourceGroup(model.resourceGroupNameCreateNew);
-            } else {
-                withCreate = ds1.withExistingResourceGroup(model.resourceGroup);
-            }
+            appServicePlan = model.appServicePlan;
         }
+
+        WebApp.DefinitionStages.Blank definitionStages = azure.webApps().define(model.webAppName);
+        WebAppBase.DefinitionStages.WithCreate<WebApp> withCreate;
+
+        WebApp.DefinitionStages.ExistingWindowsPlanWithGroup ds1 = definitionStages.withExistingWindowsPlan(appServicePlan);
+        if (model.isResourceGroupCreateNew) {
+            withCreate = ds1.withNewResourceGroup(model.resourceGroupNameCreateNew);
+        } else {
+            withCreate = ds1.withExistingResourceGroup(model.resourceGroup);
+        }
+
         if (model.jdkDownloadUrl == null) { // no custom jdk
             withCreate = withCreate.withJavaVersion(JavaVersion.JAVA_8_NEWEST).withWebContainer(model.webContainer);
         }
-
-//        if (model.isResourceGroupCreateNew) {
-//            ds1 = definitionStages.withNewResourceGroup(model.resourceGroupNameCreateNew);
-//        } else {
-//            ds1 = definitionStages.withExistingResourceGroup(model.resourceGroup);
-//        }
-
-//        if (model.isAppServicePlanCreateNew) {
-//            ds2 = ds1.withNewAppServicePlan(model.appServicePlanNameCreateNew)
-//                    .withRegion(model.appServicePlanLocationCreateNew.name())
-//                    .withPricingTier(model.appServicePricingTierCreateNew);
-//        } else {
-//            ds2 = ds1.withExistingAppServicePlan(model.appServicePlan);
-//        }
-
-//        if (model.jdkDownloadUrl == null) { // no custom jdk
-//            ds2 = ds2.withJavaVersion(JavaVersion.JAVA_8_NEWEST).withWebContainer(model.webContainer);
-//        }
 
         WebApp myWebApp = withCreate.create();
 
@@ -655,11 +643,11 @@ public class WebAppUtils {
             AzureModelController.addNewResourceGroup(model.subscriptionDetail, rg);
             AzureModelController.addNewWebAppToJustCreatedResourceGroup(rg, myWebApp);
             if (model.isAppServicePlanCreateNew) {
-                AppServicePlan asp = azure.appServices().appServicePlans().getById(myWebApp.appServicePlanId());
-                if (asp == null) {
-                    throw new AzureCmdException(String.format("azure.appServices().appServicePlans().getById(%s) returned null"), myWebApp.appServicePlanId());
-                }
-                AzureModelController.addNewAppServicePlanToJustCreatedResourceGroup(rg, asp);
+//                AppServicePlan asp = azure.appServices().appServicePlans().getById(myWebApp.appServicePlanId());
+//                if (asp == null) {
+//                    throw new AzureCmdException(String.format("azure.appServices().appServicePlans().getById(%s) returned null"), myWebApp.appServicePlanId());
+//                }
+                AzureModelController.addNewAppServicePlanToJustCreatedResourceGroup(rg, appServicePlan);
             } else {
                 // add empty list
                 AzureModelController.addNewAppServicePlanToJustCreatedResourceGroup(rg, null);
@@ -668,8 +656,8 @@ public class WebAppUtils {
             ResourceGroup rg = model.resourceGroup;
             AzureModelController.addNewWebAppToExistingResourceGroup(rg, myWebApp);
             if (model.isAppServicePlanCreateNew) {
-                AppServicePlan asp = azure.appServices().appServicePlans().getById(myWebApp.appServicePlanId());
-                AzureModelController.addNewAppServicePlanToExistingResourceGroup(rg, asp);
+                //AppServicePlan asp = azure.appServices().appServicePlans().getById(myWebApp.appServicePlanId());
+                AzureModelController.addNewAppServicePlanToExistingResourceGroup(rg, appServicePlan);
             }
         }
 

@@ -303,11 +303,15 @@ public class AzureConfigureDockerContainerStep extends AzureSelectDockerWizardSt
   }
 
   private void setFinishButtonState(boolean finishButtonState) {
-    model.getCurrentNavigationState().FINISH.setEnabled(finishButtonState);
+    try {
+      model.getCurrentNavigationState().FINISH.setEnabled(finishButtonState);
+    } catch (Exception ignored) {}
   }
 
   private void setPreviousButtonState(boolean previousButtonState) {
-    model.getCurrentNavigationState().PREVIOUS.setEnabled(previousButtonState);
+    try {
+      model.getCurrentNavigationState().PREVIOUS.setEnabled(previousButtonState);
+    } catch (Exception ignored) {}
   }
 
   @Override

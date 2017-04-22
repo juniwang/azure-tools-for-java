@@ -25,16 +25,18 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
-import com.intellij.ui.AnActionButton;
-import com.intellij.ui.AnActionButtonRunnable;
-import com.intellij.ui.AnActionButtonUpdater;
-import com.intellij.ui.ToolbarDecorator;
+import com.intellij.ui.*;
 import com.intellij.ui.table.JBTable;
 import com.intellij.ui.wizard.WizardNavigationState;
 import com.intellij.ui.wizard.WizardStep;
@@ -64,8 +66,11 @@ import com.microsoft.tooling.msservices.components.DefaultLoader;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -78,15 +83,15 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
   private JPanel rootPanel;
   private JPanel dockerHostsPanel;
   private JTextField dockerImageNameTextField;
-  private TextFieldWithBrowseButton dockerArtifactPath;
   private JLabel dockerImageNameLabel;
   private JLabel dockerArtifactPathLabel;
+  private ComboboxWithBrowseButton dockerArtifactComboboxWithBrowse;
   private JBTable dockerHostsTable;
 
   private AzureSelectDockerWizardModel model;
   private AzureDockerHostsManager dockerManager;
   private AzureDockerImageInstance dockerImageDescription;
-  private Artifact artifact;
+//  private Artifact artifact;
 
   private DockerHostsTableSelection dockerHostsTableSelection;
 
@@ -116,37 +121,84 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
     dockerImageNameTextField.getDocument().addDocumentListener(resetDialogButtonsState(null));
     dockerImageNameLabel.setVisible(false);
 
-    dockerArtifactPath.addActionListener(UIUtils.createFileChooserListener(dockerArtifactPath, model.getProject(),
-        FileChooserDescriptorFactory.createSingleLocalFileDescriptor()));
+//    dockerArtifactPath.addActionListener(UIUtils.createFileChooserListener(dockerArtifactPath, model.getProject(),
+//        FileChooserDescriptorFactory.createSingleLocalFileDescriptor()));
+//
+//    artifact = null;
+//
+//    for (Artifact item : ArtifactUtil.getArtifactWithOutputPaths(model.getProject())) {
+//      if (item.getArtifactType().getPresentableName().equals("Web Application: Archive") ||
+//          item.getArtifactType().getPresentableName().equals("JAR")) {
+//        artifact = item;
+//        break;
+//      }
+//    }
+//
+//    if (artifact != null && AzureDockerValidationUtils.validateDockerArtifactPath(artifact.getOutputFilePath())) {
+//      String artifactFileName = new File(artifact.getOutputFilePath()).getName();
+//      dockerImageDescription.artifactName = artifactFileName.indexOf(".") > 0 ? artifactFileName.substring(0, artifactFileName.lastIndexOf(".")) : "";
+//      dockerArtifactPath.setText(artifact.getOutputFilePath());
+//      dockerArtifactPathLabel.setVisible(false);
+//    } else {
+//      dockerArtifactPath.setText("");
+//      dockerArtifactPathLabel.setVisible(true);
+//    }
+//
+//    dockerArtifactPath.setToolTipText(AzureDockerValidationUtils.getDockerArtifactPathTip());
+//    dockerArtifactPath.getTextField().setInputVerifier(new InputVerifier() {
+//      @Override
+//      public boolean verify(JComponent input) {
+//        if (AzureDockerValidationUtils.validateDockerArtifactPath(dockerArtifactPath.getText())) {
+//          dockerArtifactPathLabel.setVisible(false);
+//          setDialogButtonsState(doValidate(false) == null);
+//          return true;
+//        } else {
+//          dockerArtifactPathLabel.setVisible(true);
+//          setDialogButtonsState(false);
+//          return false;
+//        }
+//      }
+//    });
+//    dockerArtifactPath.getTextField().getDocument().addDocumentListener(resetDialogButtonsState(null));
 
-    artifact = null;
-
-    for (Artifact item : ArtifactUtil.getArtifactWithOutputPaths(model.getProject())) {
-      if (item.getArtifactType().getPresentableName().equals("Web Application: Archive")) {
-        artifact = item;
-        break;
+    dockerArtifactComboboxWithBrowse.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        String path = (String) dockerArtifactComboboxWithBrowse.getComboBox().getSelectedItem();
+        final VirtualFile[] files = FileChooser.chooseFiles(new FileChooserDescriptor(true, false, true, true, false, false),
+            dockerArtifactComboboxWithBrowse, model.getProject(),
+            (model.getProject() == null) && path != null && !path.isEmpty() ? LocalFileSystem.getInstance().findFileByPath(path) : null);
+        if (files.length > 0) {
+          final StringBuilder builder = new StringBuilder();
+          for (VirtualFile file : files) {
+            if (builder.length() > 0) {
+              builder.append(File.pathSeparator);
+            }
+            builder.append(FileUtil.toSystemDependentName(file.getPath()));
+          }
+          path = builder.toString();
+          int idx = dockerArtifactComboboxWithBrowse.getComboBox().getItemCount() - 1;
+          for (;idx >= 0;idx --) {
+            if (dockerArtifactComboboxWithBrowse.getComboBox().getItemAt(idx).equals(path)) {
+              dockerArtifactComboboxWithBrowse.getComboBox().setSelectedIndex(idx);
+              break;
+            }
+          }
+          if (idx < 0) {
+            dockerArtifactComboboxWithBrowse.getComboBox().addItem(path);
+            dockerArtifactComboboxWithBrowse.getComboBox().setSelectedItem(path);
+          }
+        }
       }
-    }
-
-    if (artifact != null && AzureDockerValidationUtils.validateDockerArtifactPath(artifact.getOutputFilePath())) {
-      String artifactFileName = new File(artifact.getOutputFilePath()).getName();
-      dockerImageDescription.artifactName = artifactFileName.indexOf(".") > 0 ? artifactFileName.substring(0, artifactFileName.lastIndexOf(".")) : "";
-      dockerImageInstance.artifactName = artifact.getName();
-      dockerArtifactPath.setText(artifact.getOutputFilePath());
-      dockerArtifactPathLabel.setVisible(false);
-    } else {
-      dockerArtifactPath.setText("");
-      dockerArtifactPathLabel.setVisible(true);
-    }
-
-    dockerArtifactPath.setToolTipText(AzureDockerValidationUtils.getDockerArtifactPathTip());
-    dockerArtifactPath.getTextField().setInputVerifier(new InputVerifier() {
+    });
+    dockerArtifactComboboxWithBrowse.setToolTipText(AzureDockerValidationUtils.getDockerArtifactPathTip());
+    dockerArtifactComboboxWithBrowse.setInputVerifier(new InputVerifier() {
       @Override
       public boolean verify(JComponent input) {
-        if (AzureDockerValidationUtils.validateDockerArtifactPath(dockerArtifactPath.getText())) {
+        if (AzureDockerValidationUtils.validateDockerArtifactPath((String) dockerArtifactComboboxWithBrowse.getComboBox().getSelectedItem())) {
           dockerArtifactPathLabel.setVisible(false);
           setDialogButtonsState(doValidate(false) == null);
-          setDialogButtonsState(doValidate() == null);
+          System.out.println("\tCOMBOBOXWITHBROWSE Validator " + (String) dockerArtifactComboboxWithBrowse.getComboBox().getSelectedItem());
           return true;
         } else {
           dockerArtifactPathLabel.setVisible(true);
@@ -155,7 +207,31 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
         }
       }
     });
-    dockerArtifactPath.getTextField().getDocument().addDocumentListener(resetDialogButtonsState(null));
+    dockerArtifactComboboxWithBrowse.getComboBox().setEditable(true);
+    dockerArtifactComboboxWithBrowse.getComboBox().setToolTipText(dockerArtifactComboboxWithBrowse.getToolTipText());
+    dockerArtifactComboboxWithBrowse.getComboBox().setInputVerifier(dockerArtifactComboboxWithBrowse.getInputVerifier());
+    dockerArtifactComboboxWithBrowse.getComboBox().addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        System.out.println("\tCOMBOBOXWITHBROWSE Selector " + (String) dockerArtifactComboboxWithBrowse.getComboBox().getSelectedItem());
+        setDialogButtonsState(doValidate(false) == null);
+      }
+    });
+    for (Artifact item : ArtifactUtil.getArtifactWithOutputPaths(model.getProject())) {
+      String path = item.getOutputFilePath();
+      if (path != null && (path.toLowerCase().endsWith(".war") || path.toLowerCase().endsWith(".jar")) &&
+          AzureDockerValidationUtils.validateDockerArtifactPath(path)) {
+        dockerArtifactComboboxWithBrowse.getComboBox().addItem(path);
+      }
+    }
+    if (dockerArtifactComboboxWithBrowse.getComboBox().getItemCount() > 0) {
+      dockerArtifactComboboxWithBrowse.getComboBox().setSelectedIndex(0);
+      String artifactFileName = new File((String) dockerArtifactComboboxWithBrowse.getComboBox().getItemAt(0)).getName();
+      dockerImageDescription.artifactName = artifactFileName.indexOf(".") > 0 ? artifactFileName.substring(0, artifactFileName.lastIndexOf(".")) : "";
+      dockerArtifactPathLabel.setVisible(false);
+    } else {
+      dockerArtifactPathLabel.setVisible(true);
+    }
 
     refreshDockerHostsTable();
 
@@ -556,27 +632,37 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
     dockerImageDescription.dockerImageName = dockerImageNameTextField.getText();
     model.setDockerContainerName(AzureDockerUtils.getDefaultDockerContainerName(dockerImageDescription.dockerImageName));
 
-    if (dockerArtifactPath.getText() == null || !AzureDockerValidationUtils.validateDockerArtifactPath(dockerArtifactPath.getText())) {
-      ValidationInfo info = new ValidationInfo("Invalid artifact file name", dockerArtifactPath);
+//    if (dockerArtifactPath.getText() == null || !AzureDockerValidationUtils.validateDockerArtifactPath(dockerArtifactPath.getText())) {
+//      ValidationInfo info = new ValidationInfo("Invalid artifact file name", dockerArtifactPath);
+//      dockerArtifactPathLabel.setVisible(true);
+//      setDialogButtonsState(false);
+//      if (shakeOnError)
+//        model.getSelectDockerWizardDialog().DialogShaker(info);
+//      return info;
+//    }
+//    String artifactFilePath = dockerArtifactPath.getText();
+    String dockerArtifactPath = (String) dockerArtifactComboboxWithBrowse.getComboBox().getSelectedItem();
+    if (dockerArtifactPath == null || !AzureDockerValidationUtils.validateDockerArtifactPath(dockerArtifactPath)) {
+      ValidationInfo info = new ValidationInfo("Invalid artifact file name", dockerArtifactComboboxWithBrowse);
       dockerArtifactPathLabel.setVisible(true);
       setDialogButtonsState(false);
       if (shakeOnError)
         model.getSelectDockerWizardDialog().DialogShaker(info);
       return info;
     }
-    String artifactFilePath = dockerArtifactPath.getText();
-    String artifactFileName = new File(artifactFilePath).getName();
+    String artifactFileName = new File(dockerArtifactPath).getName();
     dockerImageDescription.artifactName = artifactFileName.indexOf(".") > 0 ? artifactFileName.substring(0, artifactFileName.lastIndexOf(".")) : "";
     if (dockerImageDescription.artifactName.isEmpty()) {
-      ValidationInfo info = new ValidationInfo("Invalid artifact file name (it's missing a file name)", dockerArtifactPath);
+      ValidationInfo info = new ValidationInfo("Invalid artifact file name (it is missing a file name)", dockerArtifactComboboxWithBrowse);
+//      ValidationInfo info = new ValidationInfo("Invalid artifact file name (it's missing a file name)", dockerArtifactPath);
       dockerArtifactPathLabel.setVisible(true);
       setDialogButtonsState(false);
       if (shakeOnError)
         model.getSelectDockerWizardDialog().DialogShaker(info);
       return info;
     }
-    if (dockerImageDescription.artifactPath == null || artifactFilePath == null || !dockerImageDescription.artifactPath.equals(artifactFilePath)) {
-      dockerImageDescription.artifactPath = artifactFilePath;
+    if (dockerImageDescription.artifactPath == null || !dockerImageDescription.artifactPath.equals(dockerArtifactPath)) {
+      dockerImageDescription.artifactPath = dockerArtifactPath;
       dockerImageDescription.hasRootDeployment = artifactFileName.toLowerCase().matches(".*.jar");
       model.setPredefinedDockerfileOptions(artifactFileName);
     }

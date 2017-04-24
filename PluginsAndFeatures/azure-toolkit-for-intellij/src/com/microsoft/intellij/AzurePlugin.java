@@ -180,6 +180,7 @@ public class AzurePlugin extends AbstractProjectComponent {
                     return;
 
                 final Map<String, String> properties = new HashMap<>();
+                String eventName = "";
 
                 if (event.getSource() instanceof ActionMenuItem) {
                     final ActionMenuItem item = (ActionMenuItem) event.getSource();
@@ -190,6 +191,7 @@ public class AzurePlugin extends AbstractProjectComponent {
                                 actionRef = (ActionRef) FieldUtils.readField(field, item, true);
                                 AnAction anAction = actionRef.getAction();
                                 if (anAction != null && anAction.getClass().getName().contains("microsoft")) {
+                                    eventName = "AzurePlugin.Intellij.MainMenu";
                                     properties.put("when", String.valueOf(mouseEvent.getWhen()));
                                     properties.put("text", item.getText());
                                     properties.put("actionCommand", item.getActionCommand());
@@ -211,6 +213,7 @@ public class AzurePlugin extends AbstractProjectComponent {
                         }
                     }
                     if (isMicrosoft) {
+                        eventName = "AzurePlugin.Intellij.AzureExplorer";
                         properties.put("text", menuItem.getText());
                         properties.put("place", "AzureExplorer");
                         properties.put("when", String.valueOf(mouseEvent.getWhen()));
@@ -218,7 +221,7 @@ public class AzurePlugin extends AbstractProjectComponent {
                 }
 
                 if (!properties.isEmpty()) {
-                    AppInsightsCustomEvent.create("AzurePlugin.Intellij.Menu", "", properties);
+                    AppInsightsCustomEvent.create(eventName, "", properties);
                 }
             }
         }, eventMask);

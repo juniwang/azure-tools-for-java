@@ -39,6 +39,7 @@ import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
 import com.microsoft.azuretools.ijidea.utility.UpdateProgressIndicator;
 import com.microsoft.azuretools.utils.*;
+import com.microsoft.intellij.ui.components.AzureDialogWrapper;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +54,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class AppServiceCreateDialog extends DialogWrapper {
+public class AppServiceCreateDialog extends AzureDialogWrapper {
     private static final Logger LOGGER = Logger.getInstance(AppServiceCreateDialog.class);
 
     protected JPanel contentPane;
@@ -736,6 +737,7 @@ public class AppServiceCreateDialog extends DialogWrapper {
 
     @Override
     protected void doOKAction() {
+        sendOKorCancelTelemetry(true);
         ProgressManager.getInstance().run(new Task.Modal(project,"Create App Service Progress", true) {
             @Override
             public void run(ProgressIndicator progressIndicator) {

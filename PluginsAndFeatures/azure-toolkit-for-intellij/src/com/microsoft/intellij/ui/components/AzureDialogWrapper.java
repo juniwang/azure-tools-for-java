@@ -1,7 +1,8 @@
-package com.microsoft.intellij.util;
+package com.microsoft.intellij.ui.components;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.microsoft.intellij.util.AppInsightsCustomEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 
 /**
  * Created by juniwang on 4/19/2017.
+ * Subclass of DialogWrapper. Do some common implementation here like the telemetry.
  */
 public abstract class AzureDialogWrapper extends DialogWrapper {
     protected AzureDialogWrapper(@Nullable Project project, boolean canBeParent) {
@@ -46,13 +48,13 @@ public abstract class AzureDialogWrapper extends DialogWrapper {
     /*
     Add custom properties to telemetry while Cancel button is pressed.
      */
-    protected void sendCancelTelemetryProperties(final Map<String, String> properties) {
+    protected void addCancelTelemetryProperties(final Map<String, String> properties) {
     }
 
     /*
     Add custom properties to telemetry while OK button is pressed.
      */
-    protected void sendOKTelemetryProperties(final Map<String, String> properties) {
+    protected void addOKTelemetryProperties(final Map<String, String> properties) {
         final JComponent centerPanel = this.createCenterPanel();
         for (final Component component : getAllComponents(this.getContentPane())) {
             if (!component.isEnabled() || !component.isVisible())
@@ -92,18 +94,26 @@ public abstract class AzureDialogWrapper extends DialogWrapper {
         return compList;
     }
 
+    protected void sendOKorCancelTelemetry(boolean isOK) {
+        final String eventName = "AzurePlugin.Intellij." + this.getClass().getSimpleName() + (isOK ? ".OK" : ".Cancel");
+        final Map<String, String> properties = new HashMap<>();
+        properties.put("window", this.getClass().getSimpleName());
+        properties.put("title", this.getTitle());
+        if (isOK) {
+            addOKTelemetryProperties(properties);
+        } else {
+            addCancelTelemetryProperties(properties);
+        }
+
+        AppInsightsCustomEvent.create(eventName, "", properties);
+    }
+
     @Override
     protected void doOKAction() {
         // send telemetry when OK button pressed.
         // In case subclass overrides doOKAction(), it should call super.doOKAction() explicitly
         // Otherwise the telemetry is omitted.
-        final String eventName = "AzurePlugin.Intellij." + this.getClass().getSimpleName() + ".OK";
-        final Map<String, String> properties = new HashMap<>();
-        properties.put("window", this.getClass().getSimpleName());
-        properties.put("title", this.getTitle());
-        sendOKTelemetryProperties(properties);
-        AppInsightsCustomEvent.create(eventName, "", properties);
-
+        this.sendOKorCancelTelemetry(true);
         super.doOKAction();
     }
 
@@ -112,13 +122,7 @@ public abstract class AzureDialogWrapper extends DialogWrapper {
         // send telemetry when Cancel button pressed.
         // In case subclass overrides doCancelAction(), it should call super.doCancelAction() explicitly
         // Otherwise the telemetry is omitted.
-        final String eventName = "AzurePlugin.Intellij." + this.getClass().getSimpleName() + ".Cancel";
-        final Map<String, String> properties = new HashMap<>();
-        properties.put("window", this.getClass().getSimpleName());
-        properties.put("title", this.getTitle());
-        this.sendCancelTelemetryProperties(properties);
-        AppInsightsCustomEvent.create(eventName, "", properties);
-
+        this.sendOKorCancelTelemetry(false);
         super.doCancelAction();
     }
 }

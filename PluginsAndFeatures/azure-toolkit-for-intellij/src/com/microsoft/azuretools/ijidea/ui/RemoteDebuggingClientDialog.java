@@ -6,13 +6,13 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.microsoft.azure.management.appservice.PlatformArchitecture;
 import com.microsoft.azure.management.appservice.PublishingProfile;
 import com.microsoft.azure.management.appservice.WebApp;
 import com.microsoft.azuretools.ijidea.utility.UpdateProgressIndicator;
 import com.microsoft.azuretools.utils.WebAppUtils;
+import com.microsoft.intellij.ui.components.AzureDialogWrapper;
 import com.microsoft.intellij.util.PluginHelper;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 
-public class RemoteDebuggingClientDialog  extends DialogWrapper {
+public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
     private static final Logger LOGGER = Logger.getInstance(SignInWindow.class);
 
     private JPanel contentPane;

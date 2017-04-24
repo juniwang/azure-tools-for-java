@@ -28,21 +28,16 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.wizard.WizardNavigationState;
-import com.intellij.ui.wizard.WizardStep;
 import com.microsoft.azure.CloudException;
 import com.microsoft.azure.management.Azure;
-import com.microsoft.azure.management.compute.KnownLinuxVirtualMachineImage;
-import com.microsoft.azure.management.compute.KnownWindowsVirtualMachineImage;
-import com.microsoft.azure.management.compute.VirtualMachineImage;
-import com.microsoft.azure.management.compute.VirtualMachineOffer;
-import com.microsoft.azure.management.compute.VirtualMachinePublisher;
-import com.microsoft.azure.management.compute.VirtualMachineSku;
+import com.microsoft.azure.management.compute.*;
 import com.microsoft.azure.management.resources.Location;
 import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
 import com.microsoft.azuretools.utils.AzureModel;
 import com.microsoft.azuretools.utils.AzureModelController;
+import com.microsoft.intellij.ui.components.AzureWizardStep;
 import com.microsoft.intellij.util.PluginUtil;
 import com.microsoft.intellij.wizards.VMWizardModel;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
@@ -53,16 +48,13 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
 
-public class SelectImageStep extends WizardStep<VMWizardModel> {
+public class SelectImageStep extends AzureWizardStep<VMWizardModel> {
     private JPanel rootPanel;
     private JList createVmStepsList;
     private JComboBox regionComboBox;
@@ -102,7 +94,7 @@ public class SelectImageStep extends WizardStep<VMWizardModel> {
             @Override
             public void customize(JList jList, Object o, int i, boolean b, boolean b1) {
                 if (o != null && (o instanceof Location)) {
-                    setText("  " + ((Location)o).displayName());
+                    setText("  " + ((Location) o).displayName());
                 }
             }
         });
@@ -205,7 +197,7 @@ public class SelectImageStep extends WizardStep<VMWizardModel> {
             public void customize(JList jList, Object o, int i, boolean b, boolean b1) {
                 if (o instanceof KnownWindowsVirtualMachineImage) {
                     setText(((KnownWindowsVirtualMachineImage) o).offer() + " - " + ((KnownWindowsVirtualMachineImage) o).sku());
-                } else if (o instanceof KnownLinuxVirtualMachineImage){
+                } else if (o instanceof KnownLinuxVirtualMachineImage) {
                     setText(((KnownLinuxVirtualMachineImage) o).offer() + " - " + ((KnownLinuxVirtualMachineImage) o).sku());
                 }
             }
@@ -400,6 +392,23 @@ public class SelectImageStep extends WizardStep<VMWizardModel> {
         //validation might be delayed, so lets check if we are still on this screen
         if (customImageBtn.isSelected() && model.getCurrentStep().equals(this)) {
             model.getCurrentNavigationState().NEXT.setEnabled(false);
+        }
+    }
+
+    @Override
+    protected void addExtraTelemetryProperties(final Map<String, String> properties) {
+        properties.put("region", ((Location) this.regionComboBox.getSelectedItem()).displayName());
+        if (knownImageBtn.isSelected()) {
+            properties.put("image", knownImageComboBox.getSelectedItem().toString());
+        } else if (customImageBtn.isSelected()) {
+            VirtualMachineImage virtualMachineImage = (VirtualMachineImage) imageLabelList.getSelectedValue();
+            if (virtualMachineImage != null) {
+                properties.put("publisher", virtualMachineImage.publisherName());
+                properties.put("offer", virtualMachineImage.offer());
+                properties.put("Sku", virtualMachineImage.sku());
+                properties.put("version", virtualMachineImage.version());
+                properties.put("id", virtualMachineImage.id());
+            }
         }
     }
 }

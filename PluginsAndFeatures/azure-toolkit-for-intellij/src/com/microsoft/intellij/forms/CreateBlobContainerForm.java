@@ -28,11 +28,10 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.microsoft.azure.management.storage.StorageAccount;
-import com.microsoft.intellij.helpers.LinkListener;
-import com.microsoft.intellij.util.PluginUtil;
-import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
+import com.microsoft.intellij.helpers.LinkListener;
+import com.microsoft.intellij.ui.components.AzureDialogWrapper;
+import com.microsoft.intellij.util.PluginUtil;
 import com.microsoft.tooling.msservices.helpers.azure.sdk.StorageClientSDKManager;
 import com.microsoft.tooling.msservices.model.storage.BlobContainer;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +42,7 @@ import java.util.Calendar;
 
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
 
-public class CreateBlobContainerForm extends DialogWrapper {
+public class CreateBlobContainerForm extends AzureDialogWrapper {
     private JPanel contentPane;
     private JTextField nameTextField;
     private JLabel namingGuidelinesLink;
@@ -118,6 +117,7 @@ public class CreateBlobContainerForm extends DialogWrapper {
             }
         });
 
+        sendOKorCancelTelemetry(true);
         this.close(DialogWrapper.OK_EXIT_CODE, true);
     }
 

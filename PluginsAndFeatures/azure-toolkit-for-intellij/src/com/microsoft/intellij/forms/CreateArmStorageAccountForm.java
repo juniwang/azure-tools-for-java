@@ -21,8 +21,6 @@
  */
 package com.microsoft.intellij.forms;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -35,7 +33,6 @@ import com.microsoft.azure.management.resources.ResourceGroup;
 import com.microsoft.azure.management.storage.AccessTier;
 import com.microsoft.azure.management.storage.Kind;
 import com.microsoft.azure.management.storage.SkuTier;
-import com.microsoft.azure.management.storage.StorageAccount;
 import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.authmanage.SubscriptionManager;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
@@ -44,6 +41,7 @@ import com.microsoft.azuretools.utils.AzureModel;
 import com.microsoft.azuretools.utils.AzureModelController;
 import com.microsoft.intellij.AzurePlugin;
 import com.microsoft.intellij.helpers.LinkListener;
+import com.microsoft.intellij.ui.components.AzureDialogWrapper;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.tooling.msservices.helpers.azure.sdk.AzureSDKManager;
 import com.microsoft.tooling.msservices.model.ReplicationTypes;
@@ -62,7 +60,7 @@ import java.util.stream.Collectors;
 
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
 
-public class CreateArmStorageAccountForm extends DialogWrapper {
+public class CreateArmStorageAccountForm extends AzureDialogWrapper {
     private JPanel contentPane;
     private JComboBox<SubscriptionDetail> subscriptionComboBox;
     private JTextField nameTextField;
@@ -231,6 +229,7 @@ public class CreateArmStorageAccountForm extends DialogWrapper {
                     createStorageAccount();
                 }
             });
+            sendOKorCancelTelemetry(true);
             close(DialogWrapper.OK_EXIT_CODE, true);
         } else { //creating from 'create vm'
             newStorageAccount =
@@ -247,6 +246,7 @@ public class CreateArmStorageAccountForm extends DialogWrapper {
             if (onCreate != null) {
                 onCreate.run();
             }
+            sendOKorCancelTelemetry(true);
             close(DialogWrapper.OK_EXIT_CODE, true);
         }
 //        ProgressManager.getInstance().run(

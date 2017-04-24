@@ -32,7 +32,6 @@ import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.ui.OrderRoot;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainer;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainerFactory;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.AnActionButtonRunnable;
@@ -41,6 +40,7 @@ import com.intellij.ui.components.JBList;
 import com.microsoft.intellij.AzurePlugin;
 import com.microsoft.intellij.ui.components.DefaultDialogWrapper;
 import com.microsoft.intellij.util.AppInsightsCustomEvent;
+import com.microsoft.intellij.ui.components.AzureDialogWrapper;
 import com.microsoft.intellij.util.PluginHelper;
 import com.microsoft.intellij.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +53,7 @@ import java.util.List;
 
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
 
-public class LibrariesConfigurationDialog extends DialogWrapper {
+public class LibrariesConfigurationDialog extends AzureDialogWrapper {
     private JPanel contentPane;
     private JPanel librariesPanel;
     private JBList librariesList;

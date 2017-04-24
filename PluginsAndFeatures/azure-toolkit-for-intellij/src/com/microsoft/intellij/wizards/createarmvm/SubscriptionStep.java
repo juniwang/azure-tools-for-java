@@ -23,12 +23,12 @@ package com.microsoft.intellij.wizards.createarmvm;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.wizard.WizardNavigationState;
-import com.intellij.ui.wizard.WizardStep;
 import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.authmanage.SubscriptionManager;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.ijidea.actions.SelectSubscriptionsAction;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.intellij.ui.components.AzureWizardStep;
 import com.microsoft.intellij.wizards.VMWizardModel;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 
@@ -40,7 +40,7 @@ import java.awt.event.ItemListener;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SubscriptionStep extends WizardStep<VMWizardModel> {
+public class SubscriptionStep extends AzureWizardStep<VMWizardModel> {
     VMWizardModel model;
     private JPanel rootPanel;
     private JList createVmStepsList;

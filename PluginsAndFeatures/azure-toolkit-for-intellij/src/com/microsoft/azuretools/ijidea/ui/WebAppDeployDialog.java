@@ -54,6 +54,7 @@ import com.microsoft.azuretools.utils.CanceledByUserException;
 import com.microsoft.azuretools.utils.WebAppUtils;
 import com.microsoft.intellij.deploy.AzureDeploymentProgressNotification;
 import com.microsoft.intellij.util.AppInsightsCustomEvent;
+import com.microsoft.intellij.ui.components.AzureDialogWrapper;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,7 +76,7 @@ import java.util.Map;
 
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
 
-public class WebAppDeployDialog extends DialogWrapper {
+public class WebAppDeployDialog extends AzureDialogWrapper {
     private static final Logger LOGGER = Logger.getInstance(WebAppDeployDialog.class);
 
     private JPanel contentPane;

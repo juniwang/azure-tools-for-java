@@ -212,7 +212,7 @@ public class AzurePlugin extends AbstractProjectComponent {
                     }
                     if (isMicrosoft) {
                         properties.put("text", menuItem.getText());
-                        properties.put("place", "PopupMenu");
+                        properties.put("place", "AzureExplorer");
                         properties.put("when", String.valueOf(mouseEvent.getWhen()));
                     }
                 }

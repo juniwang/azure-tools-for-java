@@ -42,6 +42,7 @@ import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.tooling.msservices.components.PluginComponent;
 import com.microsoft.tooling.msservices.components.PluginSettings;
 import com.microsoft.tooling.msservices.serviceexplorer.Node;
+import rx.internal.util.PlatformDependent;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -96,6 +97,13 @@ public class AzureActionsComponent implements ApplicationComponent, PluginCompon
                 if (actionGroup != null)
                     actionGroup.addAll((ActionGroup) actionManager.getAction("AzureWebDeployGroup"));
             }
+        }
+        try {
+            PlatformDependent.isAndroid();
+        } catch (Throwable ignored ) {
+            DefaultLoader.getUIHelper().showError("There's a problem with your Android Support plugin setup preventing the Azure Toolkit from functioning correctly (RxJava failed to initialize).\n" +
+                "To fix this issue try disabling the Android Support plugin in IntelliJ Plugin settings or installing the Android SDK", "Azure Toolkit for IntelliJ");
+//            DefaultLoader.getUIHelper().showException("Android Support Error: isAndroid() throws " + ignored.getMessage(), ignored, "Error Android", true, false);
         }
     }
 

@@ -94,9 +94,8 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
                 }
                 ParserXMLUtility.saveXMLFile(dataFile, doc);
                 // Its necessary to call application insights custom create event after saving data.xml
-                final boolean firstTimeInstall = StringUtils.isNullOrEmpty(oldPrefVal);
                 final boolean acceptTelemetry = checkBox1.isSelected();
-                if (firstTimeInstall || Boolean.valueOf(oldPrefVal) != acceptTelemetry) {
+                if (StringUtils.isNullOrEmpty(oldPrefVal) || Boolean.valueOf(oldPrefVal) != acceptTelemetry) {
                     // Boolean.valueOf(oldPrefVal) != acceptTelemetry means user changes his mind.
                     // Either from Agree to Deny, or from Deny to Agree.
                     AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Telemetry, "", acceptTelemetry ? "Agree" : "Deny", null);
@@ -104,7 +103,7 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
             } else {
                 AzurePlugin.copyResourceFile(message("dataFileName"), dataFile);
                 setValues(dataFile);
-                AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Telemetry, "", checkBox1.isSelected() ? "Agree" : "Deny", null);
+                AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Telemetry, "Load", checkBox1.isSelected() ? "Agree" : "Deny", null);
             }
         } catch (Exception ex) {
             AzurePlugin.log(ex.getMessage(), ex);

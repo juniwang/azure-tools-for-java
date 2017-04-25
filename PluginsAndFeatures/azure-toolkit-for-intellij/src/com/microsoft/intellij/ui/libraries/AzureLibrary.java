@@ -28,7 +28,8 @@ public class AzureLibrary {
             null,
             new String[]{
                     "azure-1.0.0.jar",
-                    "azure-client-runtime-1.0.0.jar",
+                    "azure-client-authentication-1.0.2.jar",
+                    "azure-client-runtime-1.0.2.jar",
                     "client-runtime-1.0.0.jar",
                     "guava-20.0.jar",
                     "retrofit-2.1.0.jar",
@@ -44,7 +45,6 @@ public class AzureLibrary {
                     "joda-time-2.4.jar",
                     "commons-lang3-3.4.jar",
                     "adapter-rxjava-2.1.0.jar",
-                    "azure-client-authentication-1.0.0.jar",
                     "adal4j-1.1.2.jar",
                     "oauth2-oidc-sdk-4.5.jar",
                     "mail-1.4.7.jar",

@@ -39,7 +39,7 @@ import com.microsoft.azuretools.ijidea.actions.SelectSubscriptionsAction;
 import com.microsoft.intellij.AzurePlugin;
 import com.microsoft.intellij.helpers.UIHelperImpl;
 import com.microsoft.intellij.serviceexplorer.azure.AzureModuleImpl;
-import com.microsoft.intellij.util.AppInsightsCustomEvent;
+import com.microsoft.intellij.util.AppInsightsEventHelper;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.tooling.msservices.helpers.collections.ListChangeListener;
 import com.microsoft.tooling.msservices.helpers.collections.ListChangedEvent;
@@ -127,7 +127,7 @@ public class ServerExplorerToolWindowFactory implements ToolWindowFactory, Prope
         Node node = (Node) treeNode.getUserObject();
 
         final Map<String, String> properties = new HashMap<>();
-        properties.put("node", node.getName());
+        properties.put("Node", node.getName());
 
         // delegate click to the node's click action if this is a left button click
         if (SwingUtilities.isLeftMouseButton(e)) {
@@ -135,19 +135,13 @@ public class ServerExplorerToolWindowFactory implements ToolWindowFactory, Prope
             // do not propagate the click event to it
             if (!node.isLoading()) {
                 node.getClickAction().fireNodeActionEvent();
-
-                properties.put("mouse", "left");
-                AppInsightsCustomEvent.create("AzurePlugin.Intellij.ServerExplorer", "", properties);
             }
         }
         // for right click show the context menu populated with all the
         // actions from the node
         else if (SwingUtilities.isRightMouseButton(e) || e.isPopupTrigger()) {
             if (node.hasNodeActions()) {
-                properties.put("mouse", "right");
-                AppInsightsCustomEvent.create("AzurePlugin.Intellij.ServerExplorer", "", properties);
-
-                // select the node which was right-clicked
+                 // select the node which was right-clicked
                 tree.getSelectionModel().setSelectionPath(treePath);
 
                 JPopupMenu menu = createPopupMenuForNode(node);

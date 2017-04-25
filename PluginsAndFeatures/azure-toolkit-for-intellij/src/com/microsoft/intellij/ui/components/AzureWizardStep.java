@@ -2,7 +2,7 @@ package com.microsoft.intellij.ui.components;
 
 import com.intellij.ui.wizard.WizardModel;
 import com.intellij.ui.wizard.WizardStep;
-import com.microsoft.intellij.util.AppInsightsCustomEvent;
+import com.microsoft.intellij.util.AppInsightsEventHelper;
 
 import javax.swing.*;
 import java.util.HashMap;
@@ -45,35 +45,34 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
     }
 
     protected void sendTelemetryOnNext(final String action, final T model) {
-        final String eventName = "AzurePlugin.Intellij.WizardStep." + this.getClass().getSimpleName() + "." + action;
         final Map<String, String> properties = new HashMap<>();
-        properties.put("wizardStep", this.getClass().getSimpleName());
-        properties.put("action", action);
-        properties.put("title", this.getTitle());
+        properties.put("WizardStep", this.getClass().getSimpleName());
+        properties.put("Action", action);
+        properties.put("Title", this.getTitle());
 
         if (model != null && model instanceof TelemetryProperties) {
             properties.putAll(((TelemetryProperties) model).toProperties());
         }
 
         addExtraTelemetryProperties(properties);
-        AppInsightsCustomEvent.create(eventName, "", properties);
+        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.WizardStep, this.getClass().getSimpleName(), action, properties);
     }
 
     @Override
     public WizardStep onNext(T model) {
-        sendTelemetryOnNext("next", model);
+        sendTelemetryOnNext("Next", model);
         return super.onNext(model);
     }
 
     @Override
     public boolean onFinish() {
-        sendTelemetryOnNext("finish");
+        sendTelemetryOnNext("Finish");
         return super.onFinish();
     }
 
     @Override
     public boolean onCancel() {
-        sendTelemetryOnNext("cancel");
+        sendTelemetryOnNext("Cancel");
         return super.onCancel();
     }
 }

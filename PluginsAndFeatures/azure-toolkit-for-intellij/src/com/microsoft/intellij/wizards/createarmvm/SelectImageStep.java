@@ -397,7 +397,9 @@ public class SelectImageStep extends AzureWizardStep<VMWizardModel> {
 
     @Override
     protected void addExtraTelemetryProperties(final Map<String, String> properties) {
-        properties.put("region", ((Location) this.regionComboBox.getSelectedItem()).displayName());
+        if (this.regionComboBox.getSelectedItem() instanceof Location) {
+            properties.put("region", ((Location) this.regionComboBox.getSelectedItem()).displayName());
+        }
         if (knownImageBtn.isSelected()) {
             properties.put("image", knownImageComboBox.getSelectedItem().toString());
         } else if (customImageBtn.isSelected()) {

@@ -2,7 +2,7 @@ package com.microsoft.intellij.ui.components;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.microsoft.intellij.util.AppInsightsCustomEvent;
+import com.microsoft.intellij.util.AppInsightsEventHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,17 +95,18 @@ public abstract class AzureDialogWrapper extends DialogWrapper {
     }
 
     protected void sendOKorCancelTelemetry(boolean isOK) {
-        final String eventName = "AzurePlugin.Intellij." + this.getClass().getSimpleName() + (isOK ? ".OK" : ".Cancel");
         final Map<String, String> properties = new HashMap<>();
-        properties.put("window", this.getClass().getSimpleName());
-        properties.put("title", this.getTitle());
+        String action = "OK";
+        properties.put("Window", this.getClass().getSimpleName());
+        properties.put("Title", this.getTitle());
         if (isOK) {
             addOKTelemetryProperties(properties);
         } else {
             addCancelTelemetryProperties(properties);
+            action = "Cancel";
         }
 
-        AppInsightsCustomEvent.create(eventName, "", properties);
+        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Dialog, this.getClass().getSimpleName(), action, properties);
     }
 
     @Override

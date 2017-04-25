@@ -53,7 +53,6 @@ import com.microsoft.azuretools.utils.AzureModelController;
 import com.microsoft.azuretools.utils.CanceledByUserException;
 import com.microsoft.azuretools.utils.WebAppUtils;
 import com.microsoft.intellij.deploy.AzureDeploymentProgressNotification;
-import com.microsoft.intellij.util.AppInsightsCustomEvent;
 import com.microsoft.intellij.ui.components.AzureDialogWrapper;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
@@ -88,6 +87,8 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
 
     private final Project project;
     private final Artifact artifact;
+
+    private Map<String, String> trackableProperties = new HashMap<String, String>();
 
     private void createUIComponents() {
         DefaultTableModel tableModel = new DefaultTableModel() {
@@ -205,11 +206,12 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         setModal(true);
         setTitle("Deploy Web App");
         setOKButtonText("Deploy");
+        trackableProperties.put("Java App Name", project.getName());
 
         editorPaneAppServiceDetails.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
-                if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     // Do something with e.getURL() here
                     //e.getURL().toString()
                     JXHyperlink link = new JXHyperlink();
@@ -222,7 +224,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         Font font = UIManager.getFont("Label.font");
         String bodyRule = "body { font-family: " + font.getFamily() + "; " +
                 "font-size: " + font.getSize() + "pt; }";
-        ((HTMLDocument)editorPaneAppServiceDetails.getDocument()).getStyleSheet().addRule(bodyRule);
+        ((HTMLDocument) editorPaneAppServiceDetails.getDocument()).getStyleSheet().addRule(bodyRule);
 
         init();
     }
@@ -232,6 +234,18 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         dm.getDataVector().removeAllElements();
         webAppWebAppDetailsMap.clear();
         dm.fireTableDataChanged();
+    }
+
+    @Override
+    protected void addCancelTelemetryProperties(final Map<String, String> properties) {
+        super.addCancelTelemetryProperties(properties);
+        properties.putAll(trackableProperties);
+    }
+
+    @Override
+    protected void addOKTelemetryProperties(final Map<String, String> properties) {
+        super.addOKTelemetryProperties(properties);
+        properties.putAll(trackableProperties);
     }
 
     @Nullable
@@ -301,7 +315,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         if (rgaspMap == null) throw new NullPointerException("rgaspMap is null");
 
         cleanTable();
-        DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
 
         for (SubscriptionDetail sd : srgMap.keySet()) {
             if (!sd.isSelected()) continue;
@@ -314,7 +328,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                     }
                 }
             } catch (NullPointerException npe) {
-                LOGGER.error("NPE while initializing App Service Plan map", npe );
+                LOGGER.error("NPE while initializing App Service Plan map", npe);
             }
 
             for (ResourceGroup rg : srgMap.get(sd)) {
@@ -403,7 +417,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
-            String appServiceName = (String)tableModel.getValueAt(selectedRow, 0);
+            String appServiceName = (String) tableModel.getValueAt(selectedRow, 0);
             WebAppDetails wad = webAppWebAppDetailsMap.get(appServiceName);
 
             int choice = JOptionPane.showOptionDialog(WebAppDeployDialog.this.getContentPane(),
@@ -417,7 +431,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                 return;
             }
 
-            try{
+            try {
                 AzureManager manager = AuthMethodManager.getInstance().getAzureManager();
                 if (manager == null) {
                     return;
@@ -429,7 +443,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                             progressIndicator.setIndeterminate(true);
                             progressIndicator.setText("Deleting App Service...");
                             manager.getAzure(wad.subscriptionDetail.getSubscriptionId()).webApps().deleteById(wad.webApp.id());
-                            ApplicationManager.getApplication().invokeAndWait( new Runnable() {
+                            ApplicationManager.getApplication().invokeAndWait(new Runnable() {
                                 @Override
                                 public void run() {
                                     tableModel.removeRow(selectedRow);
@@ -466,7 +480,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
-            String appServiceName = (String)tableModel.getValueAt(selectedRow, 0);
+            String appServiceName = (String) tableModel.getValueAt(selectedRow, 0);
             WebAppDetails wad = webAppWebAppDetailsMap.get(appServiceName);
             SubscriptionDetail sd = wad.subscriptionDetail;
             AppServicePlan asp = wad.appServicePlan;
@@ -504,7 +518,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         }
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         WebAppDetails wad = webAppWebAppDetailsMap.get(tableModel.getValueAt(selectedRow, 0));
-        if (wad.webApp.javaVersion()  == JavaVersion.OFF ) {
+        if (wad.webApp.javaVersion() == JavaVersion.OFF) {
             return new ValidationInfo("Please select java based App Service", table);
         }
 
@@ -539,7 +553,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                     WebAppUtils.deployArtifact(artifact.getName(), artifact.getOutputFilePath(),
                             pp, isDeployToRoot, new UpdateProgressIndicator(progressIndicator));
                     String sitePath = buildSiteLink(wad.webApp, isDeployToRoot ? null : artifact.getName());
-                    postEventProperties.put("WebApp URI", sitePath);
+                    trackableProperties.put("WebApp URI", sitePath);
                     progressIndicator.setText("Checking Web App availability...");
                     progressIndicator.setText2("Link: " + sitePath);
 
@@ -554,7 +568,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                             try {
                                 for (int step = 0; step < stepLimit; ++step) {
 
-                                    if (WebAppUtils.isUrlAccessible(sitePath))  { // warm up
+                                    if (WebAppUtils.isUrlAccessible(sitePath)) { // warm up
                                         break;
                                     }
                                     Thread.sleep(sleepMs);
@@ -573,7 +587,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                     azureDeploymentProgressNotification.notifyProgress(webApp.name(), startDate, sitePath, 100, message("runStatus"));
                     showLink(sitePath);
                 } catch (IOException | InterruptedException ex) {
-                    postEventProperties.put("PublishError", ex.getMessage());
+                    trackableProperties.put("PublishError", ex.getMessage());
                     ex.printStackTrace();
                     LOGGER.error("deploy", ex);
                     ApplicationManager.getApplication().invokeLater(new Runnable() {
@@ -583,7 +597,6 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                         }
                     });
                 }
-                AppInsightsCustomEvent.create("Deploy as WebApp", "", postEventProperties);
             }
         });
     }
@@ -599,8 +612,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                         JOptionPane.QUESTION_MESSAGE,
                         null, null, null);
 
-                if (choice == JOptionPane.YES_OPTION)
-                {
+                if (choice == JOptionPane.YES_OPTION) {
                     JXHyperlink hl = new JXHyperlink();
                     hl.setURI(URI.create(link));
                     hl.doClick();

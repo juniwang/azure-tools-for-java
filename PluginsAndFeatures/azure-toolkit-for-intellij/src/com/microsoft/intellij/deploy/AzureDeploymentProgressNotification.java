@@ -42,7 +42,7 @@ import com.microsoft.azuretools.sdkmanage.AzureManager;
 import com.microsoft.intellij.AzurePlugin;
 import com.microsoft.intellij.activitylog.ActivityLogToolWindowFactory;
 import com.microsoft.intellij.docker.utils.AzureDockerUIResources;
-import com.microsoft.intellij.util.AppInsightsCustomEvent;
+import com.microsoft.intellij.util.AppInsightsEventHelper;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -138,7 +138,7 @@ public final class AzureDeploymentProgressNotification {
         Map<String, String> postEventProperties = new HashMap<String, String>();
         postEventProperties.put("DockerApiName", dockerImageInstance.host.apiUrl);
         postEventProperties.put("DockerFileOption", dockerImageInstance.predefinedDockerfile);
-        String descriptionTask =  String.format("Publishing %s into Docker host %s at port(s) %s", new File(dockerImageInstance.artifactPath).getName(), dockerImageInstance.host.name, dockerImageInstance.dockerPortSettings);
+        String descriptionTask = String.format("Publishing %s into Docker host %s at port(s) %s", new File(dockerImageInstance.artifactPath).getName(), dockerImageInstance.host.name, dockerImageInstance.dockerPortSettings);
         try {
             String msg = String.format("Publishing %s to Docker host %s ...", new File(dockerImageInstance.artifactPath).getName(), dockerImageInstance.host.name);
             notifyProgress(descriptionTask, startDate, null, 5, msg);
@@ -155,21 +155,26 @@ public final class AzureDeploymentProgressNotification {
             if (dockerImageInstance.hasNewDockerHost) {
                 msg = String.format("Creating new virtual machine %s ...", dockerImageInstance.host.name);
                 notifyProgress(descriptionTask, startDate, null, 25, msg);
-                if (AzureDockerUtils.DEBUG) System.out.println("Creating new virtual machine: " + new Date().toString());
+                if (AzureDockerUtils.DEBUG)
+                    System.out.println("Creating new virtual machine: " + new Date().toString());
                 AzureDockerVMOps.createDockerHostVM(azureClient, dockerImageInstance.host);
-                if (AzureDockerUtils.DEBUG) System.out.println("Done creating new virtual machine: " + new Date().toString());
+                if (AzureDockerUtils.DEBUG)
+                    System.out.println("Done creating new virtual machine: " + new Date().toString());
 
                 msg = String.format("Waiting for virtual machine to be up %s ...", dockerImageInstance.host.name);
                 notifyProgress(descriptionTask, startDate, null, 30, msg);
-                if (AzureDockerUtils.DEBUG) System.out.println("Waiting for virtual machine to be up: " + new Date().toString());
+                if (AzureDockerUtils.DEBUG)
+                    System.out.println("Waiting for virtual machine to be up: " + new Date().toString());
                 AzureDockerVMOps.waitForVirtualMachineStartup(azureClient, dockerImageInstance.host);
-                if (AzureDockerUtils.DEBUG) System.out.println("Done Waiting for virtual machine to be up: " + new Date().toString());
+                if (AzureDockerUtils.DEBUG)
+                    System.out.println("Done Waiting for virtual machine to be up: " + new Date().toString());
 
                 msg = String.format("Configuring Docker service for %s ...", dockerImageInstance.host.name);
                 notifyProgress(descriptionTask, startDate, null, 45, msg);
                 if (AzureDockerUtils.DEBUG) System.out.println("Configuring Docker host: " + new Date().toString());
                 AzureDockerVMOps.installDocker(dockerImageInstance.host);
-                if (AzureDockerUtils.DEBUG) System.out.println("Done configuring Docker host: " + new Date().toString());
+                if (AzureDockerUtils.DEBUG)
+                    System.out.println("Done configuring Docker host: " + new Date().toString());
 
                 if (AzureDockerUtils.DEBUG) System.out.println("Finished setting up Docker host");
             } else {
@@ -178,9 +183,11 @@ public final class AzureDeploymentProgressNotification {
             }
 
             if (dockerImageInstance.host.session == null) {
-                if (AzureDockerUtils.DEBUG) System.out.println("Opening a remote connection to the Docker host: " + new Date().toString());
+                if (AzureDockerUtils.DEBUG)
+                    System.out.println("Opening a remote connection to the Docker host: " + new Date().toString());
                 dockerImageInstance.host.session = AzureDockerSSHOps.createLoginInstance(dockerImageInstance.host);
-                if (AzureDockerUtils.DEBUG) System.out.println("Done opening a remote connection to the Docker host: " + new Date().toString());
+                if (AzureDockerUtils.DEBUG)
+                    System.out.println("Done opening a remote connection to the Docker host: " + new Date().toString());
             }
 
             if (dockerImageInstance.hasNewDockerHost) {
@@ -191,27 +198,35 @@ public final class AzureDeploymentProgressNotification {
 
             msg = String.format("Uploading Dockerfile and artifact %s on %s ...", dockerImageInstance.artifactName, dockerImageInstance.host.name);
             notifyProgress(descriptionTask, startDate, null, 60, msg);
-            if (AzureDockerUtils.DEBUG) System.out.println("Uploading Dockerfile and artifact: " + new Date().toString());
+            if (AzureDockerUtils.DEBUG)
+                System.out.println("Uploading Dockerfile and artifact: " + new Date().toString());
             AzureDockerVMOps.uploadDockerfileAndArtifact(dockerImageInstance, dockerImageInstance.host.session);
-            if (AzureDockerUtils.DEBUG) System.out.println("Uploading Dockerfile and artifact: " + new Date().toString());
+            if (AzureDockerUtils.DEBUG)
+                System.out.println("Uploading Dockerfile and artifact: " + new Date().toString());
 
             msg = String.format("Creating Docker image %s on %s ...", dockerImageInstance.dockerImageName, dockerImageInstance.host.name);
             notifyProgress(descriptionTask, startDate, null, 80, msg);
-            if (AzureDockerUtils.DEBUG) System.out.println("Creating a Docker image to the Docker host: " + new Date().toString());
+            if (AzureDockerUtils.DEBUG)
+                System.out.println("Creating a Docker image to the Docker host: " + new Date().toString());
             AzureDockerImageOps.create(dockerImageInstance, dockerImageInstance.host.session);
-            if (AzureDockerUtils.DEBUG) System.out.println("Done creating a Docker image to the Docker host: " + new Date().toString());
+            if (AzureDockerUtils.DEBUG)
+                System.out.println("Done creating a Docker image to the Docker host: " + new Date().toString());
 
             msg = String.format("Creating Docker container %s for image %s on %s ...", dockerImageInstance.dockerContainerName, dockerImageInstance.dockerImageName, dockerImageInstance.host.name);
             notifyProgress(descriptionTask, startDate, null, 85, msg);
-            if (AzureDockerUtils.DEBUG) System.out.println("Creating a Docker container to the Docker host: " + new Date().toString());
+            if (AzureDockerUtils.DEBUG)
+                System.out.println("Creating a Docker container to the Docker host: " + new Date().toString());
             AzureDockerContainerOps.create(dockerImageInstance, dockerImageInstance.host.session);
-            if (AzureDockerUtils.DEBUG) System.out.println("Done creating a Docker container to the Docker host: " + new Date().toString());
+            if (AzureDockerUtils.DEBUG)
+                System.out.println("Done creating a Docker container to the Docker host: " + new Date().toString());
 
             msg = String.format("Starting Docker container %s for image %s on %s ...", dockerImageInstance.dockerContainerName, dockerImageInstance.dockerImageName, dockerImageInstance.host.name);
             notifyProgress(descriptionTask, startDate, null, 90, msg);
-            if (AzureDockerUtils.DEBUG) System.out.println("Starting a Docker container to the Docker host: " + new Date().toString());
+            if (AzureDockerUtils.DEBUG)
+                System.out.println("Starting a Docker container to the Docker host: " + new Date().toString());
             AzureDockerContainerOps.start(dockerImageInstance, dockerImageInstance.host.session);
-            if (AzureDockerUtils.DEBUG) System.out.println("Done starting a Docker container to the Docker host: " + new Date().toString());
+            if (AzureDockerUtils.DEBUG)
+                System.out.println("Done starting a Docker container to the Docker host: " + new Date().toString());
 
             msg = String.format("Updating Docker hosts ...");
             notifyProgress(descriptionTask, startDate, null, 95, msg);
@@ -242,6 +257,6 @@ public final class AzureDeploymentProgressNotification {
             postEventProperties.put("PublishError", ee.getMessage());
             notifyProgress(descriptionTask, startDate, url, 100, "Error: %s", ee.getMessage());
         }
-        AppInsightsCustomEvent.create("Deploy as DockerContainer", "", postEventProperties);
+        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.DockerContainer, null, "Deploy", postEventProperties);
     }
 }

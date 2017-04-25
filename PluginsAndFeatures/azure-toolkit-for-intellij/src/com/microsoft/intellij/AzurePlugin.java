@@ -46,7 +46,7 @@ import com.microsoft.intellij.common.CommonConst;
 import com.microsoft.intellij.ui.libraries.AILibraryHandler;
 import com.microsoft.intellij.ui.libraries.AzureLibrary;
 import com.microsoft.intellij.ui.messages.AzureBundle;
-import com.microsoft.intellij.util.AppInsightsCustomEvent;
+import com.microsoft.intellij.util.AppInsightsEventHelper;
 import com.microsoft.intellij.util.PluginHelper;
 import com.microsoft.intellij.util.PluginUtil;
 import org.apache.commons.io.FileUtils;
@@ -180,7 +180,6 @@ public class AzurePlugin extends AbstractProjectComponent {
                     return;
 
                 final Map<String, String> properties = new HashMap<>();
-                String eventName = "";
 
                 if (event.getSource() instanceof ActionMenuItem) {
                     final ActionMenuItem item = (ActionMenuItem) event.getSource();
@@ -191,12 +190,12 @@ public class AzurePlugin extends AbstractProjectComponent {
                                 actionRef = (ActionRef) FieldUtils.readField(field, item, true);
                                 AnAction anAction = actionRef.getAction();
                                 if (anAction != null && anAction.getClass().getName().contains("microsoft")) {
-                                    eventName = "AzurePlugin.Intellij.MainMenu";
-                                    properties.put("when", String.valueOf(mouseEvent.getWhen()));
-                                    properties.put("text", item.getText());
-                                    properties.put("actionCommand", item.getActionCommand());
-                                    properties.put("action", anAction.getClass().getCanonicalName());
-                                    properties.put("place", "MainMenu");
+                                    properties.put("When", String.valueOf(mouseEvent.getWhen()));
+                                    properties.put("Text", item.getText());
+                                    properties.put("ActionCommand", item.getActionCommand());
+                                    properties.put("Action", anAction.getClass().getCanonicalName());
+
+                                    AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.MainMenu, null, null, properties);
                                 }
                             } catch (IllegalAccessException e) {
                             }
@@ -213,15 +212,11 @@ public class AzurePlugin extends AbstractProjectComponent {
                         }
                     }
                     if (isMicrosoft) {
-                        eventName = "AzurePlugin.Intellij.AzureExplorer";
-                        properties.put("text", menuItem.getText());
-                        properties.put("place", "AzureExplorer");
-                        properties.put("when", String.valueOf(mouseEvent.getWhen()));
-                    }
-                }
+                        properties.put("Text", menuItem.getText());
+                        properties.put("When", String.valueOf(mouseEvent.getWhen()));
 
-                if (!properties.isEmpty()) {
-                    AppInsightsCustomEvent.create(eventName, "", properties);
+                        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.AzureExplorer, null, null, properties);
+                    }
                 }
             }
         }, eventMask);
@@ -268,7 +263,7 @@ public class AzurePlugin extends AbstractProjectComponent {
             LOG.error(message("error"), ex);
         }
 
-        AppInsightsCustomEvent.create(message("telAgrEvtName"), "");
+        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Application, null, "Config", null);
     }
 
     /**

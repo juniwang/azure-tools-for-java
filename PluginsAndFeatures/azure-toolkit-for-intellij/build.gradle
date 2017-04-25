@@ -59,6 +59,8 @@ dependencies {
     compile 'com.microsoft.azuretools:azuretools-core:3.0.0-SNAPSHOT'
     compile 'com.microsoft.azuretools:azure-explorer-common:3.0.0-SNAPSHOT'
     compile 'com.microsoft.azuretools:hdinsight-node-common:3.0.0-SNAPSHOT'
+    runtime 'com.microsoft.azure:azure-client-runtime:1.0.2'
+    runtime 'com.microsoft.azure:azure-client-authentication:1.0.2'
 }
 
 

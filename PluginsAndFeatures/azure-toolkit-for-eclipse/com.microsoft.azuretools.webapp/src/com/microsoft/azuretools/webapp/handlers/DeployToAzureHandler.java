@@ -25,6 +25,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -38,8 +39,15 @@ public class DeployToAzureHandler extends AbstractHandler {
     public Object execute(ExecutionEvent ee) throws ExecutionException {
         IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(ee);
         IProject project = PluginUtil.getSelectedProject();
-        if (!SignInCommandHandler.doSignIn( window.getShell())) return null;
-        WebAppDeployDialog.go(window.getShell(), project);
+        if (project != null) {
+            if (!SignInCommandHandler.doSignIn( window.getShell())) return null;
+            WebAppDeployDialog.go(window.getShell(), project);
+        } else {
+            MessageDialog.openInformation(
+                    window.getShell(),
+                    "Deploy to Azure App Service",
+                    "Can't detect an active project");
+        }
         return null;
     }
 

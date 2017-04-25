@@ -632,8 +632,6 @@ public class WebAppUtils {
         }
 
         // update cache
-        AzureModel azureModel = AzureModel.getInstance();
-
         if (model.isResourceGroupCreateNew) {
             ResourceGroup rg = azure.resourceGroups().getByName(model.resourceGroupNameCreateNew);
             if (rg == null) {
@@ -643,10 +641,6 @@ public class WebAppUtils {
             AzureModelController.addNewResourceGroup(model.subscriptionDetail, rg);
             AzureModelController.addNewWebAppToJustCreatedResourceGroup(rg, myWebApp);
             if (model.isAppServicePlanCreateNew) {
-//                AppServicePlan asp = azure.appServices().appServicePlans().getById(myWebApp.appServicePlanId());
-//                if (asp == null) {
-//                    throw new AzureCmdException(String.format("azure.appServices().appServicePlans().getById(%s) returned null"), myWebApp.appServicePlanId());
-//                }
                 AzureModelController.addNewAppServicePlanToJustCreatedResourceGroup(rg, appServicePlan);
             } else {
                 // add empty list

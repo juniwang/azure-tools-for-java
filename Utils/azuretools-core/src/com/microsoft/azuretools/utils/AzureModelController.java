@@ -314,9 +314,9 @@ public class AzureModelController {
         // presume addNewResourceGroup goes first
         List<WebApp> l = new LinkedList<>();
         l.add(webApp);
+        AzureModel.getInstance().getResourceGroupToWebAppMap().put(rg, l);
+        // TODO:notify subscribers
         if (AzureUIRefreshCore.listeners != null) {
-            AzureModel.getInstance().getResourceGroupToWebAppMap().put(rg, l);
-            // TODO:notify subscribers
             AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, new WebAppDetails(rg, webApp, null, null)));
         }
     }
@@ -330,14 +330,6 @@ public class AzureModelController {
     }
 
     public static void removeWebAppFromResourceGroup(ResourceGroup rg, WebApp webApp) {
-//        String waName = webApp.name().toLowerCase();
-//        List<WebApp> wal = AzureModel.getInstance().getResourceGroupToWebAppMap().get(rg);
-//        for (int i = 0; i < wal.size(); ++i) {
-//            if (wal.get(i).name().toLowerCase().equals(waName)) {
-//                wal.remove(i);
-//                break;
-//            }
-//        }
         AzureModel.getInstance().getResourceGroupToWebAppMap().get(rg).remove(webApp);
         // TODO:notify subscribers
         if (AzureUIRefreshCore.listeners != null) {

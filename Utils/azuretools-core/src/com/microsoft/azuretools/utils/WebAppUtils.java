@@ -683,6 +683,7 @@ public class WebAppUtils {
         public SubscriptionDetail subscriptionDetail;
         public ResourceGroup resourceGroup;
         public AppServicePlan appServicePlan;
+        public ResourceGroup appServicePlanResourceGroup;
         public WebApp webApp;
 
         public WebAppDetails() {}

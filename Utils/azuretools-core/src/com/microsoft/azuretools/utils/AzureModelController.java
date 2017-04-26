@@ -337,6 +337,10 @@ public class AzureModelController {
         }
     }
 
+    public static void removeAppServicePlanFromResourceGroup(ResourceGroup rg, AppServicePlan appServicePlan) {
+        AzureModel.getInstance().getResourceGroupToAppServicePlanMap().get(rg).remove(appServicePlan);
+    }
+
     public static void addNewAppServicePlanToJustCreatedResourceGroup(ResourceGroup rg, AppServicePlan appServicePlan) {
         // presume addNewResourceGroup call goes first
         List<AppServicePlan> l = new LinkedList<>();

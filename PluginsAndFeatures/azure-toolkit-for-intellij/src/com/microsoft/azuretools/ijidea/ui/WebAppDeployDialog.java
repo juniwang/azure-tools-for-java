@@ -39,6 +39,7 @@ import com.intellij.ui.AnActionButtonRunnable;
 import com.intellij.ui.AnActionButtonUpdater;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
+import com.microsoft.azure.management.Azure;
 import com.microsoft.azure.management.appservice.AppServicePlan;
 import com.microsoft.azure.management.appservice.JavaVersion;
 import com.microsoft.azure.management.appservice.PublishingProfile;
@@ -284,6 +285,21 @@ public class WebAppDeployDialog extends DialogWrapper {
         });
     }
 
+    private static class AspDetails {
+        private AppServicePlan asp;
+        private ResourceGroup rg;
+        public AspDetails(AppServicePlan asp, ResourceGroup rg) {
+            this.asp = asp;
+            this.rg = rg;
+        }
+        public AppServicePlan getAsp() {
+            return asp;
+        }
+        public ResourceGroup getRg() {
+            return rg;
+        }
+    }
+
     private void doFillTable() {
 
         Map<SubscriptionDetail, List<ResourceGroup>> srgMap = AzureModel.getInstance().getSubscriptionToResourceGroupMap();
@@ -295,15 +311,14 @@ public class WebAppDeployDialog extends DialogWrapper {
 
         cleanTable();
         DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
-
         for (SubscriptionDetail sd : srgMap.keySet()) {
             if (!sd.isSelected()) continue;
 
-            Map<String, AppServicePlan> aspMap = new HashMap<>();
+            Map<String, AspDetails> aspMap = new HashMap<>();
             try {
                 for (ResourceGroup rg : srgMap.get(sd)) {
                     for (AppServicePlan asp : rgaspMap.get(rg)) {
-                        aspMap.put(asp.id(), asp);
+                        aspMap.put(asp.id(), new AspDetails(asp, rg));
                     }
                 }
             } catch (NullPointerException npe) {
@@ -331,7 +346,8 @@ public class WebAppDeployDialog extends DialogWrapper {
                     webAppDetails.webApp = wa;
                     webAppDetails.subscriptionDetail = sd;
                     webAppDetails.resourceGroup = rg;
-                    webAppDetails.appServicePlan = aspMap.get(wa.appServicePlanId());
+                    webAppDetails.appServicePlan = aspMap.get(wa.appServicePlanId()).getAsp();
+                    webAppDetails.appServicePlanResourceGroup = aspMap.get(wa.appServicePlanId()).getRg();
                     webAppWebAppDetailsMap.put(wa.name(), webAppDetails);
                 }
             }
@@ -421,14 +437,21 @@ public class WebAppDeployDialog extends DialogWrapper {
                         try {
                             progressIndicator.setIndeterminate(true);
                             progressIndicator.setText("Deleting App Service...");
-                            manager.getAzure(wad.subscriptionDetail.getSubscriptionId()).webApps().deleteById(wad.webApp.id());
+                            Azure azure = manager.getAzure(wad.subscriptionDetail.getSubscriptionId());
+                            azure.webApps().deleteById(wad.webApp.id());
+                            // check asp still exists
+                            AppServicePlan asp = azure.appServices().appServicePlans().getById(wad.appServicePlan.id());
+                            System.out.println("asp is " + (asp == null ? "null -> removing form cache" : asp.name()));
+                            // update cache
+                            AzureModelController.removeWebAppFromResourceGroup(wad.resourceGroup, wad.webApp);
+                            if (asp == null) {
+                                AzureModelController.removeAppServicePlanFromResourceGroup(wad.appServicePlanResourceGroup, wad.appServicePlan);
+                            }
                             ApplicationManager.getApplication().invokeAndWait( new Runnable() {
                                 @Override
                                 public void run() {
                                     tableModel.removeRow(selectedRow);
                                     tableModel.fireTableDataChanged();
-                                    // update cache
-                                    AzureModelController.removeWebAppFromResourceGroup(wad.resourceGroup, wad.webApp);
                                     editorPaneAppServiceDetails.setText("");
                                 }
                             });

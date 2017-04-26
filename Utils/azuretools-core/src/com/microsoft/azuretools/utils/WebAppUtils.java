@@ -658,6 +658,20 @@ public class WebAppUtils {
         return myWebApp;
     }
 
+    public static void deleteAppService(WebAppDetails webAppDetails) throws IOException {
+        AzureManager azureManager = AuthMethodManager.getInstance().getAzureManager();
+        Azure azure = azureManager.getAzure(webAppDetails.subscriptionDetail.getSubscriptionId());
+        azure.webApps().deleteById(webAppDetails.webApp.id());
+        // check asp still exists
+        AppServicePlan asp = azure.appServices().appServicePlans().getById(webAppDetails.appServicePlan.id());
+        System.out.println("asp is " + (asp == null ? "null -> removing form cache" : asp.name()));
+        // update cache
+        AzureModelController.removeWebAppFromResourceGroup(webAppDetails.resourceGroup, webAppDetails.webApp);
+        if (asp == null) {
+            AzureModelController.removeAppServicePlanFromResourceGroup(webAppDetails.appServicePlanResourceGroup, webAppDetails.appServicePlan);
+        }
+    }
+
     public static void uploadWebConfig(WebApp webApp, InputStream fileStream, IProgressIndicator indicator) throws IOException {
         FTPClient ftp = null;
         try {
@@ -688,12 +702,29 @@ public class WebAppUtils {
 
         public WebAppDetails() {}
 
-        public WebAppDetails(ResourceGroup resourceGroup, WebApp webApp, AppServicePlan appServicePlan, SubscriptionDetail subscriptionDetail) {
+        public WebAppDetails(ResourceGroup resourceGroup, WebApp webApp,
+                             AppServicePlan appServicePlan, ResourceGroup appServicePlanResourceGroup,
+                             SubscriptionDetail subscriptionDetail) {
             this.resourceGroup = resourceGroup;
             this.webApp = webApp;
             this.appServicePlan = appServicePlan;
+            this.appServicePlanResourceGroup = appServicePlanResourceGroup;
             this.subscriptionDetail = subscriptionDetail;
         }
     }
 
+    public static class AspDetails {
+        private AppServicePlan asp;
+        private ResourceGroup rg;
+        public AspDetails(AppServicePlan asp, ResourceGroup rg) {
+            this.asp = asp;
+            this.rg = rg;
+        }
+        public AppServicePlan getAsp() {
+            return asp;
+        }
+        public ResourceGroup getRg() {
+            return rg;
+        }
+    }
 }

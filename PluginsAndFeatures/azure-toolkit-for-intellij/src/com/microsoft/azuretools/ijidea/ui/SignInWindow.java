@@ -41,8 +41,11 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,6 +71,7 @@ public class SignInWindow extends DialogWrapper {
     private JTextField authFileTextField;
     private JButton browseButton;
     private JButton createNewAuthenticationFileButton;
+    private JEditorPane manualSpNoteEditorPane;
 
     private AuthMethodDetails authMethodDetails;
     private AuthMethodDetails authMethodDetailsResult;
@@ -137,6 +141,25 @@ public class SignInWindow extends DialogWrapper {
         Font labelFont = UIManager.getFont("Label.font");
         interactiveCommentTextPane.setFont(labelFont);
         automatedCommentTextPane.setFont(labelFont);
+
+        //manualSpNoteEditorPane.setFont(labelFont);
+        Font font = UIManager.getFont("Label.font");
+        String bodyRule = "body { font-family: " + font.getFamily() + "; " +
+                "font-size: " + font.getSize() + "pt; }";
+        ((HTMLDocument) manualSpNoteEditorPane.getDocument()).getStyleSheet().addRule(bodyRule);
+
+
+        manualSpNoteEditorPane.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    JXHyperlink link = new JXHyperlink();
+                    link.setURI(URI.create(e.getURL().toString()));
+                    link.doClick();
+                }
+            }
+        });
+
 
         interactiveRadioButton.setSelected(true);
         onInteractiveRadioButton();

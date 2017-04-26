@@ -3,7 +3,7 @@
   <grid id="cbd77" binding="contentPane" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="48" y="54" width="603" height="420"/>
+      <xy x="48" y="54" width="603" height="343"/>
     </constraints>
     <properties>
       <enabled value="true"/>
@@ -34,7 +34,7 @@
               <text value="Automated"/>
             </properties>
           </component>
-          <grid id="9ade3" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="9ade3" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="3" use-parent-layout="false"/>
@@ -91,6 +91,19 @@
                 </constraints>
                 <properties>
                   <text value="New..."/>
+                </properties>
+              </component>
+              <component id="af2c9" class="javax.swing.JEditorPane" binding="manualSpNoteEditorPane">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="50"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <contentType value="text/html"/>
+                  <editable value="false"/>
+                  <opaque value="false"/>
+                  <text value="&lt;html&gt;&#10;  &lt;head&gt;&#10;    &#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;    (Note: In some cases, the Toolkit may not be able to create this file &#10;    programmatically. In that case, follow &lt;a href=&quot;https://go.microsoft.com/fwlink/?linkid=847862&quot;&gt;these &#10;    manual steps &lt;/a&gt;instead.)&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;"/>
                 </properties>
               </component>
             </children>

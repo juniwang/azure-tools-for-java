@@ -79,7 +79,7 @@ public class AzureConfigureDockerContainerStep extends WizardPage {
 	 * Create the wizard.
 	 */
 	public AzureConfigureDockerContainerStep(AzureSelectDockerWizard wizard) {
-		super("Deploying Docker Container on Azure", "", Activator.getImageDescriptor("icons/large/Azure.png"));
+		super("Deploying Docker Container on Azure", "", Activator.getImageDescriptor("icons/large/DeployToAzureWizard.png"));
 
 		this.wizard = wizard;		
 		this.dockerManager = wizard.getDockerManager();

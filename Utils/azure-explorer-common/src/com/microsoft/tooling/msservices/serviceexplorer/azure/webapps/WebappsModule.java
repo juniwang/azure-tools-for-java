@@ -37,13 +37,14 @@ import static com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
 
 public class WebappsModule extends AzureRefreshableNode {
 	private static final String WEBAPPS_MODULE_ID = WebappsModule.class.getName();
-	private static final String WEB_RUN_ICON = "website.png";
-	private static final String WEB_STOP_ICON = "stopWebsite.png";
+	private static final String WEB_RUN_ICON = "WebAppRunning_16.png";
+	private static final String WEB_STOP_ICON = "WebAppStopped_16.png";
+	private static final String WEB_APP_ICON = "WebApp_16.png";
 	private static final String BASE_MODULE_NAME = "Web Apps";
 	private static final String RUN_STATUS = "Running";
 
 	public WebappsModule(Node parent) {
-		super(WEBAPPS_MODULE_ID, BASE_MODULE_NAME, parent, WEB_RUN_ICON);
+		super(WEBAPPS_MODULE_ID, BASE_MODULE_NAME, parent, WEB_APP_ICON);
 		createListener();
 	}
 

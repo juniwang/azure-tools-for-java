@@ -39,8 +39,8 @@ public class WebappNode extends Node {
 	private static final String ACTION_START = "Start";
 	private static final String ACTION_STOP = "Stop";
 	private static final String ACTION_RESTART = "Restart";
-	private static final String WEB_RUN_ICON = "website.png";
-	private static final String WEB_STOP_ICON = "stopWebsite.png";
+	private static final String WEB_RUN_ICON = "WebAppRunning_16.png";
+	private static final String WEB_STOP_ICON = "WebAppStopped_16.png";
 	private static final String RUN_STATUS = "Running";
 	private WebApp webApp;
 	private ResourceGroup resourceGroup;

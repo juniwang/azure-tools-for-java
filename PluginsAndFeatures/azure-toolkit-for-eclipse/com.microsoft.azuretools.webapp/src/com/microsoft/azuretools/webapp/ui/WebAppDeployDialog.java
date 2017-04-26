@@ -121,7 +121,7 @@ public class WebAppDeployDialog extends TitleAreaDialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        Image image = PluginUtil.getImage("icons/large/Azure.png");
+        Image image = PluginUtil.getImage("icons/large/DeployToAzureWizard.png");
         if (image != null) {
         	setTitleImage(image);
         }

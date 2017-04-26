@@ -23,6 +23,8 @@ package com.microsoft.azuretools.core.ui;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +54,8 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import com.microsoft.azuretools.adauth.AuthCanceledException;
 import com.microsoft.azuretools.adauth.StringUtils;
@@ -62,6 +66,7 @@ import com.microsoft.azuretools.authmanage.models.AuthMethodDetails;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.core.Activator;
 import com.microsoft.azuretools.sdkmanage.AccessTokenAzureManager;
+import org.eclipse.swt.widgets.Link;
 
 public class SignInDialog extends TitleAreaDialog {
 	private static ILog LOG = Activator.getDefault().getLog();
@@ -77,6 +82,7 @@ public class SignInDialog extends TitleAreaDialog {
     private AuthMethodDetails authMethodDetails;
     private String accountEmail;
     FileDialog fileDialog;
+    private Link link;
 
     public AuthMethodDetails getAuthMethodDetails() {
         return authMethodDetails;
@@ -209,6 +215,23 @@ public class SignInDialog extends TitleAreaDialog {
         btnCreateAuthenticationFile.setEnabled(false);
         btnCreateAuthenticationFile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         btnCreateAuthenticationFile.setText("New...");
+        
+        link = new Link(compositeAutomated, SWT.NONE);
+        link.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                try {
+                    PlatformUI.getWorkbench().getBrowserSupport().
+                    getExternalBrowser().openURL(new URL("https://go.microsoft.com/fwlink/?linkid=847862"));
+                } catch (PartInitException | MalformedURLException ex) {
+                    LOG.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "widgetSelected@SelectionAdapter@link@SignInDialog", ex));
+                }
+            }
+        });
+        GridData gd_link = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1);
+        gd_link.widthHint = 312;
+        link.setLayoutData(gd_link);
+        link.setText("(Note: In some cases, the Toolkit may not be able to create this file programmatically. In that case, follow <a>these manual steps </a> instead.)");
         
         fileDialog = new FileDialog(btnBrowse.getShell(), SWT.OPEN);
         fileDialog.setText("Select Authentication File");

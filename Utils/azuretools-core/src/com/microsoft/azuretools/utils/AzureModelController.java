@@ -144,6 +144,13 @@ public class AzureModelController {
                 Subscription subscription = sidToSubscriptionMap.get(sd.getSubscriptionId());
                 if(progressIndicator != null) progressIndicator.setText(String.format("Updating subscription '%s' locations...", subscription.displayName()));
                 List<Location> locl = subscription.listLocations();
+                Collections.sort(locl, new Comparator<Location>() {
+                    @Override
+                    public int compare(Location lhs, Location rhs) {
+                        return lhs.displayName().compareTo(rhs.displayName());
+                    }
+                });
+
                 Map<SubscriptionDetail, List<Location>> sdlocMap = azureModel.getSubscriptionToLocationMap();
                 sdlocMap.put(sd, locl);
 

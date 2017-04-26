@@ -57,20 +57,18 @@ import com.microsoft.azure.management.appservice.JavaVersion;
 import com.microsoft.azure.management.appservice.PublishingProfile;
 import com.microsoft.azure.management.appservice.WebApp;
 import com.microsoft.azure.management.resources.ResourceGroup;
-import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.core.telemetry.AppInsightsCustomEvent;
 import com.microsoft.azuretools.core.ui.ErrorWindow;
 import com.microsoft.azuretools.core.ui.views.AzureDeploymentProgressNotification;
-import com.microsoft.azuretools.core.utils.Messages;
 import com.microsoft.azuretools.core.utils.PluginUtil;
 import com.microsoft.azuretools.core.utils.ProgressDialog;
 import com.microsoft.azuretools.core.utils.UpdateProgressIndicator;
-import com.microsoft.azuretools.sdkmanage.AzureManager;
 import com.microsoft.azuretools.utils.AzureModel;
 import com.microsoft.azuretools.utils.AzureModelController;
 import com.microsoft.azuretools.utils.CanceledByUserException;
 import com.microsoft.azuretools.utils.WebAppUtils;
+import com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
 import com.microsoft.azuretools.webapp.Activator;
 
 
@@ -86,13 +84,6 @@ public class WebAppDeployDialog extends TitleAreaDialog {
     
     private IProject project;
     private Shell parentShell;
-    
-    static class WebAppDetails {
-        public SubscriptionDetail subscriptionDetail;
-        public ResourceGroup resourceGroup;
-        public AppServicePlan appServicePlan;
-        public WebApp webApp;
-    }
     
     final String ftpLinkString = "ShowFtpCredentials";
 
@@ -377,10 +368,10 @@ public class WebAppDeployDialog extends TitleAreaDialog {
         for (SubscriptionDetail sd : srgMap.keySet()) {
             if (!sd.isSelected()) continue;
 
-            Map<String, AppServicePlan> aspMap = new HashMap<>();
+            Map<String, WebAppUtils.AspDetails> aspMap = new HashMap<>();
             for (ResourceGroup rg : srgMap.get(sd)) {
                 for (AppServicePlan asp : rgaspMap.get(rg)) {
-                    aspMap.put(asp.id(), asp);
+                    aspMap.put(asp.id(), new WebAppUtils.AspDetails(asp, rg));
                 }
             }
             
@@ -408,7 +399,8 @@ public class WebAppDeployDialog extends TitleAreaDialog {
                     webAppDetails.webApp = wa;
                     webAppDetails.subscriptionDetail = sd;
                     webAppDetails.resourceGroup = rg;
-                    webAppDetails.appServicePlan = aspMap.get(wa.appServicePlanId());
+                    webAppDetails.appServicePlan = aspMap.get(wa.appServicePlanId()).getAsp();
+                    webAppDetails.appServicePlanResourceGroup = aspMap.get(wa.appServicePlanId()).getRg();
                     webAppDetailsMap.put(wa.name(), webAppDetails);
                 }
             }
@@ -686,18 +678,13 @@ public class WebAppDeployDialog extends TitleAreaDialog {
         
         String errTitle = "Delete App Service Error";
         try{
-            AzureManager manager = AuthMethodManager.getInstance().getAzureManager();
-            if (manager == null) { 
-                return;
-            }
             ProgressDialog.get(this.getShell(), "Delete App Service Progress").run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(IProgressMonitor monitor) {
                     monitor.beginTask("Deleting App Service...", IProgressMonitor.UNKNOWN);
                     
                     try {
-                        manager.getAzure(wad.subscriptionDetail.getSubscriptionId()).webApps().deleteById(wad.webApp.id());
-                        AzureModelController.removeWebAppFromResourceGroup(wad.resourceGroup, wad.webApp);
+                        WebAppUtils.deleteAppService(wad);
                         Display.getDefault().asyncExec(new Runnable() {
                             @Override
                             public void run() {

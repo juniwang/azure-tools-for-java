@@ -452,10 +452,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                         try {
                             progressIndicator.setIndeterminate(true);
                             progressIndicator.setText("Deleting App Service...");
-<<<<<<< HEAD
-                            manager.getAzure(wad.subscriptionDetail.getSubscriptionId()).webApps().deleteById(wad.webApp.id());
-                            ApplicationManager.getApplication().invokeAndWait(new Runnable() {
-=======
+
                             Azure azure = manager.getAzure(wad.subscriptionDetail.getSubscriptionId());
                             azure.webApps().deleteById(wad.webApp.id());
                             // check asp still exists
@@ -467,7 +464,6 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                                 AzureModelController.removeAppServicePlanFromResourceGroup(wad.appServicePlanResourceGroup, wad.appServicePlan);
                             }
                             ApplicationManager.getApplication().invokeAndWait( new Runnable() {
->>>>>>> upstream/work/v3.0.0
                                 @Override
                                 public void run() {
                                     tableModel.removeRow(selectedRow);
@@ -559,8 +555,6 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         WebAppDetails wad = webAppWebAppDetailsMap.get(tableModel.getValueAt(selectedRow, 0));
         WebApp webApp = wad.webApp;
         boolean isDeployToRoot = deployToRootCheckBox.isSelected();
-        Map<String, String> postEventProperties = new HashMap<String, String>();
-        postEventProperties.put("Java App Name", project.getName());
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Deploy Web App Progress", true) {
             @Override
             public void run(@NotNull ProgressIndicator progressIndicator) {
@@ -575,10 +569,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                     WebAppUtils.deployArtifact(artifact.getName(), artifact.getOutputFilePath(),
                             pp, isDeployToRoot, new UpdateProgressIndicator(progressIndicator));
                     String sitePath = buildSiteLink(wad.webApp, isDeployToRoot ? null : artifact.getName());
-<<<<<<< HEAD
                     trackableProperties.put("WebApp URI", sitePath);
-=======
->>>>>>> upstream/work/v3.0.0
                     progressIndicator.setText("Checking Web App availability...");
                     progressIndicator.setText2("Link: " + sitePath);
 

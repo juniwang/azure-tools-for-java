@@ -233,27 +233,21 @@ public final class AzureDeploymentProgressNotification {
                 System.out.println("Done creating a Docker image to the Docker host: " + new Date().toString());
 
             msg = String.format("Creating Docker container %s for image %s on %s ...", dockerImageInstance.dockerContainerName, dockerImageInstance.dockerImageName, dockerImageInstance.host.name);
-<<<<<<< HEAD
             notifyProgress(descriptionTask, startDate, null, 85, msg);
             if (AzureDockerUtils.DEBUG)
                 System.out.println("Creating a Docker container to the Docker host: " + new Date().toString());
-=======
             notifyProgress(descriptionTask, startDate, null, 90, msg);
             if (AzureDockerUtils.DEBUG) System.out.println("Creating a Docker container to the Docker host: " + new Date().toString());
->>>>>>> upstream/work/v3.0.0
             AzureDockerContainerOps.create(dockerImageInstance, dockerImageInstance.host.session);
             if (AzureDockerUtils.DEBUG)
                 System.out.println("Done creating a Docker container to the Docker host: " + new Date().toString());
 
             msg = String.format("Starting Docker container %s for image %s on %s ...", dockerImageInstance.dockerContainerName, dockerImageInstance.dockerImageName, dockerImageInstance.host.name);
-<<<<<<< HEAD
             notifyProgress(descriptionTask, startDate, null, 90, msg);
             if (AzureDockerUtils.DEBUG)
                 System.out.println("Starting a Docker container to the Docker host: " + new Date().toString());
-=======
             notifyProgress(descriptionTask, startDate, null, 95, msg);
             if (AzureDockerUtils.DEBUG) System.out.println("Starting a Docker container to the Docker host: " + new Date().toString());
->>>>>>> upstream/work/v3.0.0
             AzureDockerContainerOps.start(dockerImageInstance, dockerImageInstance.host.session);
             if (AzureDockerUtils.DEBUG)
                 System.out.println("Done starting a Docker container to the Docker host: " + new Date().toString());

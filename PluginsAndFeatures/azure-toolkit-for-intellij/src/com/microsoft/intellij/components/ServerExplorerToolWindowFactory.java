@@ -39,7 +39,6 @@ import com.microsoft.azuretools.ijidea.actions.SelectSubscriptionsAction;
 import com.microsoft.intellij.AzurePlugin;
 import com.microsoft.intellij.helpers.UIHelperImpl;
 import com.microsoft.intellij.serviceexplorer.azure.AzureModuleImpl;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.tooling.msservices.helpers.collections.ListChangeListener;
 import com.microsoft.tooling.msservices.helpers.collections.ListChangedEvent;
@@ -141,7 +140,7 @@ public class ServerExplorerToolWindowFactory implements ToolWindowFactory, Prope
         // actions from the node
         else if (SwingUtilities.isRightMouseButton(e) || e.isPopupTrigger()) {
             if (node.hasNodeActions()) {
-                 // select the node which was right-clicked
+                // select the node which was right-clicked
                 tree.getSelectionModel().setSelectionPath(treePath);
 
                 JPopupMenu menu = createPopupMenuForNode(node);
@@ -334,21 +333,21 @@ public class ServerExplorerToolWindowFactory implements ToolWindowFactory, Prope
                 Runnable forceRefreshTitleActions = () -> {
                     try {
                         toolWindowEx.setTitleActions(
-                                new AnAction("Refresh", "Refresh Azure Nodes List", null) {
-                                    @Override
-                                    public void actionPerformed(AnActionEvent event) {
-                                        azureModule.load(true);
-                                    }
+                            new AnAction("Refresh", "Refresh Azure Nodes List", null) {
+                                @Override
+                                public void actionPerformed(AnActionEvent event) {
+                                    azureModule.load(true);
+                                }
 
-                                    @Override
-                                    public void update(AnActionEvent e) {
-                                        boolean isDarkTheme = DefaultLoader.getUIHelper().isDarkTheme();
-                                        e.getPresentation().setIcon(UIHelperImpl.loadIcon(isDarkTheme ?
-                                                RefreshableNode.REFRESH_ICON_DARK : RefreshableNode.REFRESH_ICON_LIGHT));
-                                    }
-                                },
-                                new AzureSignInAction(),
-                                new SelectSubscriptionsAction());
+                                @Override
+                                public void update(AnActionEvent e) {
+                                    boolean isDarkTheme = DefaultLoader.getUIHelper().isDarkTheme();
+                                    e.getPresentation().setIcon(UIHelperImpl.loadIcon(isDarkTheme ?
+                                            RefreshableNode.REFRESH_ICON_DARK : RefreshableNode.REFRESH_ICON_LIGHT));
+                                }
+                            },
+                            new AzureSignInAction(),
+                            new SelectSubscriptionsAction());
                     } catch (Exception e) {
                         AzurePlugin.log(e.getMessage(), e);
                     }

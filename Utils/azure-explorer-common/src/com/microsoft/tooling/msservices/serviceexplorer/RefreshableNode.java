@@ -78,7 +78,7 @@ public abstract class RefreshableNode extends Node {
     // to refresh items asynchronously. The default implementation simply
     // delegates to "refreshItems" *synchronously* and completes the Future
     // with the result of calling getChildNodes.
-    protected void refreshItems(SettableFuture<List<Node>> future, boolean forceRefresh) {
+    protected synchronized void refreshItems(SettableFuture<List<Node>> future, boolean forceRefresh) {
         if (!loading) {
             setLoading(true);
             try {

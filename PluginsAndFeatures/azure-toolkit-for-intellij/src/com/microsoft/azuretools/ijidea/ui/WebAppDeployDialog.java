@@ -39,6 +39,7 @@ import com.intellij.ui.AnActionButtonRunnable;
 import com.intellij.ui.AnActionButtonUpdater;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
+import com.microsoft.azure.management.Azure;
 import com.microsoft.azure.management.appservice.AppServicePlan;
 import com.microsoft.azure.management.appservice.JavaVersion;
 import com.microsoft.azure.management.appservice.PublishingProfile;
@@ -73,6 +74,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
 
 public class WebAppDeployDialog extends AzureDialogWrapper {
@@ -157,13 +159,6 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                 .addExtraActions(refreshAction);
 
         panelTable = tableToolbarDecorator.createPanel();
-    }
-
-    static class WebAppDetails {
-        public SubscriptionDetail subscriptionDetail;
-        public ResourceGroup resourceGroup;
-        public AppServicePlan appServicePlan;
-        public WebApp webApp;
     }
 
     private Map<String, WebAppDetails> webAppWebAppDetailsMap = new HashMap<>();
@@ -305,6 +300,21 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         });
     }
 
+    private static class AspDetails {
+        private AppServicePlan asp;
+        private ResourceGroup rg;
+        public AspDetails(AppServicePlan asp, ResourceGroup rg) {
+            this.asp = asp;
+            this.rg = rg;
+        }
+        public AppServicePlan getAsp() {
+            return asp;
+        }
+        public ResourceGroup getRg() {
+            return rg;
+        }
+    }
+
     private void doFillTable() {
 
         Map<SubscriptionDetail, List<ResourceGroup>> srgMap = AzureModel.getInstance().getSubscriptionToResourceGroupMap();
@@ -315,16 +325,15 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         if (rgaspMap == null) throw new NullPointerException("rgaspMap is null");
 
         cleanTable();
-        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-
+        DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
         for (SubscriptionDetail sd : srgMap.keySet()) {
             if (!sd.isSelected()) continue;
 
-            Map<String, AppServicePlan> aspMap = new HashMap<>();
+            Map<String, AspDetails> aspMap = new HashMap<>();
             try {
                 for (ResourceGroup rg : srgMap.get(sd)) {
                     for (AppServicePlan asp : rgaspMap.get(rg)) {
-                        aspMap.put(asp.id(), asp);
+                        aspMap.put(asp.id(), new AspDetails(asp, rg));
                     }
                 }
             } catch (NullPointerException npe) {
@@ -352,7 +361,8 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                     webAppDetails.webApp = wa;
                     webAppDetails.subscriptionDetail = sd;
                     webAppDetails.resourceGroup = rg;
-                    webAppDetails.appServicePlan = aspMap.get(wa.appServicePlanId());
+                    webAppDetails.appServicePlan = aspMap.get(wa.appServicePlanId()).getAsp();
+                    webAppDetails.appServicePlanResourceGroup = aspMap.get(wa.appServicePlanId()).getRg();
                     webAppWebAppDetailsMap.put(wa.name(), webAppDetails);
                 }
             }
@@ -442,14 +452,26 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                         try {
                             progressIndicator.setIndeterminate(true);
                             progressIndicator.setText("Deleting App Service...");
+<<<<<<< HEAD
                             manager.getAzure(wad.subscriptionDetail.getSubscriptionId()).webApps().deleteById(wad.webApp.id());
                             ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+=======
+                            Azure azure = manager.getAzure(wad.subscriptionDetail.getSubscriptionId());
+                            azure.webApps().deleteById(wad.webApp.id());
+                            // check asp still exists
+                            AppServicePlan asp = azure.appServices().appServicePlans().getById(wad.appServicePlan.id());
+                            System.out.println("asp is " + (asp == null ? "null -> removing form cache" : asp.name()));
+                            // update cache
+                            AzureModelController.removeWebAppFromResourceGroup(wad.resourceGroup, wad.webApp);
+                            if (asp == null) {
+                                AzureModelController.removeAppServicePlanFromResourceGroup(wad.appServicePlanResourceGroup, wad.appServicePlan);
+                            }
+                            ApplicationManager.getApplication().invokeAndWait( new Runnable() {
+>>>>>>> upstream/work/v3.0.0
                                 @Override
                                 public void run() {
                                     tableModel.removeRow(selectedRow);
                                     tableModel.fireTableDataChanged();
-                                    // update cache
-                                    AzureModelController.removeWebAppFromResourceGroup(wad.resourceGroup, wad.webApp);
                                     editorPaneAppServiceDetails.setText("");
                                 }
                             });
@@ -457,7 +479,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
 
                         } catch (Exception ex) {
                             ex.printStackTrace();
-                            LOGGER.error("deleteAppService : Task.Modal ", ex);
+                            //LOGGER.error("deleteAppService : Task.Modal ", ex);
                             ApplicationManager.getApplication().invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
@@ -470,7 +492,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                 });
             } catch (Exception e) {
                 e.printStackTrace();
-                LOGGER.error("deleteAppService", e);
+                //LOGGER.error("deleteAppService", e);
                 ErrorWindow.show(project, e.getMessage(), "Delete App Service Error");
             }
         }
@@ -553,7 +575,10 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                     WebAppUtils.deployArtifact(artifact.getName(), artifact.getOutputFilePath(),
                             pp, isDeployToRoot, new UpdateProgressIndicator(progressIndicator));
                     String sitePath = buildSiteLink(wad.webApp, isDeployToRoot ? null : artifact.getName());
+<<<<<<< HEAD
                     trackableProperties.put("WebApp URI", sitePath);
+=======
+>>>>>>> upstream/work/v3.0.0
                     progressIndicator.setText("Checking Web App availability...");
                     progressIndicator.setText2("Link: " + sitePath);
 
@@ -589,7 +614,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                 } catch (IOException | InterruptedException ex) {
                     trackableProperties.put("PublishError", ex.getMessage());
                     ex.printStackTrace();
-                    LOGGER.error("deploy", ex);
+                    //LOGGER.error("deploy", ex);
                     ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {

@@ -30,6 +30,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.microsoft.azure.CloudException;
 import com.microsoft.azure.management.appservice.AppServicePlan;
 import com.microsoft.azure.management.appservice.PricingTier;
 import com.microsoft.azure.management.appservice.WebApp;
@@ -751,17 +752,16 @@ public class AppServiceCreateDialog extends AzureDialogWrapper {
                             superDoOKAction();
                         }
                     });
-                } catch (IOException ex) {
+                } catch (CloudException ex) {
                     ex.printStackTrace();
-                    // TODO: show error message
-                    LOGGER.error("run@Progress@doOKAction@@AppServiceCreateDialog", ex);
+                    //LOGGER.error("run@Progress@doOKAction@@AppServiceCreateDialog", ex);
                     ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             ErrorWindow.show(project, ex.getMessage(), "Create App Service Error");
                         }
                     });
-                } catch (InterruptedException | AzureCmdException | WebAppUtils.WebAppException ex) {
+                } catch (IOException | InterruptedException | AzureCmdException | WebAppUtils.WebAppException ex) {
                     ex.printStackTrace();
                     LOGGER.error("run@Progress@doOKAction@@AppServiceCreateDialog", ex);
                 }

@@ -40,8 +40,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.PlatformUI;
 
 import java.io.File;
+import java.net.URL;
 import java.util.*;
 
 
@@ -51,6 +53,7 @@ public class MachineSettingsStep extends WizardPage {
     private Text vmNameTextField;
     private Label vmSizeLabel;
     private Combo vmSizeComboBox;
+    private Link pricingLink;
     private Label vmUserLabel;
     private Text vmUserTextField;
     private Label vmPasswordLabel;
@@ -109,9 +112,34 @@ public class MachineSettingsStep extends WizardPage {
 
         vmSizeLabel = new Label(composite, SWT.LEFT);
         vmSizeLabel.setText("Size:");
-        vmSizeComboBox = new Combo(composite, SWT.READ_ONLY);
+        
+        Composite sizeContainer = new Composite(composite, SWT.NONE);
+        gridLayout = new GridLayout();
+        gridLayout.numColumns = 2;
+        sizeContainer.setLayout(gridLayout);
+        gridData = new GridData();
+        gridData.horizontalAlignment = SWT.FILL;
+        gridData.grabExcessHorizontalSpace = true;
+        sizeContainer.setLayoutData(gridData);
+        
+        vmSizeComboBox = new Combo(sizeContainer, SWT.READ_ONLY);
         gridData = new GridData(SWT.FILL, SWT.CENTER, true, true);
         vmSizeComboBox.setLayoutData(gridData);
+		
+		pricingLink = new Link(sizeContainer, SWT.NONE);
+		pricingLink.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+		    	try {
+		            PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser().openURL(new URL("https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/"));
+		        } catch (Exception ex) {
+		            DefaultLoader.getUIHelper().logError(ex.getMessage(), ex);
+		        }
+			}
+		});
+		pricingLink.setText("<a>Pricing</a>");
+		gridData = new GridData(SWT.RIGHT, SWT.CENTER, false, false);
+		pricingLink.setLayoutData(gridData);
 
         vmUserLabel = new Label(composite, SWT.LEFT);
         vmUserLabel.setText("User name:");

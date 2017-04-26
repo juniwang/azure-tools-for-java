@@ -56,7 +56,7 @@ public class AzureDockerHostsManager {
 
   public AzureDockerPreferredSettings getDockerPreferredSettings() { return dockerPreferredSettings; }
 
-  public void setDockerPreferredSettings(AzureDockerPreferredSettings dockerPreferredSettings) {
+  public synchronized void setDockerPreferredSettings(AzureDockerPreferredSettings dockerPreferredSettings) {
     this.dockerPreferredSettings = dockerPreferredSettings;
   }
 
@@ -95,7 +95,7 @@ public class AzureDockerHostsManager {
         }
       }
     };
-    AzureUIRefreshCore.addOnNextListener(id, listener);
+    AzureUIRefreshCore.addListener(id, listener);
   }
 
   public static AzureDockerHostsManager getAzureDockerHostsManager() {

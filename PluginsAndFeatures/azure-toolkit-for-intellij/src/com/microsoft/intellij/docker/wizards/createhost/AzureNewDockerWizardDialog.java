@@ -28,11 +28,14 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.wizard.WizardDialog;
 import com.microsoft.azure.docker.AzureDockerHostsManager;
+import com.microsoft.azure.docker.model.AzureDockerPreferredSettings;
 import com.microsoft.azure.docker.model.DockerHost;
 import com.microsoft.azure.docker.ops.AzureDockerVMOps;
 import com.microsoft.azure.docker.ops.utils.AzureDockerUtils;
 import com.microsoft.azure.management.Azure;
 import com.microsoft.azure.management.compute.VirtualMachine;
+import com.microsoft.azuretools.utils.AzureUIRefreshCore;
+import com.microsoft.azuretools.utils.AzureUIRefreshEvent;
 import com.microsoft.intellij.docker.utils.AzureDockerUIResources;
 import com.microsoft.intellij.util.PluginUtil;
 import org.jetbrains.annotations.Nullable;
@@ -96,6 +99,16 @@ public class AzureNewDockerWizardDialog extends WizardDialog<AzureNewDockerWizar
   public void create() {
     DockerHost dockerHost = model.getDockerHost();
 
+    AzureDockerPreferredSettings dockerPreferredSettings = model.getDockerManager().getDockerPreferredSettings();
+
+    if (dockerPreferredSettings == null) {
+      dockerPreferredSettings = new AzureDockerPreferredSettings();
+    }
+    dockerPreferredSettings.dockerApiName = dockerHost.apiUrl;
+    dockerPreferredSettings.region = dockerHost.hostVM.region;
+    dockerPreferredSettings.vmSize = dockerHost.hostVM.vmSize;
+    dockerPreferredSettings.vmOS = dockerHost.hostOSType.name();
+    model.getDockerManager().setDockerPreferredSettings(dockerPreferredSettings);
 
     ProgressManager.getInstance().run(new Task.Backgroundable(model.getProject(), "Creating Docker Host on Azure...", true) {
       @Override
@@ -166,7 +179,10 @@ public class AzureNewDockerWizardDialog extends WizardDialog<AzureNewDockerWizar
                 updatedHost.hasSSHLogIn = dockerHost.hasSSHLogIn;
                 updatedHost.isTLSSecured = dockerHost.isTLSSecured;
               }
-              dockerManager.addDockerHostDetails(dockerHost);
+              dockerManager.addDockerHostDetails(updatedHost);
+              if (AzureUIRefreshCore.listeners != null) {
+                AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, updatedHost));
+              }
             }
           }
 

@@ -27,7 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.microsoft.azuretools</groupId>
     <artifactId>azuretools-core</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.1</version>
     <properties>
         <artifact.name>${artifactId}-${version}.jar</artifact.name>
     </properties>
@@ -51,12 +51,12 @@
             <dependency>
                 <groupId>com.squareup.retrofit2</groupId>
                 <artifactId>retrofit</artifactId>
-                <version>2.0.2</version>
+                <version>2.1.0</version>
             </dependency>
             <dependency>
                 <groupId>io.reactivex</groupId>
                 <artifactId>rxjava</artifactId>
-                <version>1.2.7</version>
+                <version>1.2.4</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
@@ -68,6 +68,16 @@
                         <artifactId>slf4j-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.azure</groupId>
+                <artifactId>azure-client-runtime</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.azure</groupId>
+                <artifactId>azure-client-authentication</artifactId>
+                <version>1.0.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -113,16 +123,22 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>retrofit</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure</artifactId>
             <version>1.0.0</version>
-            <!--
-            <version>1.0.0-beta6-SNAPSHOT</version>
-            -->
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.squareup.retrofit2</groupId>
+                    <artifactId>retrofit</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

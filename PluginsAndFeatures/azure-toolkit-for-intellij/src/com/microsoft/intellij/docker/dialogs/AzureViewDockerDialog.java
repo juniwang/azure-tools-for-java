@@ -128,7 +128,9 @@ public class AzureViewDockerDialog extends AzureDialogWrapper {
     );
 
     // Docker Keyvault settings
-    if (dockerHost.certVault != null &&  dockerHost.certVault.uri != null && !dockerHost.certVault.uri.isEmpty()) {
+    if (dockerHost.certVault != null &&
+        dockerHost.hostVM.vaultName != null && !dockerHost.hostVM.vaultName.isEmpty() &&
+        dockerHost.certVault.uri != null && !dockerHost.certVault.uri.isEmpty()) {
       setTextField(dockerHostKeyvaultTextField, (updating != null) ?
           dockerHost.certVault.uri  + updating :
           dockerHost.certVault.uri);

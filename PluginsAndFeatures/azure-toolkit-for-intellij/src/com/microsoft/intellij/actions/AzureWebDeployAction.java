@@ -49,9 +49,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-//import com.microsoft.intellij.forms.WebSiteDeployForm;
-
-
 public class AzureWebDeployAction extends AnAction {
     private static final Logger LOGGER = Logger.getInstance(AzureWebDeployAction.class);
 
@@ -60,8 +57,6 @@ public class AzureWebDeployAction extends AnAction {
 //        Module module1 = e.getData(LangDataKeys.MODULE);
         Project project = DataKeys.PROJECT.getData(e.getDataContext());
         JFrame frame = WindowManager.getInstance().getFrame(project);
-
-
 
         try {
             if (!AzureSignInAction.doSignIn( AuthMethodManager.getInstance(), project)) return;
@@ -110,23 +105,10 @@ public class AzureWebDeployAction extends AnAction {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            LOGGER.error("actionPerformed", ex);
+            //LOGGER.error("actionPerformed", ex);
             ErrorWindow.show(project, ex.getMessage(), "Azure Web Deploy Action Error");
         }
 
-
-
-//        WebSiteDeployForm form = new WebSiteDeployForm(module);
-//        form.show();
-//        if (form.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-//            try {
-//                String url = form.deploy();
-//                WebSiteDeployTask task = new WebSiteDeployTask(e.getProject(), form.getSelectedWebSite(), url);
-//                task.queue();
-//            } catch (AzureCmdException ex) {
-//                PluginUtil.displayErrorDialogAndLog(message("webAppDplyErr"), ex.getMessage(), ex);
-//            }
-//        }
     }
 
     @Override
@@ -136,13 +118,5 @@ public class AzureWebDeployAction extends AnAction {
         if (!PlatformUtils.isIdeaUltimate()) {
             return;
         }
-
-//        try {
-//            boolean isSignIn = AuthMethodManager.getInstance().isSignedIn();
-//            boolean isEnabled = isSignIn & module != null && ModuleTypeId.JAVA_MODULE.equals(module.getOptionValue(Module.ELEMENT_TYPE));
-//            e.getPresentation().setEnabled(isEnabled);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
     }
 }

@@ -25,6 +25,8 @@ import java.util.List;
 
 import com.microsoft.azure.management.appservice.WebApp;
 import com.microsoft.azure.management.resources.ResourceGroup;
+import com.microsoft.azure.management.resources.fluentcore.arm.ResourceId;
+import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
 import com.microsoft.azuretools.utils.AzureModelController;
@@ -37,16 +39,16 @@ public class WebappNode extends Node {
 	private static final String ACTION_START = "Start";
 	private static final String ACTION_STOP = "Stop";
 	private static final String ACTION_RESTART = "Restart";
-	private static final String WEB_RUN_ICON = "website.png";
-	private static final String WEB_STOP_ICON = "stopWebsite.png";
+	private static final String WEB_RUN_ICON = "WebAppRunning_16.png";
+	private static final String WEB_STOP_ICON = "WebAppStopped_16.png";
 	private static final String RUN_STATUS = "Running";
 	private WebApp webApp;
 	private ResourceGroup resourceGroup;
 	private final String subscriptionId;
 
-	public WebappNode(WebappsModule parent, String subscriptionId, WebApp webApp, ResourceGroup resourceGroup, String icon) {
+	public WebappNode(WebappsModule parent, WebApp webApp, ResourceGroup resourceGroup, String icon) {
 		super(webApp.name(), webApp.name(), parent, icon, true);
-		this.subscriptionId = subscriptionId;
+		this.subscriptionId = ResourceId.fromString(webApp.id()).subscriptionId();
 		this.webApp = webApp;
 		this.resourceGroup = resourceGroup;
 

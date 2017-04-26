@@ -46,6 +46,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
+
 /**
  * Created by vlashch on 1/9/17.
  */
@@ -142,6 +144,13 @@ public class AzureModelController {
                 Subscription subscription = sidToSubscriptionMap.get(sd.getSubscriptionId());
                 if(progressIndicator != null) progressIndicator.setText(String.format("Updating subscription '%s' locations...", subscription.displayName()));
                 List<Location> locl = subscription.listLocations();
+                Collections.sort(locl, new Comparator<Location>() {
+                    @Override
+                    public int compare(Location lhs, Location rhs) {
+                        return lhs.displayName().compareTo(rhs.displayName());
+                    }
+                });
+
                 Map<SubscriptionDetail, List<Location>> sdlocMap = azureModel.getSubscriptionToLocationMap();
                 sdlocMap.put(sd, locl);
 
@@ -314,24 +323,29 @@ public class AzureModelController {
         l.add(webApp);
         AzureModel.getInstance().getResourceGroupToWebAppMap().put(rg, l);
         // TODO:notify subscribers
+        if (AzureUIRefreshCore.listeners != null) {
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, new WebAppDetails(rg, webApp, null, null)));
+        }
     }
 
     public static void addNewWebAppToExistingResourceGroup(ResourceGroup rg, WebApp webApp) {
         AzureModel.getInstance().getResourceGroupToWebAppMap().get(rg).add(webApp);
         // TODO:notify subscribers
+        if (AzureUIRefreshCore.listeners != null) {
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, new WebAppDetails(rg, webApp, null, null)));
+        }
     }
 
     public static void removeWebAppFromResourceGroup(ResourceGroup rg, WebApp webApp) {
-//        String waName = webApp.name().toLowerCase();
-//        List<WebApp> wal = AzureModel.getInstance().getResourceGroupToWebAppMap().get(rg);
-//        for (int i = 0; i < wal.size(); ++i) {
-//            if (wal.get(i).name().toLowerCase().equals(waName)) {
-//                wal.remove(i);
-//                break;
-//            }
-//        }
         AzureModel.getInstance().getResourceGroupToWebAppMap().get(rg).remove(webApp);
         // TODO:notify subscribers
+        if (AzureUIRefreshCore.listeners != null) {
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.REMOVE, new WebAppDetails(rg, webApp, null, null)));
+        }
+    }
+
+    public static void removeAppServicePlanFromResourceGroup(ResourceGroup rg, AppServicePlan appServicePlan) {
+        AzureModel.getInstance().getResourceGroupToAppServicePlanMap().get(rg).remove(appServicePlan);
     }
 
     public static void addNewAppServicePlanToJustCreatedResourceGroup(ResourceGroup rg, AppServicePlan appServicePlan) {
@@ -342,12 +356,14 @@ public class AzureModelController {
         }
         AzureModel.getInstance().getResourceGroupToAppServicePlanMap().put(rg, l);
         // TODO:notify subscribers
+        System.out.println("WEBAPP - IN AzureModelController::addNewAppServicePlanToJustCreatedResourceGroup");
     }
 
     public static void addNewAppServicePlanToExistingResourceGroup(ResourceGroup rg, AppServicePlan appServicePlan) {
         // presume addNewResourceGroup call goes first
         AzureModel.getInstance().getResourceGroupToAppServicePlanMap().get(rg).add(appServicePlan);
         // TODO:notify subscribers
+        System.out.println("WEBAPP - IN AzureModelController::addNewAppServicePlanToExistingResourceGroup");
     }
 
 }

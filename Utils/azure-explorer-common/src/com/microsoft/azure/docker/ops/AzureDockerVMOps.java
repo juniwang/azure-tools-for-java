@@ -344,6 +344,7 @@ public class AzureDockerVMOps {
           dockerHost.isTLSSecured = certVault.tlsServerCert != null && !certVault.tlsServerCert.isEmpty();
         }
       } else {
+        dockerHost.hasKeyVault = false;
         dockerHost.certVault = null;
       }
       if (dockerHost.port == null || !dockerHost.port.matches("[0-9]+") ||

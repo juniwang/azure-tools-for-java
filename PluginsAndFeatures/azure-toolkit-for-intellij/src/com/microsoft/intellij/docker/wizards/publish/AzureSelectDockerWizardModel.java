@@ -49,8 +49,8 @@ public class AzureSelectDockerWizardModel extends WizardModel {
     this.dockerImageDescription = dockerImageInstance;
     this.finishedOK = true;
 
-    selectDockerHostForm = new AzureSelectDockerHostStep(this.getTitle(), this, uiManager, dockerImageInstance);
     configureDockerContainerForm = new AzureConfigureDockerContainerStep(this.getTitle(), this, uiManager, dockerImageInstance);
+    selectDockerHostForm = new AzureSelectDockerHostStep(this.getTitle(), this, uiManager, dockerImageInstance);
     add(selectDockerHostForm);
     add(configureDockerContainerForm);
   }

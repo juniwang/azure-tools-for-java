@@ -121,7 +121,7 @@ public class WebAppDeployDialog extends TitleAreaDialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        Image image = PluginUtil.getImage("icons/large/Azure.png");
+        Image image = PluginUtil.getImage("icons/large/DeployToAzureWizard.png");
         if (image != null) {
         	setTitleImage(image);
         }
@@ -522,7 +522,6 @@ public class WebAppDeployDialog extends TitleAreaDialog {
                 String errorMessage = "Error";
                 Map<String, String> postEventProperties = new HashMap<String, String>();
                 postEventProperties.put("Java App Name", project.getName());
-                postEventProperties.put("WebApp URI", sitePath);
                 
                 monitor.beginTask(message, IProgressMonitor.UNKNOWN);
                 try {

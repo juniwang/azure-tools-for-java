@@ -108,7 +108,9 @@ public class PluginUtil {
 			IEditorPart editorPart = page.getActiveEditor();
 			if (editorPart != null) {
 				IFile file = (IFile) editorPart.getEditorInput().getAdapter(IFile.class);
-				selProject = file.getProject();
+				if (file != null) {
+				    selProject = file.getProject();
+				}
 			}
 		}
 		return selProject;

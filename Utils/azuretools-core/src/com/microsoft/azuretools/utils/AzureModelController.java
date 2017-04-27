@@ -324,7 +324,7 @@ public class AzureModelController {
         AzureModel.getInstance().getResourceGroupToWebAppMap().put(rg, l);
         // TODO:notify subscribers
         if (AzureUIRefreshCore.listeners != null) {
-            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, new WebAppDetails(rg, webApp, null, null)));
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, new WebAppDetails(rg, webApp, null, null, null)));
         }
     }
 
@@ -332,7 +332,7 @@ public class AzureModelController {
         AzureModel.getInstance().getResourceGroupToWebAppMap().get(rg).add(webApp);
         // TODO:notify subscribers
         if (AzureUIRefreshCore.listeners != null) {
-            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, new WebAppDetails(rg, webApp, null, null)));
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.ADD, new WebAppDetails(rg, webApp, null, null, null)));
         }
     }
 
@@ -340,7 +340,7 @@ public class AzureModelController {
         AzureModel.getInstance().getResourceGroupToWebAppMap().get(rg).remove(webApp);
         // TODO:notify subscribers
         if (AzureUIRefreshCore.listeners != null) {
-            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.REMOVE, new WebAppDetails(rg, webApp, null, null)));
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.REMOVE, new WebAppDetails(rg, webApp, null, null, null)));
         }
     }
 

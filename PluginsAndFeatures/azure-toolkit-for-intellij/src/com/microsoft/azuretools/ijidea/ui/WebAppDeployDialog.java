@@ -39,20 +39,18 @@ import com.intellij.ui.AnActionButtonRunnable;
 import com.intellij.ui.AnActionButtonUpdater;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
-import com.microsoft.azure.management.Azure;
 import com.microsoft.azure.management.appservice.AppServicePlan;
 import com.microsoft.azure.management.appservice.JavaVersion;
 import com.microsoft.azure.management.appservice.PublishingProfile;
 import com.microsoft.azure.management.appservice.WebApp;
 import com.microsoft.azure.management.resources.ResourceGroup;
-import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.ijidea.utility.UpdateProgressIndicator;
-import com.microsoft.azuretools.sdkmanage.AzureManager;
 import com.microsoft.azuretools.utils.AzureModel;
 import com.microsoft.azuretools.utils.AzureModelController;
 import com.microsoft.azuretools.utils.CanceledByUserException;
 import com.microsoft.azuretools.utils.WebAppUtils;
+import com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
 import com.microsoft.intellij.deploy.AzureDeploymentProgressNotification;
 import com.microsoft.intellij.ui.components.AzureDialogWrapper;
 import org.jdesktop.swingx.JXHyperlink;
@@ -74,7 +72,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
 
 public class WebAppDeployDialog extends AzureDialogWrapper {
@@ -300,21 +297,6 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         });
     }
 
-    private static class AspDetails {
-        private AppServicePlan asp;
-        private ResourceGroup rg;
-        public AspDetails(AppServicePlan asp, ResourceGroup rg) {
-            this.asp = asp;
-            this.rg = rg;
-        }
-        public AppServicePlan getAsp() {
-            return asp;
-        }
-        public ResourceGroup getRg() {
-            return rg;
-        }
-    }
-
     private void doFillTable() {
 
         Map<SubscriptionDetail, List<ResourceGroup>> srgMap = AzureModel.getInstance().getSubscriptionToResourceGroupMap();
@@ -329,11 +311,11 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         for (SubscriptionDetail sd : srgMap.keySet()) {
             if (!sd.isSelected()) continue;
 
-            Map<String, AspDetails> aspMap = new HashMap<>();
+            Map<String, WebAppUtils.AspDetails> aspMap = new HashMap<>();
             try {
                 for (ResourceGroup rg : srgMap.get(sd)) {
                     for (AppServicePlan asp : rgaspMap.get(rg)) {
-                        aspMap.put(asp.id(), new AspDetails(asp, rg));
+                        aspMap.put(asp.id(), new WebAppUtils.AspDetails(asp, rg));
                     }
                 }
             } catch (NullPointerException npe) {
@@ -441,28 +423,14 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                 return;
             }
 
-            try {
-                AzureManager manager = AuthMethodManager.getInstance().getAzureManager();
-                if (manager == null) {
-                    return;
-                }
+            try{
                 ProgressManager.getInstance().run(new Task.Modal(project, "Delete App Service Progress", true) {
                     @Override
                     public void run(ProgressIndicator progressIndicator) {
                         try {
                             progressIndicator.setIndeterminate(true);
                             progressIndicator.setText("Deleting App Service...");
-
-                            Azure azure = manager.getAzure(wad.subscriptionDetail.getSubscriptionId());
-                            azure.webApps().deleteById(wad.webApp.id());
-                            // check asp still exists
-                            AppServicePlan asp = azure.appServices().appServicePlans().getById(wad.appServicePlan.id());
-                            System.out.println("asp is " + (asp == null ? "null -> removing form cache" : asp.name()));
-                            // update cache
-                            AzureModelController.removeWebAppFromResourceGroup(wad.resourceGroup, wad.webApp);
-                            if (asp == null) {
-                                AzureModelController.removeAppServicePlanFromResourceGroup(wad.appServicePlanResourceGroup, wad.appServicePlan);
-                            }
+                            WebAppUtils.deleteAppService(wad);
                             ApplicationManager.getApplication().invokeAndWait( new Runnable() {
                                 @Override
                                 public void run() {

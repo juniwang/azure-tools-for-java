@@ -163,10 +163,11 @@ public class ServicePrincipalAzureManager extends AzureManagerBase {
 
     @Override
     public String getAccessToken(String tid) throws IOException {
-            ApplicationTokenCredentials credentials = (atc == null)
-                    ? ApplicationTokenCredentials.fromFile(credFile)
-                    : atc;
-
-            return credentials.getToken(Constants.resourceARM);
+        ApplicationTokenCredentials credentials = (atc == null)
+                ? ApplicationTokenCredentials.fromFile(credFile)
+                : atc;
+        // default to global cloud
+        String managementEndpoint = atc.environment() == null ? Constants.resourceARM : atc.environment().managementEndpoint();
+        return credentials.getToken(managementEndpoint);
     }
 }

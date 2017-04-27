@@ -569,7 +569,6 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                     WebAppUtils.deployArtifact(artifact.getName(), artifact.getOutputFilePath(),
                             pp, isDeployToRoot, new UpdateProgressIndicator(progressIndicator));
                     String sitePath = buildSiteLink(wad.webApp, isDeployToRoot ? null : artifact.getName());
-                    trackableProperties.put("WebApp URI", sitePath);
                     progressIndicator.setText("Checking Web App availability...");
                     progressIndicator.setText2("Link: " + sitePath);
 
@@ -603,7 +602,6 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                     azureDeploymentProgressNotification.notifyProgress(webApp.name(), startDate, sitePath, 100, message("runStatus"));
                     showLink(sitePath);
                 } catch (IOException | InterruptedException ex) {
-                    trackableProperties.put("PublishError", ex.getMessage());
                     ex.printStackTrace();
                     //LOGGER.error("deploy", ex);
                     ApplicationManager.getApplication().invokeLater(new Runnable() {

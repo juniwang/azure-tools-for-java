@@ -434,6 +434,12 @@ public class AzureNewDockerLoginStep extends AzureNewDockerWizardStep {
         newHost.hasSSHLogIn = true;
       }
 
+      if (dockerHostNoSshRadioButton.isSelected()) {
+        newHost.hasSSHLogIn = false;
+        newHost.certVault.sshKey = null;
+        newHost.certVault.sshPubKey = null;
+      }
+
       // SSH key imported from local file directory
       if (dockerHostImportSshRadioButton.isSelected()) {
         if (dockerHostImportSSHBrowseTextField.getText() == null || dockerHostImportSSHBrowseTextField.getText().isEmpty() ||

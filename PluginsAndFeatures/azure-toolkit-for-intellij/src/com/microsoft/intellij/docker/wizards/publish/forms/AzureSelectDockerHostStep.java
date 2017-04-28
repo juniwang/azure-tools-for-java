@@ -51,6 +51,7 @@ import com.microsoft.intellij.docker.wizards.createhost.AzureNewDockerWizardDial
 import com.microsoft.intellij.docker.wizards.createhost.AzureNewDockerWizardModel;
 import com.microsoft.intellij.docker.wizards.publish.AzureSelectDockerWizardModel;
 import com.microsoft.intellij.docker.wizards.publish.AzureSelectDockerWizardStep;
+import com.microsoft.intellij.util.AppInsightsEventHelper;
 import com.microsoft.intellij.util.PluginUtil;
 
 import javax.swing.*;
@@ -311,7 +312,8 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
     AnActionButton refreshDockerHostsAction = new AnActionButton("Refresh", AllIcons.Actions.Refresh) {
       @Override
       public void actionPerformed(AnActionEvent anActionEvent) {
-        onRefreshDockerHostAction();
+          AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.DockerContainer, "", "Refresh", null);
+          onRefreshDockerHostAction();
       }
     };
 
@@ -384,6 +386,7 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
   }
 
   private void onAddNewDockerHostAction() {
+    AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.DockerHost, "", "Add");
     AzureNewDockerWizardModel newDockerHostModel = new AzureNewDockerWizardModel(model.getProject(), dockerManager);
     AzureNewDockerWizardDialog wizard = new AzureNewDockerWizardDialog(newDockerHostModel);
     wizard.setTitle("Create Docker Host");
@@ -483,7 +486,7 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
       if (AzureDockerUtils.DEBUG) System.out.format("User canceled delete Docker host op: %d\n", option);
       return;
     }
-
+    AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.DockerHost, deleteHost.name, "Remove");
     int currentRow = dockerHostsTable.getSelectedRow();
     tableModel.removeRow(currentRow);
     tableModel.fireTableDataChanged();
@@ -674,7 +677,7 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
   public ValidationInfo doValidate() {
     return doValidate(true);
   }
-  
+
   @Override
   public WizardStep onNext(final AzureSelectDockerWizardModel model) {
     if (dockerHostsTableSelection != null && doValidate() == null) {

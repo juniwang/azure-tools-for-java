@@ -26,9 +26,6 @@ import org.apache.commons.lang.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by juniwang on 4/25/2017.
- */
 public class AppInsightsEventHelper {
     private static final String EVENT_NAME_PREFIX = "AzurePlugin.Intellij.";
 
@@ -39,7 +36,14 @@ public class AppInsightsEventHelper {
         WizardStep,
         Telemetry,
         DockerContainer,
-        Application
+        DockerHost,
+        WebApp,
+        Application,
+        Subscription
+    }
+
+    public static void createEvent(final EventType eventType, final String objectName, final String action) {
+        createEvent(eventType, objectName, action, null);
     }
 
     public static void createEvent(final EventType eventType, final String objectName, final String action, final Map<String, String> properties) {

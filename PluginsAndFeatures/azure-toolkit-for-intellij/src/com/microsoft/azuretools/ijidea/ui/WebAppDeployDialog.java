@@ -53,6 +53,7 @@ import com.microsoft.azuretools.utils.WebAppUtils;
 import com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
 import com.microsoft.intellij.deploy.AzureDeploymentProgressNotification;
 import com.microsoft.intellij.ui.components.AzureDialogWrapper;
+import com.microsoft.intellij.util.AppInsightsEventHelper;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -307,7 +308,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
         if (rgaspMap == null) throw new NullPointerException("rgaspMap is null");
 
         cleanTable();
-        DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         for (SubscriptionDetail sd : srgMap.keySet()) {
             if (!sd.isSelected()) continue;
 
@@ -356,6 +357,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
     }
 
     private void createAppService() {
+        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.WebApp, "", "Create");
         AppServiceCreateDialog d = AppServiceCreateDialog.go(project);
         if (d == null) {
             // something went wrong - report an error!
@@ -368,6 +370,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
     }
 
     private void refreshAppServices() {
+        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.WebApp, "", "Refresh");
         cleanTable();
         editorPaneAppServiceDetails.setText("");
         AzureModel.getInstance().setResourceGroupToWebAppMap(null);
@@ -422,8 +425,8 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
             if (choice == JOptionPane.NO_OPTION) {
                 return;
             }
-
-            try{
+            AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.WebApp, appServiceName, "Delete");
+            try {
                 ProgressManager.getInstance().run(new Task.Modal(project, "Delete App Service Progress", true) {
                     @Override
                     public void run(ProgressIndicator progressIndicator) {
@@ -431,7 +434,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
                             progressIndicator.setIndeterminate(true);
                             progressIndicator.setText("Deleting App Service...");
                             WebAppUtils.deleteAppService(wad);
-                            ApplicationManager.getApplication().invokeAndWait( new Runnable() {
+                            ApplicationManager.getApplication().invokeAndWait(new Runnable() {
                                 @Override
                                 public void run() {
                                     tableModel.removeRow(selectedRow);

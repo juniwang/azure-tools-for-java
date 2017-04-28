@@ -31,6 +31,8 @@ import com.microsoft.azuretools.authmanage.models.AuthMethodDetails;
 import com.microsoft.azuretools.sdkmanage.AccessTokenAzureManager;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
 import com.microsoft.azuretools.sdkmanage.ServicePrincipalAzureManager;
+import com.microsoft.azuretools.utils.AzureUIRefreshCore;
+import com.microsoft.azuretools.utils.AzureUIRefreshEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,11 +73,17 @@ public class AuthMethodManager {
         for (Runnable l : signInEventListeners) {
             l.run();
         }
+        if (AzureUIRefreshCore.listeners != null) {
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.SIGNIN, null));
+        }
     }
 
     private void notifySignOutEventListener() {
         for (Runnable l : signOutEventListeners) {
             l.run();
+        }
+        if (AzureUIRefreshCore.listeners != null) {
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.SIGNOUT, null));
         }
     }
 

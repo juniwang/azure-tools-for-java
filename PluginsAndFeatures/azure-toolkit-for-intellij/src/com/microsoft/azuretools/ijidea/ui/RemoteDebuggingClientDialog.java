@@ -26,7 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 
-public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
+public class RemoteDebuggingClientDialog extends AzureDialogWrapper {
     private static final Logger LOGGER = Logger.getInstance(SignInWindow.class);
 
     private JPanel contentPane;
@@ -82,7 +82,7 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
 
         String webConfigPath = PluginHelper.getTemplateFile("remotedebug" + File.separator + "web.config");
         webConfigPathTextFIeld.setText(webConfigPath);
-        webConfigOpenLink.setURI(URI.create("file:///" + webConfigPath.replaceAll("\\\\", "/" )));
+        webConfigOpenLink.setURI(URI.create("file:///" + webConfigPath.replaceAll("\\\\", "/")));
         webConfigOpenLink.setText("Show");
 
         uploadWebConfigButton.addActionListener(new ActionListener() {
@@ -115,7 +115,8 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
                 updatePlatformCurrent();
                 platform64bitLink.setClicked(true);
             }
-            private AbstractAction init(String name){
+
+            private AbstractAction init(String name) {
                 super.putValue(Action.NAME, name);
                 return this;
             }
@@ -131,6 +132,7 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
                         progressIndicator.setText("Enabling 32-bits...");
                         webApp.update().withPlatformArchitecture(PlatformArchitecture.X86).apply();
                     }
+
                     @Override
                     public void rollBack(ProgressIndicator progressIndicator) throws Exception {
                         progressIndicator.setText("Rolling back...");
@@ -140,7 +142,8 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
                 updatePlatformCurrent();
                 platform32bitLink.setClicked(true);
             }
-            private AbstractAction init(String name){
+
+            private AbstractAction init(String name) {
                 super.putValue(Action.NAME, name);
                 return this;
             }
@@ -166,7 +169,8 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
                 updateWebSocketsCurrent();
                 webSocketOnLink.setClicked(true);
             }
-            private AbstractAction init(String name){
+
+            private AbstractAction init(String name) {
                 super.putValue(Action.NAME, name);
                 return this;
             }
@@ -192,7 +196,8 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
                 updateWebSocketsCurrent();
                 webSocketOffLink.setClicked(true);
             }
-            private AbstractAction init(String name){
+
+            private AbstractAction init(String name) {
                 super.putValue(Action.NAME, name);
                 return this;
             }
@@ -209,7 +214,7 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
 
     private void updatePlatformCurrent() {
         // get platform
-        String  platformVal = webApp.inner().siteConfig().use32BitWorkerProcess()
+        String platformVal = webApp.inner().siteConfig().use32BitWorkerProcess()
                 ? P32BITS
                 : P64BITS;
         platformCurrentValueLabel.setText(platformVal);
@@ -236,6 +241,7 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
 
     @Override
     protected void doHelpAction() {
+        sendTelemetry(HELP_CODE);
         JXHyperlink link = new JXHyperlink();
         link.setURI(URI.create("https://github.com/Azure/azure-websites-java-remote-debugging"));
         link.doClick();
@@ -254,7 +260,7 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
         try {
             pb.start();
         } catch (IOException ex) {
-           ex.printStackTrace();
+            ex.printStackTrace();
         }
 
         super.doOKAction();
@@ -276,7 +282,7 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
     @Nullable
     @Override
     protected ValidationInfo doValidate() {
-        if (portTextField.getText().isEmpty() ||  !portTextField.getText().matches("^[0-9]*[0-9]$")) {
+        if (portTextField.getText().isEmpty() || !portTextField.getText().matches("^[0-9]*[0-9]$")) {
             return new ValidationInfo("Enter a valid Port value.", portTextField);
         }
         if (serverTextField.getText().isEmpty()) {
@@ -306,6 +312,7 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
                         fis.close();
                 }
             }
+
             @Override
             public void rollBack(ProgressIndicator progressIndicator) throws Exception {
                 // do nothing
@@ -315,6 +322,7 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
 
     interface IWorker {
         void work(ProgressIndicator progressIndicator) throws Exception;
+
         void rollBack(ProgressIndicator progressIndicator) throws Exception;
     }
 
@@ -326,7 +334,7 @@ public class RemoteDebuggingClientDialog  extends AzureDialogWrapper {
                 progressIndicator.setIndeterminate(true);
                 try {
                     worker.work(progressIndicator);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                     //LOGGER.error("work@IWorker@run@ProgressManager@runWithProgress@RemoteDebuggingClientDialog", ex);
                     ApplicationManager.getApplication().invokeLater(new Runnable() {

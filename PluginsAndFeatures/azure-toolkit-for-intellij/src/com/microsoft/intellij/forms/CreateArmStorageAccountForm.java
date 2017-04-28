@@ -229,7 +229,7 @@ public class CreateArmStorageAccountForm extends AzureDialogWrapper {
                     createStorageAccount();
                 }
             });
-            sendOKorCancelTelemetry(true);
+            sendTelemetry(OK_EXIT_CODE);
             close(DialogWrapper.OK_EXIT_CODE, true);
         } else { //creating from 'create vm'
             newStorageAccount =
@@ -246,7 +246,7 @@ public class CreateArmStorageAccountForm extends AzureDialogWrapper {
             if (onCreate != null) {
                 onCreate.run();
             }
-            sendOKorCancelTelemetry(true);
+            sendTelemetry(OK_EXIT_CODE);
             close(DialogWrapper.OK_EXIT_CODE, true);
         }
 //        ProgressManager.getInstance().run(

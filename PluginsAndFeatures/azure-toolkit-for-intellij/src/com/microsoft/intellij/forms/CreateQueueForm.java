@@ -139,7 +139,7 @@ public class CreateQueueForm extends AzureDialogWrapper {
             }
         });
 
-        sendOKorCancelTelemetry(true);
+        sendTelemetry(OK_EXIT_CODE);
         close(DialogWrapper.OK_EXIT_CODE, true);
     }
 

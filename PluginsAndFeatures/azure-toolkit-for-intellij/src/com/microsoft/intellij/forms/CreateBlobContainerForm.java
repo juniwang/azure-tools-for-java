@@ -117,7 +117,7 @@ public class CreateBlobContainerForm extends AzureDialogWrapper {
             }
         });
 
-        sendOKorCancelTelemetry(true);
+        sendTelemetry(OK_EXIT_CODE);
         this.close(DialogWrapper.OK_EXIT_CODE, true);
     }
 

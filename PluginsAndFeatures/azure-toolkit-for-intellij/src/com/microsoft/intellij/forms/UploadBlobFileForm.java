@@ -116,7 +116,7 @@ public class UploadBlobFileForm extends AzureDialogWrapper {
         }
 
         uploadSelected.run();
-        sendOKorCancelTelemetry(true);
+        sendTelemetry(OK_EXIT_CODE);
         close(DialogWrapper.OK_EXIT_CODE, true);
     }
 

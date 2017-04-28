@@ -184,7 +184,7 @@ public class TablesQueryDesigner extends AzureDialogWrapper {
     @Override
     protected void doOKAction() {
         onFinish.run();
-        sendOKorCancelTelemetry(true);
+        sendTelemetry(OK_EXIT_CODE);
         close(DialogWrapper.OK_EXIT_CODE, true);
     }
 

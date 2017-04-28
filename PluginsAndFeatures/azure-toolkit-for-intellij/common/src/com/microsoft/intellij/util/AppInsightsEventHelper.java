@@ -23,7 +23,6 @@ package com.microsoft.intellij.util;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class AppInsightsEventHelper {
@@ -51,9 +50,6 @@ public class AppInsightsEventHelper {
         stringBuilder.append(EVENT_NAME_PREFIX).append(eventType.name());
         if (!StringUtils.isEmpty(objectName)) stringBuilder.append(".").append(objectName);
         if (!StringUtils.isEmpty(action)) stringBuilder.append(".").append(action);
-
-        final Map<String, String> props = properties == null ? new HashMap<>() : properties;
-        props.put("EventType", eventType.name());
-        AppInsightsCustomEvent.create(stringBuilder.toString(), null, props);
+        AppInsightsCustomEvent.create(stringBuilder.toString(), null, properties);
     }
 }

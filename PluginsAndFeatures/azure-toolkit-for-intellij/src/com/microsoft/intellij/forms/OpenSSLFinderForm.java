@@ -86,7 +86,7 @@ public class OpenSSLFinderForm extends AzureDialogWrapper {
     protected void doOKAction() {
         DefaultLoader.getIdeHelper().setProperty("MSOpenSSLPath", txtFile.getText());
 
-        sendOKorCancelTelemetry(true);
+        sendTelemetry(OK_EXIT_CODE);
         close(DialogWrapper.OK_EXIT_CODE, true);
     }
 

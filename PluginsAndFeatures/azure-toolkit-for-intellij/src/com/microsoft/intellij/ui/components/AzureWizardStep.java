@@ -63,10 +63,10 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
     }
 
     protected void sendTelemetryOnNext(final String action) {
-        sendTelemetryOnNext(action, null);
+        sendTelemetryOnAction(action, null);
     }
 
-    protected void sendTelemetryOnNext(final String action, final T model) {
+    protected void sendTelemetryOnAction(final String action, final T model) {
         final Map<String, String> properties = new HashMap<>();
         properties.put("WizardStep", this.getClass().getSimpleName());
         properties.put("Action", action);
@@ -82,7 +82,7 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
 
     @Override
     public WizardStep onNext(T model) {
-        sendTelemetryOnNext("Next", model);
+        sendTelemetryOnAction("Next", model);
         return super.onNext(model);
     }
 
@@ -96,5 +96,11 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
     public boolean onCancel() {
         sendTelemetryOnNext("Cancel");
         return super.onCancel();
+    }
+
+    @Override
+    public WizardStep onPrevious(T model) {
+        sendTelemetryOnAction("Previous", model);
+        return super.onPrevious(model);
     }
 }

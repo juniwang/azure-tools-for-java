@@ -738,7 +738,7 @@ public class AppServiceCreateDialog extends AzureDialogWrapper {
 
     @Override
     protected void doOKAction() {
-        sendOKorCancelTelemetry(true);
+        sendTelemetry(OK_EXIT_CODE);
         ProgressManager.getInstance().run(new Task.Modal(project,"Create App Service Progress", true) {
             @Override
             public void run(ProgressIndicator progressIndicator) {

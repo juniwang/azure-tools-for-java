@@ -39,6 +39,8 @@ import java.util.Map;
  * Subclass of DialogWrapper. Do some common implementation here like the telemetry.
  */
 public abstract class AzureDialogWrapper extends DialogWrapper {
+    protected static final int HELP_CODE = -1;
+
     protected AzureDialogWrapper(@Nullable Project project, boolean canBeParent) {
         super(project, canBeParent);
     }
@@ -114,16 +116,25 @@ public abstract class AzureDialogWrapper extends DialogWrapper {
         return compList;
     }
 
-    protected void sendOKorCancelTelemetry(boolean isOK) {
+    protected void sendTelemetry(int code) {
         final Map<String, String> properties = new HashMap<>();
         String action = "OK";
         properties.put("Window", this.getClass().getSimpleName());
         properties.put("Title", this.getTitle());
-        if (isOK) {
-            addOKTelemetryProperties(properties);
-        } else {
-            addCancelTelemetryProperties(properties);
-            action = "Cancel";
+
+        switch (code) {
+            case HELP_CODE:
+                action = "Help";
+                break;
+            case OK_EXIT_CODE:
+                addOKTelemetryProperties(properties);
+                break;
+            case CANCEL_EXIT_CODE:
+                addCancelTelemetryProperties(properties);
+                action = "Cancel";
+                break;
+            default:
+                return;
         }
 
         AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Dialog, this.getClass().getSimpleName(), action, properties);
@@ -134,7 +145,7 @@ public abstract class AzureDialogWrapper extends DialogWrapper {
         // send telemetry when OK button pressed.
         // In case subclass overrides doOKAction(), it should call super.doOKAction() explicitly
         // Otherwise the telemetry is omitted.
-        this.sendOKorCancelTelemetry(true);
+        this.sendTelemetry(OK_EXIT_CODE);
         super.doOKAction();
     }
 
@@ -143,7 +154,13 @@ public abstract class AzureDialogWrapper extends DialogWrapper {
         // send telemetry when Cancel button pressed.
         // In case subclass overrides doCancelAction(), it should call super.doCancelAction() explicitly
         // Otherwise the telemetry is omitted.
-        this.sendOKorCancelTelemetry(false);
+        this.sendTelemetry(CANCEL_EXIT_CODE);
         super.doCancelAction();
+    }
+
+    @Override
+    protected void doHelpAction() {
+        this.sendTelemetry(HELP_CODE);
+        super.doHelpAction();
     }
 }

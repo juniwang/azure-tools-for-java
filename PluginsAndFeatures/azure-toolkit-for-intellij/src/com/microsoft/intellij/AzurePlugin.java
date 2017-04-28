@@ -195,7 +195,8 @@ public class AzurePlugin extends AbstractProjectComponent {
                                     properties.put("ActionCommand", item.getActionCommand());
                                     properties.put("Action", anAction.getClass().getCanonicalName());
 
-                                    AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.MainMenu, null, null, properties);
+
+                                    AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.MainMenu, item.getText().replaceAll("\\s+", ""), "", properties);
                                 }
                             } catch (IllegalAccessException e) {
                             }

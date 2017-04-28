@@ -99,8 +99,6 @@ public abstract class AzureDialogWrapper extends DialogWrapper {
                 }
                 String name = comboBox.getName() == null ? comboBox.getLocation().toString() : comboBox.getName();
                 properties.put("JComboBox." + name + ".Selected", stringBuilder.toString());
-            } else if (component instanceof JTextField && !(component instanceof JPasswordField)) {
-                properties.put("JTextField." + component.getName() + ".Value", String.valueOf(((JTextField) component).getText()));
             }
         }
     }

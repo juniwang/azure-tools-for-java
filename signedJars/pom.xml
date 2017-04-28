@@ -47,7 +47,7 @@
                             <target>
                                 <copy file="${project.basedir}/${azureexplorer-common.name}" tofile="${basedir}/../PluginsAndFeatures/azure-toolkit-for-eclipse/com.microsoft.azuretools.core/resources/${azureexplorer-common.name}" overwrite="true" />
                                 <copy file="${project.basedir}/${azuretools-core.name}" tofile="${basedir}/../PluginsAndFeatures/azure-toolkit-for-eclipse/com.microsoft.azuretools.core/resources/${azuretools-core.name}" overwrite="true" />
-                                <!--<copy file="${project.basedir}/${hdinsightnode-common.name}" tofile="${basedir}/../PluginsAndFeatures/azure-toolkit-for-eclipse/com.microsoft.azuretools.core/resources/${hdinsightnode-common.name}" overwrite="true" />-->
+                                <copy file="${project.basedir}/${hdinsightnode-common.name}" tofile="${basedir}/../PluginsAndFeatures/azure-toolkit-for-eclipse/com.microsoft.azuretools.core/resources/${hdinsightnode-common.name}" overwrite="true" />
                             </target>
                         </configuration>
                         <goals>

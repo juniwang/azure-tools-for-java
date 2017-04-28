@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,7 +35,13 @@ import java.util.regex.Pattern;
 import com.google.common.base.Joiner;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 import com.microsoft.azure.hdinsight.common.StreamUtil;
+import com.microsoft.azure.hdinsight.sdk.cluster.EmulatorClusterDetail;
 import com.microsoft.azure.hdinsight.sdk.cluster.IClusterDetail;
 import com.microsoft.azure.hdinsight.sdk.common.HDIException;
 import com.microsoft.azure.hdinsight.sdk.common.HttpResponse;
@@ -287,7 +294,56 @@ public class SparkSubmitHelper {
 
         return null;
     }
+    
+    public static String uploadFileToEmulator(@NotNull IClusterDetail selectedClusterDetail, @NotNull String buildJarPath) throws Exception {
+        HDInsightUtil.showInfoOnSubmissionMessageWindow(String.format("Info : Get target jar from %s.", buildJarPath));
+        String uniqueFolderId = UUID.randomUUID().toString();
+        String folderPath = String.format("../opt/livy/SparkSubmission/%s", uniqueFolderId);
+        return String.format("/opt/livy/SparkSubmission/%s/%s", uniqueFolderId, SparkSubmitHelper.getInstance().sftpFileToEmulator(buildJarPath, folderPath, selectedClusterDetail));
+    }
+    
+    public String sftpFileToEmulator(String localFile, String folderPath, IClusterDetail clusterDetail) throws IOException,HDIException, JSchException, SftpException {
+        EmulatorClusterDetail emulatorClusterDetail = (EmulatorClusterDetail) clusterDetail;
+        final File file = new File(localFile);
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            try (BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream)) {
+                String sshEndpoint = emulatorClusterDetail.getSSHEndpoint();
+                URL url = new URL(sshEndpoint);
+                String host = url.getHost();
+                int port = url.getPort();
 
+                JSch jsch = new JSch();
+                Session session = jsch.getSession(emulatorClusterDetail.getHttpUserName(), host, port);
+                session.setPassword(emulatorClusterDetail.getHttpPassword());
+
+                java.util.Properties config = new java.util.Properties();
+                config.put("StrictHostKeyChecking", "no");
+                session.setConfig(config);
+
+                session.connect();
+                ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+                channel.connect();
+
+                String[] folders = folderPath.split( "/" );
+                for ( String folder : folders ) {
+                    if (folder.length() > 0) {
+                        try {
+                            channel.cd(folder);
+                        } catch (SftpException e) {
+                            channel.mkdir(folder);
+                            channel.cd(folder);
+                        }
+                    }
+                }
+
+                channel.put(bufferedInputStream, file.getName());
+                channel.disconnect();
+                session.disconnect();
+                return file.getName();
+            }
+        }
+    }
+    
     public static String uploadFileToHDFS(/*@NotNull Project project,*/ @NotNull IClusterDetail selectedClusterDetail, @NotNull String buildJarPath) throws Exception {
 
         HDInsightUtil.showInfoOnSubmissionMessageWindow(String.format("Info : Get target jar from %s.", buildJarPath));
@@ -296,7 +352,15 @@ public class SparkSubmitHelper {
         return SparkSubmitHelper.getInstance().uploadFileToHDFS(/*project,*/ buildJarPath,
                 selectedClusterDetail.getStorageAccount(), selectedClusterDetail.getStorageAccount().getDefaultContainerOrRootPath(), uniqueFolderId);
     }
+    
+    public static String getLivyConnectionURL(IClusterDetail clusterDetail) {
+        if(clusterDetail.isEmulator()){
+            return clusterDetail.getConnectionUrl() + "/batches";
+        }
 
+        return clusterDetail.getConnectionUrl() + "/livy/batches";
+    }
+    
     public static boolean isLocalArtifactPath(String path) {
         if (StringHelper.isNullOrWhiteSpace(path)) {
             return false;

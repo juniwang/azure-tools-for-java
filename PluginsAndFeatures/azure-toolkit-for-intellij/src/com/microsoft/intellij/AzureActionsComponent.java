@@ -101,7 +101,7 @@ public class AzureActionsComponent implements ApplicationComponent, PluginCompon
         try {
             PlatformDependent.isAndroid();
         } catch (Throwable ignored ) {
-            DefaultLoader.getUIHelper().showError("A problem with your Android Support plugin setup is preventing the Azure Toolkit from functioning correctly (RxJava failed to initialize).\n" +
+            DefaultLoader.getUIHelper().showError("A problem with your Android Support plugin setup is preventing the Azure Toolkit from functioning correctly (Retrofit2 and RxJava failed to initialize).\n" +
                 "To fix this issue, try disabling the Android Support plugin or installing the Android SDK", "Azure Toolkit for IntelliJ");
 //            DefaultLoader.getUIHelper().showException("Android Support Error: isAndroid() throws " + ignored.getMessage(), ignored, "Error Android", true, false);
         }

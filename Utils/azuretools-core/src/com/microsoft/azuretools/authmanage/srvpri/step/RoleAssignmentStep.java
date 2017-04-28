@@ -81,13 +81,17 @@ public class RoleAssignmentStep implements IStep {
                     } catch (AzureException e) {
                         if (e.getCode().equals("PrincipalNotFound")) {
                             retry_count++;
-                            reporter.report(String.format("Failed! Will retry in %d sec...", SLEEP_SEC));
+                            if ((retry_count >= RETRY_QNTY)) {
+                                throw e;
+                            }
+                            reporter.report(String.format("\tFailed! Will retry in %d sec...", SLEEP_SEC));
                             Thread.sleep(SLEEP_SEC * 1000);
                         } else {
                             throw e;
                         }
                     }
                 }
+
                 CommonParams.getStatusReporter().report(new Status(
                         statusActionName,
                         Status.Result.SUCCESSFUL,

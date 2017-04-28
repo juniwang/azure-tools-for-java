@@ -338,7 +338,7 @@ public class AzureConfigureDockerContainerStep extends WizardPage {
 				return false;
 			} else {
 				try {
-					dockerImageDescription.dockerfileContent = new String(Files.readAllBytes(Paths.get(customDockerfileBrowseButton.getText())));
+					dockerImageDescription.dockerfileContent = new String(Files.readAllBytes(Paths.get(dockerfileName)));
 				} catch (Exception e) {
 					errDispatcher.addMessage("customDockerfileTextField", AzureDockerValidationUtils.getDockerfilePathTip(), null, IMessageProvider.ERROR, customDockerfileTextField);
 					setErrorMessage("Error reading Dockerfile content");

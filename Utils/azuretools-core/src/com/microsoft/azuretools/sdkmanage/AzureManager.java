@@ -43,4 +43,5 @@ public interface AzureManager {
     KeyVaultClient getKeyVaultClient(String tid) throws Exception;
     String getCurrentUserId() throws IOException;
     String getAccessToken(String tid) throws IOException;
+    String getManagementURI(String tid) throws IOException;
 }

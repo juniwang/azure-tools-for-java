@@ -158,4 +158,10 @@ public class AccessTokenAzureManager extends AzureManagerBase {
     public String getAccessToken(String tid) throws IOException {
         return AdAuthManager.getInstance().getAccessToken(tid, Constants.resourceARM, PromptBehavior.Auto);
     }
+
+    @Override
+    public String getManagementURI(String tid) throws IOException {
+        // environments other than global cloud are not supported for interactive login for now
+        return Constants.resourceARM;
+    }
 }

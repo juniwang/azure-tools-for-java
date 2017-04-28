@@ -96,7 +96,8 @@ public class ClusterOperationImpl implements IClusterOperation {
                String response = requestWithToken(subscription.getTenantId(), new RequestCallback<String>() {
                     @Override
                     public String execute(String accessToken) throws Throwable {
-                         return AzureAADHelper.executeRequest(CommonConstant.MANAGEMENT_URI,
+                         String managementURI = AuthMethodManager.getInstance().getAzureManager().getManagementURI(subscription.getTenantId());
+                         return AzureAADHelper.executeRequest(managementURI,
                                  String.format("%s/configurations?api-version=%s", clusterId.replaceAll("/+$", ""), VERSION),
                                  null,
                                  "GET",

@@ -47,7 +47,7 @@ public class ServicePrincipalAzureManager extends AzureManagerBase {
     private static Settings settings;
     private final SubscriptionManager subscriptionManager;
     private final File credFile;
-    private final ApplicationTokenCredentials atc;
+    private ApplicationTokenCredentials atc;
 
     static {
         settings = new Settings();
@@ -67,7 +67,6 @@ public class ServicePrincipalAzureManager extends AzureManagerBase {
 
     public ServicePrincipalAzureManager(File credFile) {
         this.credFile = credFile;
-        this.atc = null;
         this.subscriptionManager = new SubscriptionManagerPersist(this);
     }
 
@@ -139,10 +138,8 @@ public class ServicePrincipalAzureManager extends AzureManagerBase {
             @Override
             public String doAuthenticate(String authorization, String resource, String scope) {
                 try {
-                        ApplicationTokenCredentials credentials = (atc == null)
-                            ? ApplicationTokenCredentials.fromFile(credFile)
-                            : atc;
-                    return credentials.getToken(resource);
+                    initATCIfNeeded();
+                    return atc.getToken(resource);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -154,20 +151,25 @@ public class ServicePrincipalAzureManager extends AzureManagerBase {
 
     @Override
     public String getCurrentUserId() throws IOException {
-        ApplicationTokenCredentials credentials = (atc == null)
-            ? ApplicationTokenCredentials.fromFile(credFile)
-            : atc;
-
-        return credentials.clientId();
+        initATCIfNeeded();
+        return atc.clientId();
     }
 
     @Override
     public String getAccessToken(String tid) throws IOException {
-        ApplicationTokenCredentials credentials = (atc == null)
-                ? ApplicationTokenCredentials.fromFile(credFile)
-                : atc;
+        return atc.getToken(getManagementURI(tid));
+    }
+
+    @Override
+    public String getManagementURI(String tid) throws IOException {
+        initATCIfNeeded();
         // default to global cloud
-        String managementEndpoint = atc.environment() == null ? Constants.resourceARM : atc.environment().managementEndpoint();
-        return credentials.getToken(managementEndpoint);
+        return atc.environment() == null ? Constants.resourceARM : atc.environment().managementEndpoint();
+    }
+
+    private void initATCIfNeeded() throws IOException {
+        if (atc == null) {
+            atc = ApplicationTokenCredentials.fromFile(credFile);
+        }
     }
 }

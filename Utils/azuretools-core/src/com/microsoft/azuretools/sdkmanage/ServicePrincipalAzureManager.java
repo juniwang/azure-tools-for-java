@@ -22,6 +22,7 @@
 
 package com.microsoft.azuretools.sdkmanage;
 
+import com.microsoft.azure.AzureEnvironment;
 import com.microsoft.azure.credentials.ApplicationTokenCredentials;
 import com.microsoft.azure.keyvault.KeyVaultClient;
 import com.microsoft.azure.keyvault.authentication.KeyVaultCredentials;
@@ -157,14 +158,36 @@ public class ServicePrincipalAzureManager extends AzureManagerBase {
 
     @Override
     public String getAccessToken(String tid) throws IOException {
-        return atc.getToken(getManagementURI(tid));
+        return atc.getToken(getManagementURI());
     }
 
     @Override
-    public String getManagementURI(String tid) throws IOException {
+    public String getManagementURI() throws IOException {
         initATCIfNeeded();
         // default to global cloud
-        return atc.environment() == null ? Constants.resourceARM : atc.environment().managementEndpoint();
+        return atc.environment() == null ? Constants.resourceARM : atc.environment().resourceManagerEndpoint();
+    }
+
+    @Override
+    public String getStorageEndpointSuffix() {
+        try {
+            String managementURI = getManagementURI();
+            if (managementURI.endsWith("/")) {
+                managementURI = managementURI.substring(0, managementURI.length() - 1);
+            }
+            if (AzureEnvironment.AZURE.resourceManagerEndpoint().equals(managementURI)) {
+                return AzureEnvironment.AZURE.storageEndpointSuffix();
+            } else if (AzureEnvironment.AZURE_CHINA.resourceManagerEndpoint().equals(managementURI)) {
+                return AzureEnvironment.AZURE_CHINA.storageEndpointSuffix();
+            } else if (AzureEnvironment.AZURE_GERMANY.resourceManagerEndpoint().equals(managementURI)) {
+                return AzureEnvironment.AZURE_GERMANY.storageEndpointSuffix();
+            } else if (AzureEnvironment.AZURE_US_GOVERNMENT.resourceManagerEndpoint().equals(managementURI)) {
+                return AzureEnvironment.AZURE_US_GOVERNMENT.storageEndpointSuffix();
+            }
+            return AzureEnvironment.AZURE.storageEndpointSuffix();
+        } catch (IOException ex) {
+            return AzureEnvironment.AZURE.storageEndpointSuffix();
+        }
     }
 
     private void initATCIfNeeded() throws IOException {

@@ -68,8 +68,6 @@ public class AzureUIRefreshCore {
       for (String id : listeners.keySet()) {
         if (RUN_LISTENER_EVENT_OPS) execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.REMOVE, id));
       }
-      listeners.clear();
-      listeners = null;
     }
   }
 }

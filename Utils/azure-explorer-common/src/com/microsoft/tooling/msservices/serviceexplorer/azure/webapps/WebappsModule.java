@@ -94,9 +94,13 @@ public class WebappsModule extends AzureRefreshableNode {
 		AzureUIRefreshListener listener = new AzureUIRefreshListener() {
 			@Override
 			public void run() {
-				if (event.object == null &&
+				if (event.opsType == AzureUIRefreshEvent.EventType.SIGNIN || event.opsType == AzureUIRefreshEvent.EventType.SIGNOUT) {
+					removeAllChildNodes();
+				} else if (event.object == null &&
 						(event.opsType == AzureUIRefreshEvent.EventType.UPDATE || event.opsType == AzureUIRefreshEvent.EventType.REMOVE)) {
-					load(true);
+					if (hasChildNodes()) {
+						load(true);
+					}
 				} else if (event.object != null && event.object.getClass().toString().equals(WebAppDetails.class.toString())) {
 					WebAppDetails webAppDetails = (WebAppDetails) event.object;
 					switch (event.opsType) {

@@ -103,7 +103,7 @@
                   <contentType value="text/html"/>
                   <editable value="false"/>
                   <opaque value="false"/>
-                  <text value="&lt;html&gt;&#10;  &lt;head&gt;&#10;    &#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;    (Note: In some cases, the Toolkit may not be able to create this file &#10;    programmatically. In that case, follow &lt;a href=&quot;https://go.microsoft.com/fwlink/?linkid=847862&quot;&gt;these &#10;    manual steps &lt;/a&gt;instead.)&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;"/>
+                  <text value="&lt;html&gt;&#10;  &lt;head&gt;&#10;    &#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;    (Note: In some cases, the Toolkit may not be able to create this file &#10;    programmatically. In that case, follow &lt;a href=&quot;https://go.microsoft.com/fwlink/?linkid=847862&quot;&gt;these &#10;    manual steps&lt;/a&gt; instead.)&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;"/>
                 </properties>
               </component>
             </children>

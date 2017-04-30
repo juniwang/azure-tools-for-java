@@ -149,12 +149,13 @@ public class SrvPriManager {
                             if (error.contains("unauthorized_client")) {
                                 retry_count++;
                                 if ((retry_count >= RETRY_QNTY)) {
-                                    fileReporter.report(String.format("Failed to check cred file after %s retries, error: %s", RETRY_QNTY, e.getMessage()));
+                                    fileReporter.report(String.format("Failed to check cred file -retry limit %s is reached, error: %s", RETRY_QNTY, e.getMessage()));
                                     throw e;
                                 }
-                                fileReporter.report(String.format("Failed, will retry in %s seconds", SLEEP_SEC));
+                                fileReporter.report(String.format("Failed, will retry in %s seconds, error: %s", SLEEP_SEC, e.getMessage()));
                                 Thread.sleep(SLEEP_SEC * 1000);
                             } else {
+                                fileReporter.report(String.format("Failed to check cred file after %s retries, error", retry_count, e.getMessage()));
                                 throw e;
                             }
                         }

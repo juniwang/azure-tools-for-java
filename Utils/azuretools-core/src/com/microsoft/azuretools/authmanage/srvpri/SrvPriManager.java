@@ -23,11 +23,12 @@
 package com.microsoft.azuretools.authmanage.srvpri;
 
 import com.microsoft.azure.management.Azure;
-import com.microsoft.azuretools.authmanage.srvpri.entities.SrvPriData;
+import com.microsoft.azuretools.authmanage.srvpri.entities.AuthenticationError;
 import com.microsoft.azuretools.authmanage.srvpri.report.FileListener;
 import com.microsoft.azuretools.authmanage.srvpri.report.IListener;
 import com.microsoft.azuretools.authmanage.srvpri.report.Reporter;
 import com.microsoft.azuretools.authmanage.srvpri.step.*;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -121,57 +122,7 @@ public class SrvPriManager {
                     password
             );
 
-            // here we try to use the file to check it's ok
-            fileReporter.report("Checking cred file...");
-            final int RETRY_QNTY = 5;
-            final int SLEEP_SEC = 10;
-            int retry_count = 0;
-            File authFiel = new File(filePath.toString());
-            while (retry_count < RETRY_QNTY) {
-                try {
-                    fileReporter.report("Checking authenticate...");
-                    Azure.Authenticated azureAuthenticated = Azure.authenticate(authFiel);
-                    fileReporter.report("Checking subscriptions...");
-                    azureAuthenticated.subscriptions().list();
-                    Azure azure = azureAuthenticated.withDefaultSubscription();
-                    fileReporter.report("Checking resourceGroups...");
-                    azure.resourceGroups().list();
-                    fileReporter.report("Done.");
-                    break;
-                } catch (Throwable e) {
-                    System.out.println("=== Checking cred file exception: " + e.getMessage());
-                    //e.printStackTrace();
-                    // we can't catch the exception by type - the one we are catching is on a deep level of cause.
-                    // we are looking for an error text;
-                    final String ERROR_TEXT = "unauthorized_client";
-                    final String ERROR_LABEL = "\"error\":";
-                    String mes = e.getMessage();
-                    int i1 = mes.indexOf(ERROR_LABEL);
-                    if (i1 >=0) {
-                        String error = mes.substring(i1 + ERROR_LABEL.length());
-                        if (error.contains(ERROR_TEXT)) {
-                            retry_count++;
-                            if ((retry_count >= RETRY_QNTY)) {
-                                fileReporter.report(String.format("Failed to check cred file -retry limit %s has reached, error: %s", RETRY_QNTY, e.getMessage()));
-                                throw e;
-                            }
-                            fileReporter.report(String.format("Failed, will retry in %s seconds, error: %s", SLEEP_SEC, e.getMessage()));
-                            try {
-                                Thread.sleep(SLEEP_SEC * 1000);
-                            } catch (InterruptedException e1) {
-                                fileReporter.report("Interrupted sleep: " + e.getMessage());
-                            }
-                        } else {
-                            fileReporter.report(String.format("Failed to check cred file after %s retries, error", retry_count, e.getMessage()));
-                            throw e;
-                        }
-                    } else {
-                        // if it's not our exeption - rethrow.
-                        System.out.println("=== Checking cred file exception: " + e.getMessage());
-                        throw e;
-                    }
-                }
-            }
+            checkArtifact(fileReporter, filePath);
 
             String successSidsResult = String.format("Succeeded for %d of %d subscriptions. ",
                     CommonParams.getResultSubscriptionIdList().size(),
@@ -247,9 +198,80 @@ public class SrvPriManager {
         }
     }
 
-    SrvPriData collectSrvPriData(UUID appId) {
-        return new SrvPriData();
+    private static void checkArtifact(Reporter<String> fileReporter, Path filePath) throws IOException {
+        // here we try to use the file to check it's ok with retry logic
+        fileReporter.report("Checking cred file...");
+        final int RETRY_QNTY = 5;
+        final int SLEEP_SEC = 10;
+        int retry_count = 0;
+        File authFiel = new File(filePath.toString());
+        while (retry_count < RETRY_QNTY) {
+            try {
+                fileReporter.report("Checking: Azure.authenticate(authFile)...");
+                Azure.Authenticated azureAuthenticated = Azure.authenticate(authFiel);
+                fileReporter.report("Checking: azureAuthenticated.subscriptions().list()...");
+                azureAuthenticated.subscriptions().list();
+                fileReporter.report("Checking: azureAuthenticated.withDefaultSubscription()...");
+                Azure azure = azureAuthenticated.withDefaultSubscription();
+                fileReporter.report("Checking: resourceGroups().list()...");
+                azure.resourceGroups().list();
+                fileReporter.report("Done.");
+                break;
+            } catch (com.microsoft.aad.adal4j.AuthenticationException e) {
+                System.out.println("=== Checking cred file AuthenticationException: " + e.getMessage());
+            } catch (Throwable e) {
+                System.out.println("=== Checking cred file exception: " + e.getMessage());
+                //e.printStackTrace();
+                if (needToRetry(e)) {
+                    retry_count++;
+                    if ((retry_count >= RETRY_QNTY)) {
+                        fileReporter.report(String.format("Failed to check cred file -retry limit %s has reached, error: %s", RETRY_QNTY, e.getMessage()));
+                        throw e;
+                    }
+                    fileReporter.report(String.format("Failed, will retry in %s seconds, error: %s", SLEEP_SEC, e.getMessage()));
+                    try {
+                        Thread.sleep(SLEEP_SEC * 1000);
+                    } catch (InterruptedException e1) {
+                        fileReporter.report("Interrupted sleep: " + e.getMessage());
+                    }
+                } else {
+                    fileReporter.report(String.format("Failed to check cred file after %s retries, error", retry_count, e.getMessage()));
+                    throw e;
+                }
+            }
+        }
     }
+
+    private static boolean needToRetry(Throwable e) throws IOException {
+        final String ERROR_LABEL = "\"error\":";
+        final String ERROR_TEXT = "unauthorized_client";
+        if (e instanceof com.microsoft.aad.adal4j.AuthenticationException) {
+            System.out.println("=== needToRetry@SrvPriManager: AuthenticationException caught: " + e.getMessage());
+            ObjectMapper om = new ObjectMapper();
+            AuthenticationError ae = om.readValue(e.getMessage(), AuthenticationError.class);
+            if (ae.error.equals(ERROR_TEXT)) {
+                return true;
+            }
+        } else {
+            System.out.println("=== needToRetry@SrvPriManager: Exception caught: " + e.getMessage());
+            // if we can't catch the exception by type - the one we are catching may be on a deep level of cause.
+            // we are looking for an error text;
+            String mes = e.getMessage();
+            int i1 = mes.indexOf(ERROR_LABEL);
+            if (i1 >=0) {
+                String error = mes.substring(i1 + ERROR_LABEL.length());
+                if (error.contains(ERROR_TEXT)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+//    SrvPriData collectSrvPriData(UUID appId) {
+//        return new SrvPriData();
+//    }
 
 // ======== Private helpers ===============================
 

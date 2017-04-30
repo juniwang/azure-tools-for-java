@@ -22,6 +22,7 @@
 
 package com.microsoft.azuretools.authmanage.srvpri;
 
+import com.microsoft.azure.management.Azure;
 import com.microsoft.azuretools.authmanage.srvpri.entities.SrvPriData;
 import com.microsoft.azuretools.authmanage.srvpri.report.FileListener;
 import com.microsoft.azuretools.authmanage.srvpri.report.IListener;
@@ -36,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -89,10 +89,10 @@ public class SrvPriManager {
         String spFilename = "sp-" + filename + ".azureauth";
         String reportFilename = "report-" + filename + ".txt";
 
-        Reporter<String> reporter = new Reporter<String>();
-        reporter.addListener(new FileListener(reportFilename, spDirPath.toString()));
-//        reporter.addConsoleLister();
-        CommonParams.setReporter(reporter);
+        Reporter<String> fileReporter = new Reporter<String>();
+        fileReporter.addListener(new FileListener(reportFilename, spDirPath.toString()));
+        fileReporter.addConsoleLister();
+        CommonParams.setReporter(fileReporter);
 
         StepManager sm = new StepManager();
         sm.getParamMap().put("displayName", "AzureTools4j-" + suffix);
@@ -106,7 +106,7 @@ public class SrvPriManager {
         sm.add(new ServicePrincipalStep());
         sm.add(new RoleAssignmentStep());
 
-        reporter.report(String.format("== Starting for tenantId: '%s'", tenantId));
+        fileReporter.report(String.format("== Starting for tenantId: '%s'", tenantId));
 
         sm.execute();
 
@@ -121,6 +121,49 @@ public class SrvPriManager {
                     password
             );
 
+            // here we try to use the file to check it's ok
+            fileReporter.report("Checking cred file...");
+            final int RETRY_QNTY = 5;
+            final int SLEEP_SEC = 10;
+            int retry_count = 0;
+            File authFiel = new File(filePath.toString());
+            while (retry_count < RETRY_QNTY) {
+                try {
+                    try {
+                        fileReporter.report("Checking authenticate...");
+                        Azure.Authenticated azureAuthenticated = Azure.authenticate(authFiel);
+                        fileReporter.report("Checking subscriptions...");
+                        azureAuthenticated.subscriptions().list();
+                        Azure azure = azureAuthenticated.withDefaultSubscription();
+                        fileReporter.report("Checking resourceGroups...");
+                        azure.resourceGroups().list();
+                        fileReporter.report("Done.");
+                        break;
+                    } catch (Exception e) {
+                        //e.printStackTrace();
+                        String mes = e.getMessage();
+                        final String LABEL = "\"error\":";
+                        int i1 = mes.indexOf(LABEL);
+                        if (i1 >=0) {
+                            String error = mes.substring(i1 + LABEL.length());
+                            if (error.contains("unauthorized_client")) {
+                                retry_count++;
+                                if ((retry_count >= RETRY_QNTY)) {
+                                    fileReporter.report(String.format("Failed to check cred file after %s retries, error: %s", RETRY_QNTY, e.getMessage()));
+                                    throw e;
+                                }
+                                fileReporter.report(String.format("Failed, will retry in %s seconds", SLEEP_SEC));
+                                Thread.sleep(SLEEP_SEC * 1000);
+                            } else {
+                                throw e;
+                            }
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    fileReporter.report("Failed to check cred file: " + e.getMessage());
+                }
+            }
+
             String successSidsResult = String.format("Succeeded for %d of %d subscriptions. ",
                     CommonParams.getResultSubscriptionIdList().size(),
                     CommonParams.getSubscriptionIdList().size());
@@ -131,7 +174,7 @@ public class SrvPriManager {
                     successSidsResult
             ));
 
-            reporter.report(String.format("Authentication file created, path: %s", filePath.toString()));
+            fileReporter.report(String.format("Authentication file created, path: %s", filePath.toString()));
             return filePath.toString();
 
         } else {

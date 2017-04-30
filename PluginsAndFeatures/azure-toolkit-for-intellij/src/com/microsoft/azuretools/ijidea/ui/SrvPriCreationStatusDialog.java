@@ -171,7 +171,7 @@ public class SrvPriCreationStatusDialog extends DialogWrapper {
                             }
                         });
                         Date now = new Date();
-                        String suffix = new SimpleDateFormat("yyyyMMddHHmmss").format(now);;
+                        String suffix = new SimpleDateFormat("yyyyMMdd-HHmmss").format(now);;
                         final String authFilepath = SrvPriManager.createSp(tid, sidList, suffix, this, destinationFolder);
 //                        final String authFilepath = suffix + new Date().toString();
 //                        int steps = 15;

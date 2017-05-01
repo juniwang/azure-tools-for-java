@@ -122,6 +122,14 @@ public class SrvPriManager {
                     password
             );
 
+            statusReporter.report(new Status("Waiting for service principal activation to complete...", null, null));
+            final int SLEEP_SEC_TO_PROPAGATE = 40;
+            try {
+                Thread.sleep(SLEEP_SEC_TO_PROPAGATE * 1000);
+            } catch (InterruptedException e) {
+                fileReporter.report("Interrupted sleep: " + e.getMessage());
+            }
+
             statusReporter.report(new Status("Checking auth file...", null, null));
             checkArtifact(fileReporter, filePath);
 

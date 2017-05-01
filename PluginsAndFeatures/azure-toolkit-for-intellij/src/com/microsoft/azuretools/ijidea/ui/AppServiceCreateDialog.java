@@ -761,7 +761,7 @@ public class AppServiceCreateDialog extends DialogWrapper {
                     });
                 } catch (IOException | InterruptedException | AzureCmdException | WebAppUtils.WebAppException ex) {
                     ex.printStackTrace();
-                    LOGGER.error("run@Progress@doOKAction@@AppServiceCreateDialog", ex);
+                    LOGGER.error("run@Progress@doOKAction@AppServiceCreateDialog", ex);
                 }
             }
         });

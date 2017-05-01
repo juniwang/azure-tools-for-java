@@ -70,7 +70,7 @@ public class AuthMethodManager {
             try {
                 KeyStore keyStore = KeyStore.getInstance("jks");
                 keyStore.load(
-                    AuthMethodManager.class.getResourceAsStream("/azurecerts.jks"),
+                    AuthMethodManager.class.getResourceAsStream("/resources/azurecerts.jks"),
                     "password".toCharArray());
                 SSLContext sslContext = SSLContext.getInstance("SSL");
                 TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());

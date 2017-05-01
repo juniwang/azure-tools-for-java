@@ -122,6 +122,7 @@ public class SrvPriManager {
                     password
             );
 
+            statusReporter.report(new Status("Checking auth file...", null, null));
             checkArtifact(fileReporter, filePath);
 
             String successSidsResult = String.format("Succeeded for %d of %d subscriptions. ",
@@ -217,10 +218,8 @@ public class SrvPriManager {
                 azure.resourceGroups().list();
                 fileReporter.report("Done.");
                 break;
-            } catch (com.microsoft.aad.adal4j.AuthenticationException e) {
-                System.out.println("=== Checking cred file AuthenticationException: " + e.getMessage());
             } catch (Throwable e) {
-                System.out.println("=== Checking cred file exception: " + e.getMessage());
+                LOGGER.info("=== checkArtifact@SrvPriManager exception: " + e.getMessage());
                 //e.printStackTrace();
                 if (needToRetry(e)) {
                     retry_count++;
@@ -246,14 +245,14 @@ public class SrvPriManager {
         final String ERROR_LABEL = "\"error\":";
         final String ERROR_TEXT = "unauthorized_client";
         if (e instanceof com.microsoft.aad.adal4j.AuthenticationException) {
-            System.out.println("=== needToRetry@SrvPriManager: AuthenticationException caught: " + e.getMessage());
+            LOGGER.info("=== needToRetry@SrvPriManager: AuthenticationException info: " + e.getMessage());
             ObjectMapper om = new ObjectMapper();
             AuthenticationError ae = om.readValue(e.getMessage(), AuthenticationError.class);
             if (ae.error.equals(ERROR_TEXT)) {
                 return true;
             }
         } else {
-            System.out.println("=== needToRetry@SrvPriManager: Exception caught: " + e.getMessage());
+            LOGGER.info("=== needToRetry@SrvPriManager: Exception info: " + e.getMessage());
             // if we can't catch the exception by type - the one we are catching may be on a deep level of cause.
             // we are looking for an error text;
             String mes = e.getMessage();

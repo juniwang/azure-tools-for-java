@@ -22,8 +22,6 @@
 package com.microsoft.azuretools.utils;
 
 import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import java.util.HashMap;
@@ -68,9 +66,8 @@ public class AzureUIRefreshCore {
   public static synchronized void removeAll() {
     if (listeners != null) {
       for (String id : listeners.keySet()) {
-        removeListener(id);
+        if (RUN_LISTENER_EVENT_OPS) execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.REMOVE, id));
       }
-      listeners = null;
     }
   }
 }

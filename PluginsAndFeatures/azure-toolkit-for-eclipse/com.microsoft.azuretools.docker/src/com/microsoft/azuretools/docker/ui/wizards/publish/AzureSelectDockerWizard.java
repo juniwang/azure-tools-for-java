@@ -266,6 +266,19 @@ public class AzureSelectDockerWizard extends Wizard {
 							return Status.CANCEL_STATUS;
 						}
 						
+		                msg = String.format("Updating Docker hosts ...");
+						AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 5, msg);
+			            AzureDockerUIResources.printDebugMessage(this, "Getting the new docker host details: " + new Date().toString());
+//			            dockerManager.refreshDockerHostDetails();
+			            VirtualMachine vm = azureClient.virtualMachines().getByResourceGroup(dockerImageInstance.host.hostVM.resourceGroupName, dockerImageInstance.host.hostVM.name);
+			            if (vm != null) {
+			                DockerHost updatedHost = AzureDockerVMOps.getDockerHost(vm, dockerManager.getDockerVaultsMap());
+			                if (updatedHost != null) {
+								dockerImageInstance.host.hostVM = updatedHost.hostVM;
+								dockerImageInstance.host.apiUrl = updatedHost.apiUrl;
+			                }
+			            }
+			            AzureDockerUIResources.printDebugMessage(this, "Done getting new Docker host details: " + new Date().toString());
 
 		                msg = String.format("Waiting for virtual machine to be up %s ...", dockerImageInstance.host.name);
 						AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 10, msg);
@@ -288,7 +301,7 @@ public class AzureSelectDockerWizard extends Wizard {
 						AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 5, msg);
 			            AzureDockerUIResources.printDebugMessage(this, "Refreshing docker hosts: " + new Date().toString());
 //			            dockerManager.refreshDockerHostDetails();
-			            VirtualMachine vm = azureClient.virtualMachines().getByResourceGroup(dockerImageInstance.host.hostVM.resourceGroupName, dockerImageInstance.host.hostVM.name);
+			            vm = azureClient.virtualMachines().getByResourceGroup(dockerImageInstance.host.hostVM.resourceGroupName, dockerImageInstance.host.hostVM.name);
 			            if (vm != null) {
 			                DockerHost updatedHost = AzureDockerVMOps.getDockerHost(vm, dockerManager.getDockerVaultsMap());
 			                if (updatedHost != null) {
@@ -310,7 +323,7 @@ public class AzureSelectDockerWizard extends Wizard {
 		                AzureDockerUIResources.printDebugMessage(this, "Finished setting up Docker host");
 		            } else {
 		                msg = String.format("Using virtual machine %s ...", dockerImageInstance.host.name);
-						AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 40, msg);
+						AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 55, msg);
 		            }
 					if (progressMonitor.isCanceled()) {
 						displayWarningOnCreateDockerContainerDeployTask(this, progressMonitor, deploymentName);
@@ -342,7 +355,7 @@ public class AzureSelectDockerWizard extends Wizard {
 					
 
 		            msg = String.format("Creating Docker image %s on %s ...", dockerImageInstance.dockerImageName, dockerImageInstance.host.name);
-					AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 20, msg);
+					AzureDeploymentProgressNotification.notifyProgress(this, deploymentName, url, 15, msg);
 		            AzureDockerUIResources.printDebugMessage(this, "Creating a Docker image to the Docker host: " + new Date().toString());
 		            AzureDockerImageOps.create(dockerImageInstance, dockerImageInstance.host.session);
 		            AzureDockerUIResources.printDebugMessage(this, "Done creating a Docker image to the Docker host: " + new Date().toString());

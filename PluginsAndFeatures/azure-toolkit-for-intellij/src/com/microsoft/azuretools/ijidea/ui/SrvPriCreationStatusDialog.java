@@ -33,6 +33,7 @@ import com.intellij.ui.table.JBTable;
 import com.microsoft.azuretools.authmanage.srvpri.SrvPriManager;
 import com.microsoft.azuretools.authmanage.srvpri.report.IListener;
 import com.microsoft.azuretools.authmanage.srvpri.step.Status;
+import com.microsoft.azuretools.utils.IProgressIndicator;
 import com.microsoft.intellij.ui.components.AzureDialogWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -139,13 +140,13 @@ public class SrvPriCreationStatusDialog extends AzureDialogWrapper {
     }
 
     private class ActionRunner extends Task.Modal implements IListener<Status> {
-        //ProgressIndicator progressIndicator;
+        ProgressIndicator progressIndicator = null;
         public ActionRunner(Project project) {
             super(project, "Create Service Principal Progress", true);
         }
         @Override
         public void run(@NotNull ProgressIndicator progressIndicator) {
-            //this.progressIndicator = progressIndicator;
+            this.progressIndicator = progressIndicator;
             progressIndicator.setIndeterminate(true);
             progressIndicator.setText("Creating Service Principal for the selected subscription(s)...");
             for (String tid : tidSidsMap.keySet()) {
@@ -172,7 +173,7 @@ public class SrvPriCreationStatusDialog extends AzureDialogWrapper {
                             }
                         });
                         Date now = new Date();
-                        String suffix = new SimpleDateFormat("yyyyMMddHHmmss").format(now);;
+                        String suffix = new SimpleDateFormat("yyyyMMdd-HHmmss").format(now);;
                         final String authFilepath = SrvPriManager.createSp(tid, sidList, suffix, this, destinationFolder);
 //                        final String authFilepath = suffix + new Date().toString();
 //                        int steps = 15;
@@ -191,8 +192,8 @@ public class SrvPriCreationStatusDialog extends AzureDialogWrapper {
                             });
                         }
                     } catch (Exception ex) {
-                        LOGGER.error("ActionRunner", ex);
-                        System.out.println("Creating Service Principal exception: " + ex.getMessage());
+                        ex.printStackTrace();
+                        LOGGER.error("run@ActionRunner@SrvPriCreationStatusDialog", ex);
                     }
                 }
             }
@@ -203,10 +204,16 @@ public class SrvPriCreationStatusDialog extends AzureDialogWrapper {
             ApplicationManager.getApplication().invokeLater(new Runnable() {
                 @Override
                 public void run() {
-//                    progressIndicator.setText(status.getAction());
-                    DefaultTableModel statusTableModel = (DefaultTableModel)statusTable.getModel();
-                    statusTableModel.addRow(new Object[] {status.getAction(), status.getResult(), status.getDetails()});
-                    statusTableModel.fireTableDataChanged();
+                    if (progressIndicator != null) {
+                        progressIndicator.setText(status.getAction());
+                    }
+
+                    // if only action was set in the status - the info for progress indicator only - igonre for table
+                    if (status.getResult() != null) {
+                        DefaultTableModel statusTableModel = (DefaultTableModel)statusTable.getModel();
+                        statusTableModel.addRow(new Object[] {status.getAction(), status.getResult(), status.getDetails()});
+                        statusTableModel.fireTableDataChanged();
+                    }
                 }
             });
         }

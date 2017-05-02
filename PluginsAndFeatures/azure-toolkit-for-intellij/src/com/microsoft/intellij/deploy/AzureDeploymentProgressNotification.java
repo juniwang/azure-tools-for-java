@@ -155,13 +155,26 @@ public final class AzureDeploymentProgressNotification {
 
             if (dockerImageInstance.hasNewDockerHost) {
               msg = String.format("Creating new virtual machine %s ...", dockerImageInstance.host.name);
-              notifyProgress(descriptionTask, startDate, null, 25, msg);
+              notifyProgress(descriptionTask, startDate, null, 10, msg);
               if (AzureDockerUtils.DEBUG) System.out.println("Creating new virtual machine: " + new Date().toString());
               AzureDockerVMOps.createDockerHostVM(azureClient, dockerImageInstance.host);
               if (AzureDockerUtils.DEBUG) System.out.println("Done creating new virtual machine: " + new Date().toString());
 
-              msg = String.format("Waiting for virtual machine to be up %s ...", dockerImageInstance.host.name);
+              msg = String.format("Get new VM details...");
               notifyProgress(descriptionTask, startDate, null, 30, msg);
+              if (AzureDockerUtils.DEBUG) System.out.println("Getting the new Docker host details: " + new Date().toString());
+              VirtualMachine vm = azureClient.virtualMachines().getByResourceGroup(dockerImageInstance.host.hostVM.resourceGroupName, dockerImageInstance.host.hostVM.name);
+              if (vm != null) {
+                DockerHost updatedHost = AzureDockerVMOps.getDockerHost(vm, dockerManager.getDockerVaultsMap());
+                if (updatedHost != null) {
+                  dockerImageInstance.host.hostVM = updatedHost.hostVM;
+                  dockerImageInstance.host.apiUrl = updatedHost.apiUrl;
+                }
+              }
+              if (AzureDockerUtils.DEBUG) System.out.println("Done getting the new Docker host details: " + new Date().toString());
+
+              msg = String.format("Waiting for virtual machine to be up %s ...", dockerImageInstance.host.name);
+              notifyProgress(descriptionTask, startDate, null, 35, msg);
               if (AzureDockerUtils.DEBUG) System.out.println("Waiting for virtual machine to be up: " + new Date().toString());
               AzureDockerVMOps.waitForVirtualMachineStartup(azureClient, dockerImageInstance.host);
               if (AzureDockerUtils.DEBUG) System.out.println("Done Waiting for virtual machine to be up: " + new Date().toString());
@@ -176,7 +189,7 @@ public final class AzureDeploymentProgressNotification {
               notifyProgress(descriptionTask, startDate, null, 50, msg);
               if (AzureDockerUtils.DEBUG) System.out.println("Refreshing docker hosts: " + new Date().toString());
 //            dockerManager.refreshDockerHostDetails();
-              VirtualMachine vm = azureClient.virtualMachines().getByResourceGroup(dockerImageInstance.host.hostVM.resourceGroupName, dockerImageInstance.host.hostVM.name);
+              vm = azureClient.virtualMachines().getByResourceGroup(dockerImageInstance.host.hostVM.resourceGroupName, dockerImageInstance.host.hostVM.name);
               if (vm != null) {
                 DockerHost updatedHost = AzureDockerVMOps.getDockerHost(vm, dockerManager.getDockerVaultsMap());
                 if (updatedHost != null) {

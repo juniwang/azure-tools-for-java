@@ -25,7 +25,9 @@ public class AzureUIRefreshEvent {
   public enum EventType {
     ADD,
     REMOVE,
-    UPDATE
+    UPDATE,
+    SIGNIN,
+    SIGNOUT
   }
 
   public Object object;

@@ -144,7 +144,7 @@ public class AzureSDKManager {
             } else {
                 withWindowsAdminUsername = withOS.withSpecificWindowsImageVersion(vmImage.imageReference());
             }
-            withCreate = withWindowsAdminUsername.withAdminUsername(username).withAdminPassword(password);
+            withCreate = withWindowsAdminUsername.withAdminUsername(username).withAdminPassword(password).withUnmanagedDisks();
         } else {
             VirtualMachine.DefinitionStages.WithLinuxRootPasswordOrPublicKeyManagedOrUnmanaged withLinuxRootPasswordOrPublicKey;
             if (isKnownImage) {
@@ -157,13 +157,12 @@ public class AzureSDKManager {
             if (password != null && !password.isEmpty()) {
                 withLinuxCreate = withLinuxRootPasswordOrPublicKey.withRootPassword(password);
                 if (publicKey != null) {
-                    withCreate = withLinuxCreate.withSsh(publicKey);
-                } else {
-                    withCreate = withLinuxCreate;
+                    withLinuxCreate = withLinuxCreate.withSsh(publicKey);
                 }
             } else {
-                withCreate = withLinuxRootPasswordOrPublicKey.withSsh(publicKey);
+                withLinuxCreate = withLinuxRootPasswordOrPublicKey.withSsh(publicKey);
             }
+            withCreate = withLinuxCreate.withUnmanagedDisks();
         }
         withCreate = withCreate.withSize(size);
         // ---- Storage Account --------

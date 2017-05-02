@@ -231,7 +231,7 @@ public class SignInDialog extends TitleAreaDialog {
         GridData gd_link = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1);
         gd_link.widthHint = 312;
         link.setLayoutData(gd_link);
-        link.setText("(Note: In some cases, the Toolkit may not be able to create this file programmatically. In that case, follow <a>these manual steps </a> instead.)");
+        link.setText("Follow these manual <a>steps</a> if Azure Toolkit fails to create an authentication file programmatically.");
         
         fileDialog = new FileDialog(btnBrowse.getShell(), SWT.OPEN);
         fileDialog.setText("Select Authentication File");

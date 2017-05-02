@@ -70,7 +70,7 @@ public class AzureExportDockerTlsKeysDialog extends TitleAreaDialog {
 	public AzureExportDockerTlsKeysDialog(Shell parentShell, IProject project) {
 		super(parentShell);
         setHelpAvailable(false);
-        setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.APPLICATION_MODAL);
+        setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.APPLICATION_MODAL | SWT.MIN | SWT.RESIZE);
 
 		this.project = project;
 		try {
@@ -102,7 +102,7 @@ public class AzureExportDockerTlsKeysDialog extends TitleAreaDialog {
 			@Override
 			public void modifyText(ModifyEvent event) {
 				path = (((Text) event.getSource()).getText());
-				if (Files.isDirectory(Paths.get(path))) {
+				if (path != null && Files.isDirectory(Paths.get(path))) {
 					errDispatcher.removeMessage("exportTlsPathTextField", exportTlsPathTextField);
 					setErrorMessage(null);
 				} else {
@@ -116,7 +116,6 @@ public class AzureExportDockerTlsKeysDialog extends TitleAreaDialog {
 		gd_exportTlsPathTextField.verticalIndent = 5;
 		gd_exportTlsPathTextField.horizontalIndent = 5;
 		exportTlsPathTextField.setLayoutData(gd_exportTlsPathTextField);
-		exportTlsPathTextField.setText(path);
 		
 		Button exportTlsPathBrowseButton = new Button(mainContainer, SWT.NONE);
 		exportTlsPathBrowseButton.addSelectionListener(new SelectionAdapter() {
@@ -185,7 +184,12 @@ public class AzureExportDockerTlsKeysDialog extends TitleAreaDialog {
 	 */
 	@Override
 	protected Point getInitialSize() {
-		return new Point(530, 250);
+		return new Point(580, 280);
+	}
+
+	@Override
+	protected boolean isResizable() {
+		return true;
 	}
 
 	public boolean doValidate() {

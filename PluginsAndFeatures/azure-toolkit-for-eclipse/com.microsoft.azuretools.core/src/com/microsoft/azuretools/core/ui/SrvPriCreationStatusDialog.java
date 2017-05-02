@@ -175,21 +175,28 @@ public class SrvPriCreationStatusDialog extends TitleAreaDialog {
     private void createServicePrincipalAsync() {
         try {
             class StatusTask implements IRunnableWithProgress, IListener<Status> {
-
+            	IProgressMonitor progressIndicator = null;
+            	
                 @Override
                 public void listen(Status status) {
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            TableItem item = new TableItem(table, SWT.NULL);
-                            item.setText(new String[] {status.getAction(), status.getResult().toString(), status.getDetails()});
+                            if (progressIndicator != null) {
+                                progressIndicator.setTaskName(status.getAction());
+                            }
+                            // if only action was set in the status - the info for progress indicator only - igonre for table
+                            if (status.getResult() != null) {
+                                TableItem item = new TableItem(table, SWT.NULL);
+                                item.setText(new String[] {status.getAction(), status.getResult().toString(), status.getDetails()});
+                            }
                         }
                     });
                 }
 
                 @Override
                 public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                    
+                	progressIndicator = monitor;
                     monitor.beginTask("Creating Service Principal...", IProgressMonitor.UNKNOWN);
                     for (String tid : tidSidsMap.keySet()) {
                         if (monitor.isCanceled()) {

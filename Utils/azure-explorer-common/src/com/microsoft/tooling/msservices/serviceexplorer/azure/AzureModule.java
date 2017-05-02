@@ -193,10 +193,5 @@ public class AzureModule extends AzureRefreshableNode {
         for (Node child : getChildNodes()) {
             child.removeAllChildNodes();
         }
-//        AzureUIRefreshCore.removeAll();
-        if (AzureUIRefreshCore.listeners != null) {
-            // trigger a force update/reload
-            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.UPDATE, null));
-        }
     }
 }

@@ -113,6 +113,11 @@ public class AzureSelectKeyVault extends Dialog {
 		return new Point(330, 120);
 	}
 
+	@Override
+	protected boolean isResizable() {
+		return true;
+	}
+
 	public String getSelectedKeyvault() {
 		return keyvault;
 	}

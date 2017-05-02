@@ -46,10 +46,12 @@ public class AppInsightsEventHelper {
     }
 
     public static void createEvent(final EventType eventType, final String objectName, final String action, final Map<String, String> properties) {
+        boolean force = false;
+        if(eventType.name().equalsIgnoreCase("Telemetry") && action.equalsIgnoreCase("Deny")) force = true;
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(EVENT_NAME_PREFIX).append(eventType.name());
         if (!StringUtils.isEmpty(objectName)) stringBuilder.append(".").append(objectName.replaceAll("\\s+", ""));
         if (!StringUtils.isEmpty(action)) stringBuilder.append(".").append(action.replaceAll("\\s+", ""));
-        AppInsightsCustomEvent.create(stringBuilder.toString(), null, properties);
+        AppInsightsCustomEvent.create(stringBuilder.toString(), null, properties, force);
     }
 }

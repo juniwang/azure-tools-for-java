@@ -22,9 +22,6 @@
 package com.microsoft.intellij;
 
 import com.intellij.ide.plugins.cl.PluginClassLoader;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.impl.ActionMenuItem;
-import com.intellij.openapi.actionSystem.impl.actionholder.ActionRef;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -50,7 +47,6 @@ import com.microsoft.intellij.util.AppInsightsEventHelper;
 import com.microsoft.intellij.util.PluginHelper;
 import com.microsoft.intellij.util.PluginUtil;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.w3c.dom.Document;
 
 import javax.swing.*;
@@ -60,7 +56,6 @@ import java.awt.event.AWTEventListener;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.*;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -181,29 +176,7 @@ public class AzurePlugin extends AbstractProjectComponent {
 
                 final Map<String, String> properties = new HashMap<>();
 
-                if (event.getSource() instanceof ActionMenuItem) {
-                    final ActionMenuItem item = (ActionMenuItem) event.getSource();
-                    ActionRef actionRef;
-                    for (final Field field : FieldUtils.getAllFields(item.getClass())) {
-                        if (field.getType().isAssignableFrom(ActionRef.class)) {
-                            try {
-                                actionRef = (ActionRef) FieldUtils.readField(field, item, true);
-                                AnAction anAction = actionRef.getAction();
-                                if (anAction != null && anAction.getClass().getName().contains("microsoft")) {
-                                    properties.put("When", String.valueOf(mouseEvent.getWhen()));
-                                    properties.put("Text", item.getText());
-                                    properties.put("ActionCommand", item.getActionCommand());
-                                    properties.put("Action", anAction.getClass().getCanonicalName());
-
-
-                                    AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.MainMenu, item.getText().replaceAll("\\s+", ""), "", properties);
-                                }
-                            } catch (IllegalAccessException e) {
-                            }
-                            break;
-                        }
-                    }
-                } else if (event.getSource() instanceof JMenuItem) {
+                if (event.getSource() instanceof JMenuItem) {
                     final JMenuItem menuItem = (JMenuItem) event.getSource();
                     boolean isMicrosoft = false;
                     for (ActionListener actionListener : menuItem.getActionListeners()) {

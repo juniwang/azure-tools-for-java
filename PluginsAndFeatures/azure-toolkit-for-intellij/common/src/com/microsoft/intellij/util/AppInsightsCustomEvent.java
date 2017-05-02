@@ -1,12 +1,14 @@
 package com.microsoft.intellij.util;
 
 import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.azuretools.adauth.StringUtils;
 import com.microsoft.azuretools.azurecommons.helpers.Nullable;
 import com.microsoft.azuretools.azurecommons.xmlhandling.DataOperations;
 import com.microsoft.intellij.ui.messages.AzureBundle;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -31,6 +33,13 @@ public class AppInsightsCustomEvent {
                 telemetry.getContext().setInstrumentationKey(key);
                 Map<String, String> properties = myProperties == null ? new HashMap<String, String>() : new HashMap<String, String>(myProperties);
                 properties.put("SessionId", sessionId);
+                // Telemetry client doesn't accept null value
+                for (Iterator<Map.Entry<String, String>> iter = properties.entrySet().iterator(); iter.hasNext(); ) {
+                    Map.Entry<String, String> entry = iter.next();
+                    if (StringUtils.isNullOrEmpty(entry.getKey())) {
+                        iter.remove();
+                    }
+                }
                 if (version != null && !version.isEmpty()) {
                     properties.put("Library Version", version);
                 }

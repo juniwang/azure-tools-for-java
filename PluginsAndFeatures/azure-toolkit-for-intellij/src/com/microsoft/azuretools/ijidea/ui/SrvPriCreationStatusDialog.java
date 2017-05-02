@@ -35,6 +35,7 @@ import com.microsoft.azuretools.authmanage.srvpri.report.IListener;
 import com.microsoft.azuretools.authmanage.srvpri.step.Status;
 import com.microsoft.azuretools.utils.IProgressIndicator;
 import com.microsoft.intellij.ui.components.AzureDialogWrapper;
+import com.microsoft.azuretools.utils.IProgressIndicator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

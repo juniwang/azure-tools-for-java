@@ -107,7 +107,7 @@ public class AzureSelectDockerHostPage extends WizardPage {
 	 * Create the wizard.
 	 */
 	public AzureSelectDockerHostPage(AzureSelectDockerWizard wizard) {
-		super("Deploying Docker Container on Azure", "", Activator.getImageDescriptor("icons/large/DeployToAzureWizard.png"));
+		super("Deploying Docker Container on Azure", "", Activator.getImageDescriptor("icons/large/DeploytoAzureWizard.png"));
 		
 		this.wizard = wizard;		
 		this.dockerManager = wizard.getDockerManager();

@@ -72,7 +72,7 @@ public class AzureExportDockerSshKeysDialog extends TitleAreaDialog {
 	public AzureExportDockerSshKeysDialog(Shell parentShell, IProject project) {
 		super(parentShell);
         setHelpAvailable(false);
-        setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.APPLICATION_MODAL);
+        setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.APPLICATION_MODAL | SWT.MIN | SWT.RESIZE);
 
 		this.project = project;
 		this.project = project;
@@ -188,6 +188,11 @@ public class AzureExportDockerSshKeysDialog extends TitleAreaDialog {
 	@Override
 	protected Point getInitialSize() {
 		return new Point(450, 275);
+	}
+
+	@Override
+	protected boolean isResizable() {
+		return true;
 	}
 
 	public boolean doValidate() {

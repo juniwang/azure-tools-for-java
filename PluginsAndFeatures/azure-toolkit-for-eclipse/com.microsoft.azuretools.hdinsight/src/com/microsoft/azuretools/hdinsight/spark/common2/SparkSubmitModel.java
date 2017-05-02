@@ -269,7 +269,7 @@ public class SparkSubmitModel {
     	
     }
     
-    private void uploadFileToHDFS(@NotNull final IClusterDetail selectedClusterDetail, @NotNull final String selectedArtifactName) throws Exception {
+    private void uploadFileToCluster(@NotNull final IClusterDetail selectedClusterDetail, @NotNull final String selectedArtifactName) throws Exception {
     	String buildJarPath;
     	if (submissionParameter.isLocalArtifact()) {
     		buildJarPath = submissionParameter.getLocalArtifactPath();
@@ -279,15 +279,17 @@ public class SparkSubmitModel {
             buildJarPath = String.format("%s%s%s%s", proj.getLocation(), File.separator, proj.getName(), ".jar");
 			 
     	}
-                	//((artifactHashMap.get(selectedArtifactName).getOutputFilePath()));
-
-        String fileOnBlobPath = SparkSubmitHelper.uploadFileToHDFS(/*project,*/ selectedClusterDetail, buildJarPath);
-        submissionParameter.setFilePath(fileOnBlobPath);
+    	
+        String filePath = selectedClusterDetail.isEmulator() ?
+                SparkSubmitHelper.uploadFileToEmulator(selectedClusterDetail, buildJarPath) :
+                SparkSubmitHelper.uploadFileToHDFS(selectedClusterDetail, buildJarPath);
+        submissionParameter.setFilePath(filePath);
     }
-
+    
+    
     private void tryToCreateBatchSparkJob(@NotNull final IClusterDetail selectedClusterDetail) throws HDIException,IOException {
         SparkBatchSubmission.getInstance().setCredentialsProvider(selectedClusterDetail.getHttpUserName(), selectedClusterDetail.getHttpPassword());
-        HttpResponse response = SparkBatchSubmission.getInstance().createBatchSparkJob(selectedClusterDetail.getConnectionUrl() + "/livy/batches", submissionParameter);
+        HttpResponse response = SparkBatchSubmission.getInstance().createBatchSparkJob(SparkSubmitHelper.getLivyConnectionURL(selectedClusterDetail), submissionParameter);
 
         if (response.getCode() == 201 || response.getCode() == 200) {
             HDInsightUtil.showInfoOnSubmissionMessageWindow("Info : Submit to spark cluster successfully.");
@@ -316,7 +318,6 @@ public class SparkSubmitModel {
             postEventProperty.put("IsSubmitSucceed", "false");
             postEventProperty.put("SubmitFailedReason", response.getContent());
             AppInsightsCustomEvent.create(Messages.SparkSubmissionButtonClickEvent, null, postEventProperty);
-            AppInsightsCustomEvent.create("dsfs", null);
         }
     }
 
@@ -386,8 +387,8 @@ public class SparkSubmitModel {
                 }
 
                 try {
-                    uploadFileToHDFS(selectedClusterDetail, selectedArtifactName);
-                    tryToCreateBatchSparkJob(selectedClusterDetail);
+                	uploadFileToCluster(selectedClusterDetail, selectedArtifactName);
+                	tryToCreateBatchSparkJob(selectedClusterDetail);
                 } catch (Exception exception) {
                 	exception.printStackTrace();
                     showFailedSubmitErrorMessage(exception);

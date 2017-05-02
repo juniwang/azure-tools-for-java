@@ -23,6 +23,7 @@
 package com.microsoft.azuretools.authmanage.srvpri.step;
 
 import com.microsoft.azuretools.authmanage.srvpri.entities.Application;
+import com.microsoft.azuretools.authmanage.srvpri.entities.ApplicationGet;
 import com.microsoft.azuretools.authmanage.srvpri.entities.ApplicationRet;
 import com.microsoft.azuretools.authmanage.srvpri.entities.PasswordCredentials;
 import com.microsoft.azuretools.authmanage.srvpri.report.Reporter;
@@ -64,15 +65,40 @@ public class ApplicationStep implements IStep {
         reporter.report("identifierUri: " + identifierUri);
         reporter.report("password: " + password);
 
+        reporter.report("Creating ADD Application...");
         ApplicationRet app = createAadApplication(
                 displayName,
                 homePage,
                 new String[]{identifierUri},
                 password);
+        reporter.report("Done.");
+        reporter.report(String.format("Checking ADD Application availability..."));
+        final int RETRY_QNTY = 5;
+        final int SLEEP_SEC = 10;
+        int retry_count = 0;
+        while (retry_count < RETRY_QNTY) {
+            ApplicationGet applicationGet = getAadApplication( app.appId);
+            if (applicationGet.value.size() > 0) {
+                reporter.report("Done.");
+                break;
+            }
+            retry_count++;
+            reporter.report(String.format("Not available. Will retry in %d sec...", SLEEP_SEC));
+            Thread.sleep(SLEEP_SEC * 1000);
+        }
+
+        if ((retry_count >= RETRY_QNTY)) {
+            String errorDetails = String.format("The AD Application (appId: %s) is not available after %s retries", app.appId, RETRY_QNTY);
+            CommonParams.getStatusReporter().report(new Status(
+                    getName(),
+                    Status.Result.FAILED,
+                    errorDetails
+            ));
+            throw new IOException(errorDetails);
+        }
 
         params.put("appId", app.appId);
         params.put("appObjectId", app.objectId);
-        Thread.sleep(1000);
         params.put("status", "app");
         CommonParams.getStatusReporter().report(new Status(
                 getName(),
@@ -149,6 +175,16 @@ public class ApplicationStep implements IStep {
         // DELETE https://graph.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/applications/8a30c28a-dd22-456d-b377-99e6a775f552?api-version=1.6-internal
         String resp = graphRestHelper.doDelete("applications/" + appObjectId.toString(), null, null);
         System.out.println("destroyAadApplication responce: " + resp);
+    }
+
+    private ApplicationGet getAadApplication(UUID appId) throws IOException {
+        // GET /72f988bf-86f1-41af-91ab-2d7cd011db47/applications?$filter=appId%20eq%20'd43b8e8a-3ab5-436a-b8ab-bef2e3cef533'&api-version=1.6 HTTP/1.1
+
+        String resp = graphRestHelper.doGet("applications", "$filter=appId%20eq%20'" + appId.toString() + "'");
+        System.out.println("getAadApplication responce: " + resp);
+        ObjectMapper mapper = new ObjectMapper();
+        ApplicationGet applicationGet = mapper.readValue(resp, ApplicationGet.class);
+        return applicationGet;
     }
 
 }

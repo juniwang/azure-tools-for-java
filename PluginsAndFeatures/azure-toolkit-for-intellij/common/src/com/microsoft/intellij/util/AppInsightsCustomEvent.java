@@ -26,7 +26,7 @@ public class AppInsightsCustomEvent {
     public static void create(String eventName, String version, @Nullable Map<String, String> myProperties) {
         if (new File(dataFile).exists()) {
             String prefValue = DataOperations.getProperty(dataFile, AzureBundle.message("prefVal"));
-            if (prefValue == null || prefValue.isEmpty() || prefValue.equalsIgnoreCase("true")) {
+            if (prefValue == null || prefValue.isEmpty() || prefValue.equalsIgnoreCase("true") || eventName.equals("AzurePlugin.Intellij.Telemetry.Deny")) {
                 TelemetryClient telemetry = new TelemetryClient();
                 telemetry.getContext().setInstrumentationKey(key);
                 Map<String, String> properties = myProperties == null ? new HashMap<String, String>() : new HashMap<String, String>(myProperties);

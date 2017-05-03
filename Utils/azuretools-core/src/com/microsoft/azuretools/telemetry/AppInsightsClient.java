@@ -53,10 +53,16 @@ public class AppInsightsClient {
     }
 
     public static void createByType(final EventType eventType, final String objectName, final String action) {
+        if (!isAppInsightsClientAvailable())
+            return;
+
         createByType(eventType, objectName, action, null);
     }
 
     public static void createByType(final EventType eventType, final String objectName, final String action, final Map<String, String> properties) {
+        if (!isAppInsightsClientAvailable())
+            return;
+
         boolean force = eventType == EventType.Telemetry && "Deny".equalsIgnoreCase(action);
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(configuration.eventNamePrefix()).append(eventType.name());
@@ -67,14 +73,23 @@ public class AppInsightsClient {
     }
 
     public static void create(String eventName, String version) {
+        if (!isAppInsightsClientAvailable())
+            return;
+
         create(eventName, version, null);
     }
 
     public static void create(String eventName, String version, @Nullable Map<String, String> myProperties) {
+        if (!isAppInsightsClientAvailable())
+            return;
+
         create(eventName, version, myProperties, false);
     }
 
     public static void create(String eventName, String version, @Nullable Map<String, String> myProperties, boolean force) {
+        if (!isAppInsightsClientAvailable())
+            return;
+
         if (configuration.validated()) {
             String prefValue = configuration.preferenceVal();
             if (prefValue == null || prefValue.isEmpty() || prefValue.equalsIgnoreCase("true") || force) {
@@ -110,6 +125,9 @@ public class AppInsightsClient {
     }
 
     public static void createFTPEvent(String eventName, String uri, String appName, String subId) {
+        if (!isAppInsightsClientAvailable())
+            return;
+        
         TelemetryClient telemetry = new TelemetryClient();
         telemetry.getContext().setInstrumentationKey(configuration.appInsightsKey());
 
@@ -137,5 +155,9 @@ public class AppInsightsClient {
         }
         telemetry.trackEvent(eventName, properties, null);
         telemetry.flush();
+    }
+
+    private static boolean isAppInsightsClientAvailable() {
+        return configuration != null;
     }
 }

@@ -51,7 +51,7 @@ public abstract class AzureAnAction extends AnAction {
     public abstract void onActionPerformed(AnActionEvent anActionEvent);
 
     @Override
-    public void actionPerformed(AnActionEvent anActionEvent) {
+    public final void actionPerformed(AnActionEvent anActionEvent) {
         final Map<String, String> properties = new HashMap<>();
         properties.put("Text", anActionEvent.getPresentation().getText());
         properties.put("Description", anActionEvent.getPresentation().getDescription());

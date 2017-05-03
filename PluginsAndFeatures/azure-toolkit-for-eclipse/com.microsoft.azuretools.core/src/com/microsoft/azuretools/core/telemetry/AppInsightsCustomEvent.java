@@ -21,9 +21,12 @@ package com.microsoft.azuretools.core.telemetry;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.azuretools.adauth.StringUtils;
 import com.microsoft.azuretools.azurecommons.xmlhandling.DataOperations;
 import com.microsoft.azuretools.core.utils.Messages;
 import com.microsoft.azuretools.core.utils.PluginUtil;
@@ -33,20 +36,35 @@ public class AppInsightsCustomEvent {
 			Messages.commonPluginID);
 	static String dataFile = String.format("%s%s%s", pluginInstLoc, File.separator, Messages.dataFileName);
 	static String key = "824aaa4c-052b-4c43-bdcb-48f915d71b3f";
+	static String sessionId = UUID.randomUUID().toString();
 
 	public static void create(String eventName, String version) {
 		create(eventName, version, null);
 	}
 
-	public static void create(String eventName, String version, Map<String, String> myProperties) {
+	public static void create(String eventName, String version, Map<String, String> myProperties){
+		create(eventName, version, myProperties, false);
+	}
+	
+	public static void create(String eventName, String version, Map<String, String> myProperties, boolean force) {
 		if (new File(pluginInstLoc).exists() && new File(dataFile).exists()) {
 			String prefValue = DataOperations.getProperty(dataFile, Messages.prefVal);
-			if (prefValue == null || prefValue.isEmpty() || prefValue.equalsIgnoreCase("true")) {
+			if (prefValue == null || prefValue.isEmpty() || prefValue.equalsIgnoreCase("true") || force) {
 				TelemetryClient telemetry = new TelemetryClient();
 				telemetry.getContext().setInstrumentationKey(key);
 
 				Map<String, String> properties = myProperties == null ? new HashMap<String, String>()
 						: new HashMap<String, String>(myProperties);
+				properties.put("SessionId", sessionId);
+				
+				// Telemetry client doesn't accept null value
+                for (Iterator<Map.Entry<String, String>> iter = properties.entrySet().iterator(); iter.hasNext(); ) {
+                    Map.Entry<String, String> entry = iter.next();
+                    if (StringUtils.isNullOrEmpty(entry.getKey())) {
+                        iter.remove();
+                    }
+                }
+                
 				if (version != null && !version.isEmpty()) {
 					properties.put("Library Version", version);
 				}

@@ -90,7 +90,7 @@ public class AzureDockerHostsManager {
       @Override
       public void run() {
         if (event.object == null &&
-            (event.opsType == AzureUIRefreshEvent.EventType.UPDATE || event.opsType == AzureUIRefreshEvent.EventType.REMOVE)) {
+            (event.opsType == AzureUIRefreshEvent.EventType.SIGNIN || event.opsType == AzureUIRefreshEvent.EventType.SIGNOUT ||  event.opsType == AzureUIRefreshEvent.EventType.UPDATE || event.opsType == AzureUIRefreshEvent.EventType.REMOVE)) {
           resetAzureDockerHostsManager();
         }
       }

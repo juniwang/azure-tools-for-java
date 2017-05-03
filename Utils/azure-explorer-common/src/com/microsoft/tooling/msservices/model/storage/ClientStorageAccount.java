@@ -22,6 +22,7 @@
 package com.microsoft.tooling.msservices.model.storage;
 
 import com.microsoft.azuretools.azurecommons.helpers.NotNull;
+import com.microsoft.tooling.msservices.helpers.azure.sdk.StorageClientSDKManager;
 import com.microsoft.tooling.msservices.model.ServiceTreeItem;
 
 public class ClientStorageAccount implements ServiceTreeItem {
@@ -29,12 +30,14 @@ public class ClientStorageAccount implements ServiceTreeItem {
     public static final String DEFAULT_ENDPOINTS_PROTOCOL_KEY = "DefaultEndpointsProtocol";
     public static final String ACCOUNT_NAME_KEY = "AccountName";
     public static final String ACCOUNT_KEY_KEY = "AccountKey";
+    public static final String ENDPOINT_SUFFIX_KEY = "EndpointSuffix";
     public static final String BLOB_ENDPOINT_KEY = "BlobEndpoint";
     public static final String QUEUE_ENDPOINT_KEY = "QueueEndpoint";
     public static final String TABLE_ENDPOINT_KEY = "TableEndpoint";
     public static final String DEFAULT_CONN_STR_TEMPLATE = DEFAULT_ENDPOINTS_PROTOCOL_KEY + "=%s;" +
             ACCOUNT_NAME_KEY + "=%s;" +
-            ACCOUNT_KEY_KEY + "=%s";
+            ACCOUNT_KEY_KEY + "=%s;" +
+            ENDPOINT_SUFFIX_KEY + "=%s";
     public static final String CUSTOM_CONN_STR_TEMPLATE = BLOB_ENDPOINT_KEY + "=%s;" +
             QUEUE_ENDPOINT_KEY + "=%s;" +
             TABLE_ENDPOINT_KEY + "=%s;" +
@@ -126,17 +129,20 @@ public class ClientStorageAccount implements ServiceTreeItem {
 
     @NotNull
     public String getConnectionString() {
-        return isUseCustomEndpoints() ?
-                String.format(ClientStorageAccount.CUSTOM_CONN_STR_TEMPLATE,
-                        getBlobsUri(),
-                        getQueuesUri(),
-                        getTablesUri(),
-                        getName(),
-                        getPrimaryKey()) :
-                String.format(ClientStorageAccount.DEFAULT_CONN_STR_TEMPLATE,
-                        getProtocol(),
-                        getName(),
-                        getPrimaryKey());
+        if (isUseCustomEndpoints()) {
+            return String.format(ClientStorageAccount.CUSTOM_CONN_STR_TEMPLATE,
+                    getBlobsUri(),
+                    getQueuesUri(),
+                    getTablesUri(),
+                    getName(),
+                    getPrimaryKey());
+        } else {
+            return String.format(ClientStorageAccount.DEFAULT_CONN_STR_TEMPLATE,
+                    getProtocol(),
+                    getName(),
+                    getPrimaryKey(),
+                    StorageClientSDKManager.getEndpointSuffix());
+        }
     }
 
     @Override

@@ -135,6 +135,26 @@ public class AzureNewDockerWizardDialog extends WizardDialog<AzureNewDockerWizar
             }
           }
 
+          progressIndicator.setFraction(.60);
+          progressIndicator.setIndeterminate(true);
+          progressIndicator.setText2("Getting the new Docker virtual machines details...");
+          if (AzureDockerUtils.DEBUG) System.out.println("Getting the new Docker virtual machines details: " + new Date().toString());
+          // dockerManager.refreshDockerHostDetails();
+          VirtualMachine vm = azureClient.virtualMachines().getByResourceGroup(dockerHost.hostVM.resourceGroupName, dockerHost.hostVM.name);
+          if (vm != null) {
+            DockerHost updatedHost = AzureDockerVMOps.getDockerHost(vm, dockerManager.getDockerVaultsMap());
+            if (updatedHost != null) {
+              dockerHost.hostVM = updatedHost.hostVM;
+              dockerHost.apiUrl = updatedHost.apiUrl;
+            }
+          }
+          if (AzureDockerUtils.DEBUG) System.out.println("Done getting the new Docker virtual machines details: " + new Date().toString());
+          if (progressIndicator.isCanceled()) {
+            if (displayWarningOnCreateHostCancelAction() == 1) {
+              return;
+            }
+          }
+
           progressIndicator.setFraction(.65);
           progressIndicator.setText2(String.format("Waiting for virtual machine %s to be up...", dockerHost.name));
           if (AzureDockerUtils.DEBUG) System.out.println("Waiting for virtual machine to be up: " + new Date().toString());
@@ -167,7 +187,7 @@ public class AzureNewDockerWizardDialog extends WizardDialog<AzureNewDockerWizar
           progressIndicator.setText2("Refreshing the Docker virtual machines details...");
           if (AzureDockerUtils.DEBUG) System.out.println("Refreshing Docker hosts details: " + new Date().toString());
           // dockerManager.refreshDockerHostDetails();
-          VirtualMachine vm = azureClient.virtualMachines().getByResourceGroup(dockerHost.hostVM.resourceGroupName, dockerHost.hostVM.name);
+          vm = azureClient.virtualMachines().getByResourceGroup(dockerHost.hostVM.resourceGroupName, dockerHost.hostVM.name);
           if (vm != null) {
             DockerHost updatedHost = AzureDockerVMOps.getDockerHost(vm, dockerManager.getDockerVaultsMap());
             if (updatedHost != null) {

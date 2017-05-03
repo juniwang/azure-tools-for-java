@@ -22,19 +22,25 @@
 
 package com.microsoft.azuretools.sdkmanage;
 
+import com.microsoft.azure.AzureEnvironment;
+import com.microsoft.azure.AzureResponseBuilder;
 import com.microsoft.azure.credentials.ApplicationTokenCredentials;
 import com.microsoft.azure.keyvault.KeyVaultClient;
 import com.microsoft.azure.keyvault.authentication.KeyVaultCredentials;
 import com.microsoft.azure.management.Azure;
 import com.microsoft.azure.management.resources.Subscription;
 import com.microsoft.azure.management.resources.Tenant;
+import com.microsoft.azure.serializer.AzureJacksonAdapter;
 import com.microsoft.azuretools.Constants;
+import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.authmanage.CommonSettings;
 import com.microsoft.azuretools.authmanage.SubscriptionManager;
 import com.microsoft.azuretools.authmanage.SubscriptionManagerPersist;
 import com.microsoft.azuretools.utils.AzureRegisterProviderNamespaces;
 import com.microsoft.azuretools.utils.Pair;
+import com.microsoft.rest.RestClient;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
+import retrofit2.Retrofit;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +53,7 @@ public class ServicePrincipalAzureManager extends AzureManagerBase {
     private static Settings settings;
     private final SubscriptionManager subscriptionManager;
     private final File credFile;
-    private final ApplicationTokenCredentials atc;
+    private ApplicationTokenCredentials atc;
 
     static {
         settings = new Settings();
@@ -67,15 +73,31 @@ public class ServicePrincipalAzureManager extends AzureManagerBase {
 
     public ServicePrincipalAzureManager(File credFile) {
         this.credFile = credFile;
-        this.atc = null;
         this.subscriptionManager = new SubscriptionManagerPersist(this);
     }
 
     private Azure.Authenticated auth() throws IOException {
-        Azure.Configurable azureConfigurable = Azure.configure().withUserAgent(CommonSettings.USER_AGENT);
-        return (atc == null)
+        ApplicationTokenCredentials credentials = (atc == null) ? ApplicationTokenCredentials.fromFile(credFile) : atc;
+        if (!credentials.environment().managementEndpoint().contains(AzureEnvironment.AZURE.managementEndpoint()) &&
+            AuthMethodManager.getClientBuilder() != null) {
+            // Register attached resources certificates needed to work with China and Germany clouds
+                RestClient restClient = new RestClient.Builder(
+                    AuthMethodManager.getClientBuilder(),
+                    new Retrofit.Builder())
+                    .withBaseUrl(credentials.environment().resourceManagerEndpoint())
+                    .withCredentials(credentials)
+                    .withSerializerAdapter(new AzureJacksonAdapter())
+                    .withResponseBuilderFactory(new AzureResponseBuilder.Factory())
+                    .withUserAgent(CommonSettings.USER_AGENT)
+                    .build();
+
+                return Azure.authenticate(restClient, credentials.domain());
+        } else {
+            Azure.Configurable azureConfigurable = Azure.configure().withUserAgent(CommonSettings.USER_AGENT);
+            return (atc == null)
                 ? azureConfigurable.authenticate(credFile)
                 : azureConfigurable.authenticate(atc);
+        }
     }
 
     @Override
@@ -139,10 +161,8 @@ public class ServicePrincipalAzureManager extends AzureManagerBase {
             @Override
             public String doAuthenticate(String authorization, String resource, String scope) {
                 try {
-                        ApplicationTokenCredentials credentials = (atc == null)
-                            ? ApplicationTokenCredentials.fromFile(credFile)
-                            : atc;
-                    return credentials.getToken(resource);
+                    initATCIfNeeded();
+                    return atc.getToken(resource);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -154,19 +174,47 @@ public class ServicePrincipalAzureManager extends AzureManagerBase {
 
     @Override
     public String getCurrentUserId() throws IOException {
-        ApplicationTokenCredentials credentials = (atc == null)
-            ? ApplicationTokenCredentials.fromFile(credFile)
-            : atc;
-
-        return credentials.clientId();
+        initATCIfNeeded();
+        return atc.clientId();
     }
 
     @Override
     public String getAccessToken(String tid) throws IOException {
-            ApplicationTokenCredentials credentials = (atc == null)
-                    ? ApplicationTokenCredentials.fromFile(credFile)
-                    : atc;
+        return atc.getToken(getManagementURI());
+    }
 
-            return credentials.getToken(Constants.resourceARM);
+    @Override
+    public String getManagementURI() throws IOException {
+        initATCIfNeeded();
+        // default to global cloud
+        return atc.environment() == null ? Constants.resourceARM : atc.environment().resourceManagerEndpoint();
+    }
+
+    @Override
+    public String getStorageEndpointSuffix() {
+        try {
+            String managementURI = getManagementURI();
+            if (managementURI.endsWith("/")) {
+                managementURI = managementURI.substring(0, managementURI.length() - 1);
+            }
+            if (AzureEnvironment.AZURE.resourceManagerEndpoint().equals(managementURI)) {
+                return AzureEnvironment.AZURE.storageEndpointSuffix();
+            } else if (AzureEnvironment.AZURE_CHINA.resourceManagerEndpoint().equals(managementURI)) {
+                return AzureEnvironment.AZURE_CHINA.storageEndpointSuffix();
+            } else if (AzureEnvironment.AZURE_GERMANY.resourceManagerEndpoint().equals(managementURI)) {
+                return AzureEnvironment.AZURE_GERMANY.storageEndpointSuffix();
+            } else if (AzureEnvironment.AZURE_US_GOVERNMENT.resourceManagerEndpoint().equals(managementURI)) {
+                return AzureEnvironment.AZURE_US_GOVERNMENT.storageEndpointSuffix();
+            }
+            return AzureEnvironment.AZURE.storageEndpointSuffix();
+        } catch (IOException ex) {
+            return AzureEnvironment.AZURE.storageEndpointSuffix();
+        }
+    }
+
+    private void initATCIfNeeded() throws IOException {
+        if (atc == null) {
+            atc = ApplicationTokenCredentials.fromFile(credFile);
+        }
     }
 }

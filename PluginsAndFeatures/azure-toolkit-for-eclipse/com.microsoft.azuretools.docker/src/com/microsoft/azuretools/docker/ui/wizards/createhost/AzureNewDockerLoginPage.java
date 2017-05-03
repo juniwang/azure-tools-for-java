@@ -669,6 +669,12 @@ public class AzureNewDockerLoginPage extends WizardPage {
 				}
 			}
 
+			if (dockerHostNoSshRadioButton.getSelection()) {
+				newHost.hasSSHLogIn = false;
+				newHost.certVault.sshKey = null;
+				newHost.certVault.sshPubKey = null;
+			}
+
 			// SSH key auto generated
 			if (dockerHostAutoSshRadioButton.getSelection()) {
 				AzureDockerCertVault certVault = AzureDockerCertVaultOps.generateSSHKeys(null, "SSH keys for " + newHost.name);

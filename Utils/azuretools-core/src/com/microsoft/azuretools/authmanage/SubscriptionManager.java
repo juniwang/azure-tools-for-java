@@ -27,6 +27,8 @@ import com.microsoft.azure.management.resources.Tenant;
 import com.microsoft.azuretools.adauth.AuthException;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.utils.AzureUIRefreshCore;
+import com.microsoft.azuretools.utils.AzureUIRefreshEvent;
 import com.microsoft.azuretools.utils.Pair;
 
 import java.io.IOException;
@@ -108,6 +110,9 @@ public class SubscriptionManager {
     private void notifyAllListeners() {
         for (ISubscriptionSelectionListener l : listeners) {
             l.update(subscriptionDetails == null);
+        }
+        if (AzureUIRefreshCore.listeners != null) {
+            AzureUIRefreshCore.execute(new AzureUIRefreshEvent(AzureUIRefreshEvent.EventType.UPDATE, null));
         }
     }
 

@@ -89,7 +89,7 @@ public class AzureViewDockerDialog extends Dialog {
 	 */
 	public AzureViewDockerDialog(Shell parentShell, IProject project, DockerHost host, AzureDockerHostsManager dockerManager) {
 		super(parentShell);
-        setShellStyle(SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
+        setShellStyle(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.MIN | SWT.RESIZE);
 		
 	    this.project = project;
 	    this.dockerHost = host;
@@ -515,6 +515,11 @@ public class AzureViewDockerDialog extends Dialog {
 	@Override
 	protected Point getInitialSize() {
 		return new Point(600, 550);
+	}
+
+	@Override
+	protected boolean isResizable() {
+		return true;
 	}
 
 	public int getInternalExitCode() {

@@ -136,7 +136,8 @@ public class AzureSelectDockerWizardModel extends WizardModel implements Telemet
     final Map<String, String> properties = new HashMap<>();
 
     if(this.subscription != null) {
-      properties.put("subscription", this.getSubscription().getSubscriptionName());
+        properties.put("SubscriptionName", this.getSubscription().getSubscriptionName());
+        properties.put("SubscriptionId", this.getSubscription().getSubscriptionId());
     }
 
     return properties;

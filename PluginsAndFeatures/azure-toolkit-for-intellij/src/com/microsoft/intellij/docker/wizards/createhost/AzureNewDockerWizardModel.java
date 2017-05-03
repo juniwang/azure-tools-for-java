@@ -119,7 +119,8 @@ public class AzureNewDockerWizardModel extends WizardModel implements TelemetryP
     final Map<String, String> properties = new HashMap<>();
 
     if(this.subscription != null) {
-      properties.put("subscription", this.getSubscription().name);
+      properties.put("SubscriptionName", this.getSubscription().name);
+      properties.put("SubscriptionId", this.getSubscription().id);
     }
 
     return properties;

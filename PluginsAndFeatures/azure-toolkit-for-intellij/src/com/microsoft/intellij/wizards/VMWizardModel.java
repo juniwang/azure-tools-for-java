@@ -295,12 +295,15 @@ public class VMWizardModel extends WizardModel implements TelemetryProperties {
     @Override
     public Map<String, String> toProperties() {
         final Map<String, String> properties = new HashMap<>();
-        if (this.getSize() != null) properties.put("size", this.getSize());
-        if (this.getSubnet() != null) properties.put("subnet", this.getSubnet());
-        if (this.getSubscription() != null)
-            properties.put("subscription", this.getSubscription().getSubscriptionName());
-        if (this.getName() != null) properties.put("name", this.getName());
-        if (this.getRegion() != null) properties.put("region", this.getRegion().name());
+        if (this.getSize() != null) properties.put("Size", this.getSize());
+        if (this.getSubnet() != null) properties.put("Subnet", this.getSubnet());
+        if (this.getSubscription() != null) {
+            properties.put("SubscriptionName", this.getSubscription().getSubscriptionName());
+            properties.put("SubscriptionId", this.getSubscription().getSubscriptionId());
+        }
+
+        if (this.getName() != null) properties.put("Name", this.getName());
+        if (this.getRegion() != null) properties.put("Region", this.getRegion().name());
         return properties;
     }
 }

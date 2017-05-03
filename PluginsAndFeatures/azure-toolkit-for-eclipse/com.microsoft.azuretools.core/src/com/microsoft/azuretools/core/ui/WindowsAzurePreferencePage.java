@@ -42,8 +42,7 @@ import com.microsoft.azuretools.azurecommons.util.GetHashMac;
 import com.microsoft.azuretools.azurecommons.util.ParserXMLUtility;
 import com.microsoft.azuretools.azurecommons.xmlhandling.DataOperations;
 import com.microsoft.azuretools.core.Activator;
-import com.microsoft.azuretools.core.telemetry.AppInsightsCustomEvent;
-import com.microsoft.azuretools.core.telemetry.AppInsightsEventHelper;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.azuretools.core.utils.FileUtil;
 import com.microsoft.azuretools.core.utils.Messages;
 import com.microsoft.azuretools.core.utils.PluginUtil;
@@ -156,19 +155,13 @@ public class WindowsAzurePreferencePage extends PreferencePage implements IWorkb
 						// Boolean.valueOf(oldPrefVal) != acceptTelemetry means
 						// user changes his mind.
 						// Either from Agree to Deny, or from Deny to Agree.
-						AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Telemetry, "",
-								acceptTelemetry ? AppInsightsEventHelper.Constants.Agree_Telemetry
-										: AppInsightsEventHelper.Constants.Deny_Telemetry,
-								null);
+						AppInsightsClient.createByType(AppInsightsClient.EventType.Telemetry, "",
+								acceptTelemetry ? "Agree" : "Deny", null);
 					}
 				} else {
 					FileUtil.copyResourceFile(Messages.dataFileEntry, dataFile);
 					setValues(dataFile);
-					AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Telemetry,
-							AppInsightsEventHelper.Constants.Plugin_Load,
-							btnPreference.getSelection() ? AppInsightsEventHelper.Constants.Agree_Telemetry
-									: AppInsightsEventHelper.Constants.Deny_Telemetry,
-							null);
+					AppInsightsClient.createByType(AppInsightsClient.EventType.Telemetry, "load", btnPreference.getSelection() ? "Agree" : "Deny", null);
 				}
 			} else {
 				new File(pluginInstLoc).mkdir();
@@ -203,7 +196,7 @@ public class WindowsAzurePreferencePage extends PreferencePage implements IWorkb
 		DataOperations.updatePropertyValue(doc, Messages.prefVal, String.valueOf(btnPreference.getSelection()));
 		ParserXMLUtility.saveXMLFile(dataFile, doc);
 		if (btnPreference.getSelection()) {
-			AppInsightsCustomEvent.create(Messages.telAgrEvtName, "");
+			AppInsightsClient.create(Messages.telAgrEvtName, "");
 		}
 	}
 }

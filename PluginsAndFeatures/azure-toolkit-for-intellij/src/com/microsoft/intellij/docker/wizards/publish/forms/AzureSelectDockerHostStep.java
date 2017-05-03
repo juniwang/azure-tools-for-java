@@ -45,13 +45,13 @@ import com.microsoft.azure.docker.model.EditableDockerHost;
 import com.microsoft.azure.docker.ops.utils.AzureDockerUtils;
 import com.microsoft.azure.docker.ops.utils.AzureDockerValidationUtils;
 import com.microsoft.azure.management.Azure;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.intellij.docker.dialogs.AzureViewDockerDialog;
 import com.microsoft.intellij.docker.utils.AzureDockerUIResources;
 import com.microsoft.intellij.docker.wizards.createhost.AzureNewDockerWizardDialog;
 import com.microsoft.intellij.docker.wizards.createhost.AzureNewDockerWizardModel;
 import com.microsoft.intellij.docker.wizards.publish.AzureSelectDockerWizardModel;
 import com.microsoft.intellij.docker.wizards.publish.AzureSelectDockerWizardStep;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
 import com.microsoft.intellij.util.PluginUtil;
 
 import javax.swing.*;
@@ -312,7 +312,7 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
     AnActionButton refreshDockerHostsAction = new AnActionButton("Refresh", AllIcons.Actions.Refresh) {
       @Override
       public void actionPerformed(AnActionEvent anActionEvent) {
-          AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.DockerContainer, "", "Refresh", null);
+        AppInsightsClient.createByType(AppInsightsClient.EventType.DockerContainer, "", "Refresh", null);
           onRefreshDockerHostAction();
       }
     };
@@ -386,7 +386,7 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
   }
 
   private void onAddNewDockerHostAction() {
-    AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.DockerHost, "", "Add");
+    AppInsightsClient.createByType(AppInsightsClient.EventType.DockerHost, "", "Add");
     AzureNewDockerWizardModel newDockerHostModel = new AzureNewDockerWizardModel(model.getProject(), dockerManager);
     AzureNewDockerWizardDialog wizard = new AzureNewDockerWizardDialog(newDockerHostModel);
     wizard.setTitle("Create Docker Host");
@@ -486,7 +486,7 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
       if (AzureDockerUtils.DEBUG) System.out.format("User canceled delete Docker host op: %d\n", option);
       return;
     }
-    AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.DockerHost, deleteHost.name, "Remove");
+    AppInsightsClient.createByType(AppInsightsClient.EventType.DockerHost, deleteHost.name, "Remove");
     int currentRow = dockerHostsTable.getSelectedRow();
     tableModel.removeRow(currentRow);
     tableModel.fireTableDataChanged();

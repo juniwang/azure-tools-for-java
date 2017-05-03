@@ -23,7 +23,7 @@
 package com.microsoft.azuretools.ijidea.utility;
 
 import com.intellij.openapi.actionSystem.*;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -57,7 +57,7 @@ public abstract class AzureAnAction extends AnAction {
         properties.put("Description", anActionEvent.getPresentation().getDescription());
         properties.put("Place", anActionEvent.getPlace());
         properties.put("ActionId", anActionEvent.getActionManager().getId(this));
-        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.MainMenu, anActionEvent.getPresentation().getText(), null, properties);
+        AppInsightsClient.createByType(AppInsightsClient.EventType.MainMenu, anActionEvent.getPresentation().getText(), null, properties);
 
         onActionPerformed(anActionEvent);
     }

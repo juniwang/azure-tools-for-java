@@ -31,7 +31,7 @@ import org.eclipse.core.resources.IProject;
 import com.microsoft.azure.hdinsight.common.ClusterManagerEx;
 import com.microsoft.azure.hdinsight.sdk.cluster.IClusterDetail;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
-import com.microsoft.azuretools.core.telemetry.AppInsightsCustomEvent;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.azuretools.core.utils.AzureAbstractHandler;
 import com.microsoft.azuretools.core.utils.PluginUtil;
 import com.microsoft.azuretools.hdinsight.Activator;
@@ -46,7 +46,7 @@ public class SubmitHandler extends AzureAbstractHandler {
 	@Override
 	public Object onExecute(ExecutionEvent event) throws ExecutionException {
 		synchronized (SubmitHandler.class) {
-					AppInsightsCustomEvent.create(Messages.SparkSubmissionRightClickProject,Activator.getDefault().getBundle().getVersion().toString());
+					AppInsightsClient.create(Messages.SparkSubmissionRightClickProject,Activator.getDefault().getBundle().getVersion().toString());
                     HDInsightUtil.showInfoOnSubmissionMessageWindow("List spark clusters ...", true);
                    
                     cachedClusterDetails = ClusterManagerEx.getInstance().getClusterDetailsWithoutAsync(true, null);

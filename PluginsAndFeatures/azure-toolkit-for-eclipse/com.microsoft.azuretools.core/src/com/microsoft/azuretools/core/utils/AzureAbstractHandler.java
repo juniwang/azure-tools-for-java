@@ -28,7 +28,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.swt.widgets.Event;
 
-import com.microsoft.azuretools.core.telemetry.AppInsightsEventHelper;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 
 public abstract class AzureAbstractHandler extends AbstractHandler {
 
@@ -43,8 +43,8 @@ public abstract class AzureAbstractHandler extends AbstractHandler {
 			properties.put("Category", event.getCommand().getCategory().getName());
 			properties.put("CommandId", event.getCommand().getId());
 			properties.put("Text", event.getCommand().getName());
-//			AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.MainMenu, event.getCommand().getName(),
-//					null, properties);
+			
+			AppInsightsClient.createByType(AppInsightsClient.EventType.MainMenu, event.getCommand().getName(),	null, properties);
 		} catch (NotDefinedException ignore) {
 		}
 

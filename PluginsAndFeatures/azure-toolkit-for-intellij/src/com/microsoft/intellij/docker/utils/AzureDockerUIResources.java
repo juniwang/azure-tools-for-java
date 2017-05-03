@@ -43,10 +43,10 @@ import com.microsoft.azure.keyvault.KeyVaultClient;
 import com.microsoft.azure.management.Azure;
 import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.intellij.docker.dialogs.AzureInputDockerLoginCredsDialog;
 import com.microsoft.intellij.docker.wizards.publish.AzureSelectDockerWizardDialog;
 import com.microsoft.intellij.docker.wizards.publish.AzureSelectDockerWizardModel;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
 import com.microsoft.intellij.util.PluginUtil;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 
@@ -381,7 +381,7 @@ public class AzureDockerUIResources {
   }
 
   public static void updateDockerHost(Project project, EditableDockerHost editableDockerHost, AzureDockerHostsManager dockerManager, boolean doReset) {
-    AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.DockerHost, "", "Update");
+    AppInsightsClient.createByType(AppInsightsClient.EventType.DockerHost, "", "Update");
     AzureInputDockerLoginCredsDialog loginCredsDialog = new AzureInputDockerLoginCredsDialog(project, editableDockerHost, dockerManager, doReset);
     loginCredsDialog.show();
 

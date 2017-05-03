@@ -46,6 +46,7 @@ import com.microsoft.azure.management.appservice.WebApp;
 import com.microsoft.azure.management.resources.ResourceGroup;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.ijidea.utility.UpdateProgressIndicator;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.azuretools.utils.AzureModel;
 import com.microsoft.azuretools.utils.AzureModelController;
 import com.microsoft.azuretools.utils.CanceledByUserException;
@@ -53,7 +54,6 @@ import com.microsoft.azuretools.utils.WebAppUtils;
 import com.microsoft.azuretools.utils.WebAppUtils.WebAppDetails;
 import com.microsoft.intellij.deploy.AzureDeploymentProgressNotification;
 import com.microsoft.intellij.ui.components.AzureDialogWrapper;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -357,7 +357,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
     }
 
     private void createAppService() {
-        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.WebApp, "", "Create");
+        AppInsightsClient.createByType(AppInsightsClient.EventType.WebApp, "", "Create");
         AppServiceCreateDialog d = AppServiceCreateDialog.go(project);
         if (d == null) {
             // something went wrong - report an error!
@@ -370,7 +370,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
     }
 
     private void refreshAppServices() {
-        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.WebApp, "", "Refresh");
+        AppInsightsClient.createByType(AppInsightsClient.EventType.WebApp, "", "Refresh");
         cleanTable();
         editorPaneAppServiceDetails.setText("");
         AzureModel.getInstance().setResourceGroupToWebAppMap(null);
@@ -425,7 +425,7 @@ public class WebAppDeployDialog extends AzureDialogWrapper {
             if (choice == JOptionPane.NO_OPTION) {
                 return;
             }
-            AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.WebApp, appServiceName, "Delete");
+            AppInsightsClient.createByType(AppInsightsClient.EventType.WebApp, appServiceName, "Delete");
             try {
                 ProgressManager.getInstance().run(new Task.Modal(project, "Delete App Service Progress", true) {
                     @Override

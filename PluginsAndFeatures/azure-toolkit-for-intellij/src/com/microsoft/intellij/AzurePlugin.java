@@ -39,11 +39,11 @@ import com.microsoft.azuretools.azurecommons.deploy.DeploymentEventListener;
 import com.microsoft.azuretools.azurecommons.helpers.StringHelper;
 import com.microsoft.azuretools.azurecommons.util.*;
 import com.microsoft.azuretools.azurecommons.xmlhandling.DataOperations;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.intellij.common.CommonConst;
 import com.microsoft.intellij.ui.libraries.AILibraryHandler;
 import com.microsoft.intellij.ui.libraries.AzureLibrary;
 import com.microsoft.intellij.ui.messages.AzureBundle;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
 import com.microsoft.intellij.util.PluginHelper;
 import com.microsoft.intellij.util.PluginUtil;
 import org.apache.commons.io.FileUtils;
@@ -161,7 +161,7 @@ public class AzurePlugin extends AbstractProjectComponent {
             copyResourceFile(message("dataFileName"), dataFile);
             setValues(dataFile);
         }
-
+        AppInsightsClient.setAppInsightsConfiguration(new AppInsightsConfigurationImpl());
         registerTelemetryEventListener();
     }
 
@@ -189,7 +189,7 @@ public class AzurePlugin extends AbstractProjectComponent {
                         properties.put("Text", menuItem.getText());
                         properties.put("When", String.valueOf(mouseEvent.getWhen()));
 
-                        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.AzureExplorer, null, null, properties);
+//                        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.AzureExplorer, null, null, properties);
                     }
                 }
             }
@@ -237,7 +237,7 @@ public class AzurePlugin extends AbstractProjectComponent {
             LOG.error(message("error"), ex);
         }
 
-        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Application, null, "Config", null);
+        AppInsightsClient.createByType(AppInsightsClient.EventType.Application, null, "Config", null);
     }
 
     /**

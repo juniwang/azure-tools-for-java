@@ -26,6 +26,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
 
 import java.util.EventListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class NodeActionListener implements EventListener {
     protected static String name;
@@ -41,6 +43,9 @@ public abstract class NodeActionListener implements EventListener {
     protected void beforeActionPerformed(NodeActionEvent e) {
         // mark node as loading
 //        e.getAction().getNode().setLoading(true);
+        final Map<String, String> properties = new HashMap<>();
+        properties.put("Text", e.getAction().getName());
+        properties.put("When", e.getAction().getClass().getSimpleName());
     }
 
     protected abstract void actionPerformed(NodeActionEvent e)

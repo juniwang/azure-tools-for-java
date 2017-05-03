@@ -24,7 +24,7 @@ package com.microsoft.intellij.ui.components;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -137,7 +137,7 @@ public abstract class AzureDialogWrapper extends DialogWrapper {
                 return;
         }
 
-        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Dialog, this.getClass().getSimpleName(), action, properties);
+        AppInsightsClient.createByType(AppInsightsClient.EventType.Dialog, this.getClass().getSimpleName(), action, properties);
     }
 
     @Override

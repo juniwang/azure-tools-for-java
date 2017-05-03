@@ -35,8 +35,8 @@ import com.microsoft.azuretools.authmanage.SubscriptionManager;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.ijidea.actions.SelectSubscriptionsAction;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.intellij.ui.components.AzureDialogWrapper;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -157,7 +157,7 @@ public class SubscriptionsDialog extends AzureDialogWrapper {
         AnActionButton refreshAction = new AnActionButton("Refresh", AllIcons.Actions.Refresh) {
             @Override
             public void actionPerformed(AnActionEvent anActionEvent) {
-                AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Subscription, "", "Refresh", null);
+                AppInsightsClient.createByType(AppInsightsClient.EventType.Subscription, "", "Refresh", null);
                 refreshSubscriptions();
             }
         };

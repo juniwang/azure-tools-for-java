@@ -36,6 +36,7 @@ import com.microsoft.azure.docker.ops.utils.AzureDockerUtils;
 import com.microsoft.azure.management.Azure;
 import com.microsoft.azure.management.compute.VirtualMachineSize;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
+import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.intellij.docker.utils.AzureDockerUIResources;
 import com.microsoft.azure.docker.ops.utils.AzureDockerValidationUtils;
 import com.microsoft.intellij.docker.wizards.createhost.AzureNewDockerWizardModel;
@@ -872,6 +873,7 @@ public class AzureNewDockerHostStep extends AzureNewDockerWizardStep {
   @Override
   public WizardStep onNext(final AzureNewDockerWizardModel model) {
     if (doValidate() == null) {
+      model.setSubscription((AzureDockerSubscription)dockerSubscriptionComboBox.getSelectedItem());
       return super.onNext(model);
     } else {
       return this;
@@ -880,13 +882,13 @@ public class AzureNewDockerHostStep extends AzureNewDockerWizardStep {
 
   @Override
   public boolean onFinish() {
+    model.setSubscription((AzureDockerSubscription)dockerSubscriptionComboBox.getSelectedItem());
     return model.doValidate() == null && super.onFinish();
   }
 
   @Override
   public boolean onCancel() {
     model.finishedOK = true;
-
     return super.onCancel();
   }
 }

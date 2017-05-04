@@ -45,6 +45,7 @@ import com.microsoft.azure.docker.model.EditableDockerHost;
 import com.microsoft.azure.docker.ops.utils.AzureDockerUtils;
 import com.microsoft.azure.docker.ops.utils.AzureDockerValidationUtils;
 import com.microsoft.azure.management.Azure;
+import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.intellij.docker.dialogs.AzureViewDockerDialog;
 import com.microsoft.intellij.docker.utils.AzureDockerUIResources;
 import com.microsoft.intellij.docker.wizards.createhost.AzureNewDockerWizardDialog;
@@ -681,6 +682,8 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
   @Override
   public WizardStep onNext(final AzureSelectDockerWizardModel model) {
     if (dockerHostsTableSelection != null && doValidate() == null) {
+      String subscriptionId = dockerHostsTableSelection.host.hostVM.sid;
+      this.model.setSubscription(new SubscriptionDetail(subscriptionId, dockerManager.getSubscriptionsMap().get(subscriptionId).name, "", true));
       return super.onNext(model);
     } else {
       setDialogButtonsState(false);
@@ -693,6 +696,8 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
   @Override
   public boolean onFinish() {
     setFinishButtonState(false);
+    String subscriptionId = dockerHostsTableSelection.host.hostVM.sid;
+    this.model.setSubscription(new SubscriptionDetail(subscriptionId, dockerManager.getSubscriptionsMap().get(subscriptionId).name, "", true));
     return model.doValidate() == null && super.onFinish();
   }
 

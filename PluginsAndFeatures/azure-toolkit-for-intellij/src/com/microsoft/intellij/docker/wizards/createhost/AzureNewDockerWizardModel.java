@@ -30,7 +30,7 @@ import com.microsoft.azure.docker.model.DockerHost;
 import com.microsoft.azure.docker.ops.utils.AzureDockerUtils;
 import com.microsoft.intellij.docker.wizards.createhost.forms.AzureNewDockerHostStep;
 import com.microsoft.intellij.docker.wizards.createhost.forms.AzureNewDockerLoginStep;
-import com.microsoft.intellij.ui.components.TelemetryProperties;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 
 import java.util.HashMap;
 import java.util.Map;

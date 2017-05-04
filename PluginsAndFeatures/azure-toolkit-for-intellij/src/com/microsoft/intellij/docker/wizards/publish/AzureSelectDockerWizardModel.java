@@ -30,7 +30,7 @@ import com.microsoft.azure.docker.model.DockerHost;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.intellij.docker.wizards.publish.forms.AzureConfigureDockerContainerStep;
 import com.microsoft.intellij.docker.wizards.publish.forms.AzureSelectDockerHostStep;
-import com.microsoft.intellij.ui.components.TelemetryProperties;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 
 import java.util.HashMap;

@@ -183,8 +183,8 @@ public abstract class AzureDialogWrapper extends DialogWrapper implements Teleme
         final Map<String, String> properties = new HashMap<>();
 
         if (this.getSubscription() != null) {
-            properties.put("SubscriptionName", this.getSubscription().getSubscriptionName());
-            properties.put("SubscriptionId", this.getSubscription().getSubscriptionId());
+            if(this.getSubscription().getSubscriptionName() != null)  properties.put("SubscriptionName", this.getSubscription().getSubscriptionName());
+            if(this.getSubscription().getSubscriptionId() != null)  properties.put("SubscriptionId", this.getSubscription().getSubscriptionId());
         }
 
         return properties;

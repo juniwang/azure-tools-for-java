@@ -698,14 +698,14 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
     setFinishButtonState(false);
     String subscriptionId = dockerHostsTableSelection.host.hostVM.sid;
     this.model.setSubscription(new SubscriptionDetail(subscriptionId, dockerManager.getSubscriptionsMap().get(subscriptionId).name, "", true));
-    return model.doValidate() == null && super.onFinish();
+    return model.doValidate() == null && super.onFinish(model);
   }
 
   @Override
   public boolean onCancel() {
     model.finishedOK = true;
 
-    return super.onCancel();
+    return super.onCancel(model);
   }
 
   private class DockerHostsTableSelection {

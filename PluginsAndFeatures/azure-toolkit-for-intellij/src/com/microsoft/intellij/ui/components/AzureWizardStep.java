@@ -24,6 +24,7 @@ package com.microsoft.intellij.ui.components;
 
 import com.intellij.ui.wizard.WizardModel;
 import com.intellij.ui.wizard.WizardStep;
+import com.microsoft.applicationinsights.telemetry.Telemetry;
 import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.azuretools.telemetry.TelemetryProperties;
 
@@ -64,6 +65,8 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
     }
 
     protected void sendTelemetryOnNext(final String action) {
+        //if(this instanceof TelemetryProperties)
+       // ((TelemetryProperties)this).toProperties();
         sendTelemetryOnAction(action, null);
     }
 
@@ -77,7 +80,7 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
             properties.putAll(((TelemetryProperties) model).toProperties());
         }
 
-        addExtraTelemetryProperties(properties);
+        //addExtraTelemetryProperties(properties);
         AppInsightsClient.createByType(AppInsightsClient.EventType.WizardStep, this.getClass().getSimpleName(), action, properties);
     }
 
@@ -87,15 +90,15 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
         return super.onNext(model);
     }
 
-    @Override
-    public boolean onFinish() {
-        sendTelemetryOnNext("Finish");
+    //@Override
+    public boolean onFinish(T model) {
+        sendTelemetryOnAction("Finish", model);
         return super.onFinish();
     }
 
-    @Override
-    public boolean onCancel() {
-        sendTelemetryOnNext("Cancel");
+    //@Override
+    public boolean onCancel(T model) {
+        sendTelemetryOnAction("Cancel", model);
         return super.onCancel();
     }
 

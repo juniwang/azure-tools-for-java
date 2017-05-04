@@ -51,7 +51,9 @@ public class CreateBlobContainer extends NodeActionListener {
             form.setConnectionString(StorageClientSDKManager.getConnectionString(((BlobModule) parent).getStorageAccount()));
         } else if (parent instanceof StorageNode) {
             form.setConnectionString(StorageClientSDKManager.getConnectionString(((StorageNode) parent).getStorageAccount()));
+            form.setSubscription(new SubscriptionDetail(((StorageNode)parent).getSubscriptionId(), null, null, true));
         }
+
         form.setOnCreate(new Runnable() {
             @Override
             public void run() {

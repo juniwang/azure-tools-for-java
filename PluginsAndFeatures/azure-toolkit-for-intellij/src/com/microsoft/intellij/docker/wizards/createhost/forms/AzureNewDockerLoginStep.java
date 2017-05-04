@@ -562,14 +562,14 @@ public class AzureNewDockerLoginStep extends AzureNewDockerWizardStep {
 
   @Override
   public boolean onFinish() {
-    return model.doValidate() == null && super.onFinish();
+    return model.doValidate() == null && super.onFinish(model);
   }
 
   @Override
   public boolean onCancel() {
     model.finishedOK = true;
 
-    return super.onCancel();
+    return super.onCancel(model);
   }
 
 }

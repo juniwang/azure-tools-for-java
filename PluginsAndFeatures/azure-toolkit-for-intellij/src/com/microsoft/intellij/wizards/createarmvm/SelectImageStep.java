@@ -28,6 +28,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.wizard.WizardNavigationState;
+import com.intellij.ui.wizard.WizardStep;
 import com.microsoft.azure.CloudException;
 import com.microsoft.azure.management.Azure;
 import com.microsoft.azure.management.compute.*;
@@ -35,6 +36,7 @@ import com.microsoft.azure.management.resources.Location;
 import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import com.microsoft.azuretools.utils.AzureModel;
 import com.microsoft.azuretools.utils.AzureModelController;
 import com.microsoft.intellij.ui.components.AzureWizardStep;
@@ -54,7 +56,7 @@ import java.util.stream.Collectors;
 
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
 
-public class SelectImageStep extends AzureWizardStep<VMWizardModel> {
+public class SelectImageStep extends AzureWizardStep<VMWizardModel> implements TelemetryProperties {
     private JPanel rootPanel;
     private JList createVmStepsList;
     private JComboBox regionComboBox;
@@ -412,5 +414,10 @@ public class SelectImageStep extends AzureWizardStep<VMWizardModel> {
                 properties.put("id", virtualMachineImage.id());
             }
         }
+    }
+
+    @Override
+    public Map<String, String> toProperties() {
+        return model.toProperties();
     }
 }

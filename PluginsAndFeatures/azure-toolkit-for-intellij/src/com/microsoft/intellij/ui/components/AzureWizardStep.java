@@ -65,8 +65,7 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
     }
 
     protected void sendTelemetryOnNext(final String action) {
-        //if(this instanceof TelemetryProperties)
-       // ((TelemetryProperties)this).toProperties();
+        //if( )
         sendTelemetryOnAction(action, null);
     }
 
@@ -76,8 +75,8 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
         properties.put("Action", action);
         properties.put("Title", this.getTitle());
 
-        if (model != null && model instanceof TelemetryProperties) {
-            properties.putAll(((TelemetryProperties) model).toProperties());
+        if (this instanceof TelemetryProperties) {
+            properties.putAll(((TelemetryProperties) this).toProperties());
         }
 
         //addExtraTelemetryProperties(properties);
@@ -90,15 +89,15 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
         return super.onNext(model);
     }
 
-    //@Override
-    public boolean onFinish(T model) {
-        sendTelemetryOnAction("Finish", model);
+    @Override
+    public boolean onFinish() {
+        sendTelemetryOnNext("Finish");
         return super.onFinish();
     }
 
-    //@Override
-    public boolean onCancel(T model) {
-        sendTelemetryOnAction("Cancel", model);
+    @Override
+    public boolean onCancel() {
+        sendTelemetryOnNext("Cancel");
         return super.onCancel();
     }
 

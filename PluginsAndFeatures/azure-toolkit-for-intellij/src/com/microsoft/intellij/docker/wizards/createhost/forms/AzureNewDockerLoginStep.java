@@ -30,6 +30,7 @@ import com.microsoft.azure.docker.AzureDockerHostsManager;
 import com.microsoft.azure.docker.model.AzureDockerCertVault;
 import com.microsoft.azure.docker.model.DockerHost;
 import com.microsoft.azure.docker.ops.AzureDockerCertVaultOps;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import com.microsoft.intellij.docker.utils.AzureDockerUIResources;
 import com.microsoft.azure.docker.ops.utils.AzureDockerValidationUtils;
 import com.microsoft.intellij.docker.wizards.createhost.AzureNewDockerWizardModel;
@@ -39,9 +40,10 @@ import com.microsoft.intellij.ui.util.UIUtils;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Map;
 import java.util.Vector;
 
-public class AzureNewDockerLoginStep extends AzureNewDockerWizardStep {
+public class AzureNewDockerLoginStep extends AzureNewDockerWizardStep implements TelemetryProperties {
   private JPanel rootConfigureContainerPanel;
   private ButtonGroup groupNewCredsType;
   private JRadioButton dockerHostImportKeyvaultCredsRadioButton;
@@ -562,14 +564,19 @@ public class AzureNewDockerLoginStep extends AzureNewDockerWizardStep {
 
   @Override
   public boolean onFinish() {
-    return model.doValidate() == null && super.onFinish(model);
+    return model.doValidate() == null && super.onFinish();
   }
 
   @Override
   public boolean onCancel() {
     model.finishedOK = true;
 
-    return super.onCancel(model);
+    return super.onCancel();
+  }
+
+  @Override
+  public Map<String, String> toProperties() {
+    return model.toProperties();
   }
 
 }

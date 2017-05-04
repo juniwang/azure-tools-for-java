@@ -47,6 +47,7 @@ import com.microsoft.azure.docker.ops.utils.AzureDockerValidationUtils;
 import com.microsoft.azure.management.Azure;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.azuretools.telemetry.AppInsightsClient;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import com.microsoft.intellij.docker.dialogs.AzureViewDockerDialog;
 import com.microsoft.intellij.docker.utils.AzureDockerUIResources;
 import com.microsoft.intellij.docker.wizards.createhost.AzureNewDockerWizardDialog;
@@ -64,9 +65,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
-public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
+public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep implements TelemetryProperties {
   private static final Logger LOGGER = Logger.getInstance(AzureSelectDockerHostStep.class);
 
   private JPanel rootPanel;
@@ -697,20 +699,27 @@ public class AzureSelectDockerHostStep extends AzureSelectDockerWizardStep {
   public boolean onFinish() {
     setFinishButtonState(false);
     String subscriptionId = dockerHostsTableSelection.host.hostVM.sid;
-    this.model.setSubscription(new SubscriptionDetail(subscriptionId, dockerManager.getSubscriptionsMap().get(subscriptionId).name, "", true));
-    return model.doValidate() == null && super.onFinish(model);
+    this.model.setSubscription(new SubscriptionDetail(subscriptionId, dockerManager.getSubscriptionsMap().get(subscriptionId).name, null, true));
+    return model.doValidate() == null && super.onFinish();
   }
 
   @Override
   public boolean onCancel() {
+    setFinishButtonState(false);
+    String subscriptionId = dockerHostsTableSelection.host.hostVM.sid;
+    this.model.setSubscription(new SubscriptionDetail(subscriptionId, dockerManager.getSubscriptionsMap().get(subscriptionId).name, null, true));
     model.finishedOK = true;
-
-    return super.onCancel(model);
+    return super.onCancel();
   }
 
   private class DockerHostsTableSelection {
     int row;
     DockerHost host;
+  }
+
+  @Override
+  public Map<String, String> toProperties() {
+    return model.toProperties();
   }
 
 // CREATE CUSTOM ACTION FOR DIALOG WRAPPER!!!!!

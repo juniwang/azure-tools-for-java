@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project;
 import com.microsoft.azure.docker.AzureDockerHostsManager;
 import com.microsoft.azure.docker.model.DockerHost;
 import com.microsoft.azure.docker.ops.AzureDockerCertVaultOps;
+import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import com.microsoft.intellij.ui.components.AzureDialogWrapper;
 import com.microsoft.intellij.util.PluginUtil;
 import org.jdesktop.swingx.JXHyperlink;
@@ -77,6 +78,7 @@ public class AzureViewDockerDialog extends AzureDialogWrapper {
     setTextField(dockerHostNameTextField, dockerHost.name);
     setTextField(dockerHostUrlTextField, dockerHost.apiUrl);
     setTextField(dockerHostSidTextField, dockerHost.sid);
+    setSubscription(new SubscriptionDetail(dockerHost.sid, null, null, true));
     setTextField(dockerHostLocationTextField, dockerHost.hostVM.region);
     setTextField(dockerHostStatusTextField, (updating != null) ?
         dockerHost.state.toString() + updating :

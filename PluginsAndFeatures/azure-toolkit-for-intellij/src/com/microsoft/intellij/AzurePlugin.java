@@ -162,38 +162,6 @@ public class AzurePlugin extends AbstractProjectComponent {
             setValues(dataFile);
         }
         AppInsightsClient.setAppInsightsConfiguration(new AppInsightsConfigurationImpl());
-        registerTelemetryEventListener();
-    }
-
-    private void registerTelemetryEventListener() {
-        final long eventMask = AWTEvent.MOUSE_EVENT_MASK;
-        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-            @Override
-            public void eventDispatched(final AWTEvent event) {
-                final MouseEvent mouseEvent = (MouseEvent) event;
-                if (mouseEvent.getID() != MouseEvent.MOUSE_CLICKED && mouseEvent.getID() != MouseEvent.MOUSE_PRESSED)
-                    return;
-
-                final Map<String, String> properties = new HashMap<>();
-
-                if (event.getSource() instanceof JMenuItem) {
-                    final JMenuItem menuItem = (JMenuItem) event.getSource();
-                    boolean isMicrosoft = false;
-                    for (ActionListener actionListener : menuItem.getActionListeners()) {
-                        if (actionListener.getClass().getName().contains("microsoft")) {
-                            isMicrosoft = true;
-                            break;
-                        }
-                    }
-                    if (isMicrosoft) {
-                        properties.put("Text", menuItem.getText());
-                        properties.put("When", String.valueOf(mouseEvent.getWhen()));
-
-//                        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.AzureExplorer, null, null, properties);
-                    }
-                }
-            }
-        }, eventMask);
     }
 
     private void initializeAIRegistry() {

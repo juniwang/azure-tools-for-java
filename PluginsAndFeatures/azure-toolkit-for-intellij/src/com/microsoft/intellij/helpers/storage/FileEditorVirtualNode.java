@@ -25,7 +25,11 @@ package com.microsoft.intellij.helpers.storage;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import com.microsoft.tooling.msservices.serviceexplorer.Node;
+import com.microsoft.tooling.msservices.serviceexplorer.NodeAction;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,5 +48,19 @@ public class FileEditorVirtualNode<T extends FileEditor> extends Node implements
             properties.putAll(((TelemetryProperties) fileEditor).toProperties());
         }
         return properties;
+    }
+
+    public JMenuItem createJMenuItem(final String actionName) {
+        final JMenuItem menuItem = new JMenuItem(actionName);
+        final NodeAction nodeAction = getNodeActionByName(actionName);
+        if (nodeAction != null) {
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    nodeAction.fireNodeActionEvent();
+                }
+            });
+        }
+        return menuItem;
     }
 }

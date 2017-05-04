@@ -48,7 +48,6 @@ import com.microsoft.tooling.msservices.model.storage.BlobContainer;
 import com.microsoft.tooling.msservices.model.storage.BlobDirectory;
 import com.microsoft.tooling.msservices.model.storage.BlobFile;
 import com.microsoft.tooling.msservices.model.storage.BlobItem;
-import com.microsoft.tooling.msservices.serviceexplorer.NodeAction;
 import com.microsoft.tooling.msservices.serviceexplorer.NodeActionEvent;
 import com.microsoft.tooling.msservices.serviceexplorer.NodeActionListener;
 import org.jetbrains.annotations.NotNull;
@@ -83,7 +82,7 @@ public class BlobExplorerFileEditor implements FileEditor, TelemetryProperties {
     static final String SAVE_AS = "Save As";
     static final String DELETE = "Delete";
     static final String UPLOAD = "Upload";
-    static final String Query = "Query";
+    static final String QUERY = "Query";
 
     private JPanel mainPanel;
     private JTextField queryTextField;
@@ -146,18 +145,6 @@ public class BlobExplorerFileEditor implements FileEditor, TelemetryProperties {
         tableHeader.setResizingAllowed(true);
 
         fileEditorVirtualNode = createVirtualNode("");
-        fileEditorVirtualNode.addAction(UPLOAD, new NodeActionListener() {
-            @Override
-            protected void actionPerformed(NodeActionEvent e) {
-                uploadFile();
-            }
-        });
-        fileEditorVirtualNode.addAction(Query, new NodeActionListener() {
-            @Override
-            protected void actionPerformed(NodeActionEvent e) {
-                fillGrid();
-            }
-        });
 
         blobListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -282,7 +269,7 @@ public class BlobExplorerFileEditor implements FileEditor, TelemetryProperties {
         ActionListener queryAction = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                fileEditorVirtualNode.getNodeActionByName(Query).fireNodeActionEvent();
+                fileEditorVirtualNode.getNodeActionByName(QUERY).fireNodeActionEvent();
             }
         };
 
@@ -496,22 +483,29 @@ public class BlobExplorerFileEditor implements FileEditor, TelemetryProperties {
             }
         });
 
+        node.addAction(UPLOAD, new NodeActionListener() {
+            @Override
+            protected void actionPerformed(NodeActionEvent e) {
+                uploadFile();
+            }
+        });
+
+        node.addAction(QUERY, new NodeActionListener() {
+            @Override
+            protected void actionPerformed(NodeActionEvent e) {
+                fillGrid();
+            }
+        });
+
         return node;
     }
 
     private JPopupMenu createTablePopUp() {
         final JPopupMenu menu = new JPopupMenu();
-        // create new Node instance so that the NodeAction list is different
-        for (final NodeAction nodeAction : createVirtualNode(this.getName()).getNodeActions()) {
-            JMenuItem menuItem = new JMenuItem(nodeAction.getName());
-            menuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    nodeAction.fireNodeActionEvent();
-                }
-            });
-            menu.add(menuItem);
-        }
+        menu.add(fileEditorVirtualNode.createJMenuItem(OPEN));
+        menu.add(fileEditorVirtualNode.createJMenuItem(SAVE_AS));
+        menu.add(fileEditorVirtualNode.createJMenuItem(COPY_URL));
+        menu.add(fileEditorVirtualNode.createJMenuItem(DELETE));
 
         return menu;
     }
@@ -944,11 +938,6 @@ public class BlobExplorerFileEditor implements FileEditor, TelemetryProperties {
     public Map<String, String> toProperties() {
         final Map<String, String> properties = new HashMap<>();
         properties.put("Container", this.getName());
-        BlobFile blobFile = getFileSelection();
-        if (blobFile != null) {
-            properties.put("BlobName", blobFile.getName());
-        }
-
         return properties;
     }
 }

@@ -95,7 +95,7 @@ public class CreateArmStorageAccountForm extends AzureDialogWrapper {
         setModal(true);
         setTitle("Create Storage Account");
 
-        // this opton is not supported by SDK yet
+        // this option is not supported by SDK yet
         encriptonComboBox.setVisible(false);
         encriptonLabel.setVisible(false);
 
@@ -220,6 +220,7 @@ public class CreateArmStorageAccountForm extends AzureDialogWrapper {
 //        storageAccount.setAccessTier((AccessTier)accessTeirComboBox.getSelectedItem());
 //        storageAccount.setEnableEncription((Boolean)encriptonComboBox.getSelectedItem());
         // creating from Azure Explorer directly
+        setSubscription((SubscriptionDetail)subscriptionComboBox.getSelectedItem());
         if (subscription == null) {
             ProgressManager.getInstance().run(new Task.Backgroundable(project,
                     "Creating storage account " + nameTextField.getText() + "...", false) {

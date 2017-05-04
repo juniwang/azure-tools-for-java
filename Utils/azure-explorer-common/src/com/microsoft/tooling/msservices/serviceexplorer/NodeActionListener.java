@@ -51,7 +51,8 @@ public abstract class NodeActionListener implements EventListener {
     protected void sendTelemetry(NodeActionEvent nodeActionEvent) {
         final Map<String, String> properties = new HashMap<>();
         Node node = nodeActionEvent.getAction().getNode();
-        properties.put("Node", node.getName());
+        properties.put("Node", node.getId());
+        properties.put("Name", node.getName());
         if (node instanceof TelemetryProperties) {
             properties.putAll(((TelemetryProperties) node).toProperties());
         }

@@ -23,6 +23,7 @@ package com.microsoft.tooling.msservices.serviceexplorer.azure.storage;
 
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.azure.management.storage.StorageAccount;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
 import com.microsoft.tooling.msservices.helpers.azure.sdk.StorageClientSDKManager;
@@ -34,7 +35,12 @@ import com.microsoft.tooling.msservices.serviceexplorer.azure.AzureNodeActionPro
 
 import java.util.Map;
 
-public class QueueNode extends Node {
+public class QueueNode extends Node implements TelemetryProperties{
+    @Override
+    public Map<String, String> toProperties() {
+        return null;
+    }
+
     public class RefreshAction extends NodeActionListener {
         @Override
         public void actionPerformed(NodeActionEvent e) {

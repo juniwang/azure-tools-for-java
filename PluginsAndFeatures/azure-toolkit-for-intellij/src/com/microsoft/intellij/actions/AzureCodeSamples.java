@@ -2,7 +2,6 @@ package com.microsoft.intellij.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.microsoft.azuretools.ijidea.utility.AzureAnAction;
-import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import org.jdesktop.swingx.JXHyperlink;
 
 import java.net.URI;
@@ -13,7 +12,6 @@ import java.net.URI;
 public class AzureCodeSamples extends AzureAnAction {
     @Override
     public void onActionPerformed(AnActionEvent anActionEvent) {
-        AppInsightsClient.createByType(AppInsightsClient.EventType.MainMenu, "AzureCodeSamples", "Click");
         JXHyperlink portalLing = new JXHyperlink();
         portalLing.setURI(URI.create("https://azure.microsoft.com/en-us/documentation/samples/?platform=java"));
         portalLing.doClick();

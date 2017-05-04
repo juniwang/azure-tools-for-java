@@ -34,8 +34,7 @@ public class AppInsightsClient {
     static AppInsightsConfiguration configuration;
 
     public enum EventType {
-        MainMenu,
-        AzureExplorer,
+        Action,
         Dialog,
         WizardStep,
         Telemetry,
@@ -98,7 +97,7 @@ public class AppInsightsClient {
                 Map<String, String> properties = myProperties == null ? new HashMap<String, String>() : new HashMap<String, String>(myProperties);
                 properties.put("SessionId", configuration.sessionId());
 
-                // Telemetry client doesn't accept null value
+                // Telemetry client doesn't accept null value.
                 for (Iterator<Map.Entry<String, String>> iter = properties.entrySet().iterator(); iter.hasNext(); ) {
                     Map.Entry<String, String> entry = iter.next();
                     if (StringUtils.isNullOrEmpty(entry.getKey())) {
@@ -127,7 +126,7 @@ public class AppInsightsClient {
     public static void createFTPEvent(String eventName, String uri, String appName, String subId) {
         if (!isAppInsightsClientAvailable())
             return;
-        
+
         TelemetryClient telemetry = new TelemetryClient();
         telemetry.getContext().setInstrumentationKey(configuration.appInsightsKey());
 

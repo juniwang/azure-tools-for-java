@@ -24,6 +24,7 @@ package com.microsoft.intellij.ui.components;
 
 import com.intellij.ui.wizard.WizardModel;
 import com.intellij.ui.wizard.WizardStep;
+import com.microsoft.applicationinsights.telemetry.Telemetry;
 import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.azuretools.telemetry.TelemetryProperties;
 
@@ -64,6 +65,7 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
     }
 
     protected void sendTelemetryOnNext(final String action) {
+        //if( )
         sendTelemetryOnAction(action, null);
     }
 
@@ -73,11 +75,11 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
         properties.put("Action", action);
         properties.put("Title", this.getTitle());
 
-        if (model != null && model instanceof TelemetryProperties) {
-            properties.putAll(((TelemetryProperties) model).toProperties());
+        if (this instanceof TelemetryProperties) {
+            properties.putAll(((TelemetryProperties) this).toProperties());
         }
 
-        addExtraTelemetryProperties(properties);
+        //addExtraTelemetryProperties(properties);
         AppInsightsClient.createByType(AppInsightsClient.EventType.WizardStep, this.getClass().getSimpleName(), action, properties);
     }
 

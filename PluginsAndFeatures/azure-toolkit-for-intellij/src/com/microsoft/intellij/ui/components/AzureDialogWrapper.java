@@ -26,6 +26,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.azuretools.telemetry.TelemetryProperties;
+import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,8 +40,9 @@ import java.util.Map;
  * Created by juniwang on 4/19/2017.
  * Subclass of DialogWrapper. Do some common implementation here like the telemetry.
  */
-public abstract class AzureDialogWrapper extends DialogWrapper {
+public abstract class AzureDialogWrapper extends DialogWrapper implements TelemetryProperties {
     protected static final int HELP_CODE = -1;
+    private SubscriptionDetail subscription;
 
     protected AzureDialogWrapper(@Nullable Project project, boolean canBeParent) {
         super(project, canBeParent);
@@ -166,5 +168,25 @@ public abstract class AzureDialogWrapper extends DialogWrapper {
     protected void doHelpAction() {
         this.sendTelemetry(HELP_CODE);
         super.doHelpAction();
+    }
+
+    public void setSubscription(SubscriptionDetail subscription) {
+        this.subscription = subscription;
+    }
+
+    public SubscriptionDetail getSubscription() {
+        return subscription;
+    }
+
+    @Override
+    public Map<String, String> toProperties() {
+        final Map<String, String> properties = new HashMap<>();
+
+        if (this.getSubscription() != null) {
+            if(this.getSubscription().getSubscriptionName() != null)  properties.put("SubscriptionName", this.getSubscription().getSubscriptionName());
+            if(this.getSubscription().getSubscriptionId() != null)  properties.put("SubscriptionId", this.getSubscription().getSubscriptionId());
+        }
+
+        return properties;
     }
 }

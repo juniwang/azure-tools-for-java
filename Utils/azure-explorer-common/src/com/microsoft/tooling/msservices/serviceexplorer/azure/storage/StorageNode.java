@@ -124,4 +124,6 @@ public class StorageNode extends RefreshableNode implements TelemetryProperties 
         return storageAccount.name() + "\n" + storageAccount.regionName()
                 + "<br>" + storageAccount.resourceGroupName();
     }
+
+    public String getSubscriptionId() { return subscriptionId; }
 }

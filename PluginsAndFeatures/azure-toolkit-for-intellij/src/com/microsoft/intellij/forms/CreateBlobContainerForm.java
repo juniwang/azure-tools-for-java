@@ -38,6 +38,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.lang.reflect.Field;
 import java.util.Calendar;
 
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
@@ -84,7 +85,7 @@ public class CreateBlobContainerForm extends AzureDialogWrapper {
     @Override
     protected void doOKAction() {
         final String name = nameTextField.getText();
-
+        //Field outerFiele = onCreate.getClass().getDeclaredField("this$0");
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Creating blob container...", false) {
             @Override
             public void run(@NotNull ProgressIndicator progressIndicator) {

@@ -41,6 +41,7 @@ import com.microsoft.azure.management.storage.StorageAccount;
 import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import com.microsoft.azuretools.utils.AzureModel;
 import com.microsoft.azuretools.utils.AzureModelController;
 import com.microsoft.intellij.AzurePlugin;
@@ -65,7 +66,7 @@ import java.util.stream.Collectors;
 
 import static com.microsoft.intellij.ui.messages.AzureBundle.message;
 
-public class SettingsStep extends AzureWizardStep<VMWizardModel> {
+public class SettingsStep extends AzureWizardStep<VMWizardModel> implements TelemetryProperties {
     private static final String CREATE_NEW = "<< Create new >>";
     private final String NONE = "(None)";
 
@@ -846,5 +847,10 @@ public class SettingsStep extends AzureWizardStep<VMWizardModel> {
             }
         });
         return super.onFinish();
+    }
+
+    @Override
+    public Map<String, String> toProperties() {
+        return model.toProperties();
     }
 }

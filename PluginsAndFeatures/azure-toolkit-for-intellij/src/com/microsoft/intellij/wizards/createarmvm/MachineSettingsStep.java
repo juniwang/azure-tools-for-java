@@ -40,6 +40,7 @@ import com.microsoft.azure.management.compute.OperatingSystemTypes;
 import com.microsoft.azure.management.compute.VirtualMachineSize;
 import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import com.microsoft.intellij.ui.components.AzureWizardStep;
 import com.microsoft.intellij.wizards.VMWizardModel;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
@@ -57,9 +58,10 @@ import java.awt.event.ItemListener;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 
 
-public class MachineSettingsStep extends AzureWizardStep<VMWizardModel> {
+public class MachineSettingsStep extends AzureWizardStep<VMWizardModel> implements TelemetryProperties {
     private JPanel rootPanel;
     private JList createVmStepsList;
     private JTextField vmNameTextField;
@@ -329,5 +331,10 @@ public class MachineSettingsStep extends AzureWizardStep<VMWizardModel> {
                         || (certificateCheckBox.isSelected() && certificateField.getText().isEmpty()));
 
         model.getCurrentNavigationState().NEXT.setEnabled(allFieldsCompleted);
+    }
+
+    @Override
+    public Map<String, String> toProperties() {
+        return model.toProperties();
     }
 }

@@ -24,7 +24,8 @@ package com.microsoft.intellij.ui.components;
 
 import com.intellij.ui.wizard.WizardModel;
 import com.intellij.ui.wizard.WizardStep;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 
 import javax.swing.*;
 import java.util.HashMap;
@@ -77,7 +78,7 @@ public abstract class AzureWizardStep<T extends WizardModel> extends WizardStep<
         }
 
         addExtraTelemetryProperties(properties);
-        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.WizardStep, this.getClass().getSimpleName(), action, properties);
+        AppInsightsClient.createByType(AppInsightsClient.EventType.WizardStep, this.getClass().getSimpleName(), action, properties);
     }
 
     @Override

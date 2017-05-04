@@ -39,12 +39,12 @@ import com.microsoft.azure.management.compute.VirtualMachine;
 import com.microsoft.azuretools.authmanage.AuthMethodManager;
 import com.microsoft.azuretools.azurecommons.deploy.DeploymentEventArgs;
 import com.microsoft.azuretools.sdkmanage.AzureManager;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 import com.microsoft.azuretools.utils.AzureUIRefreshCore;
 import com.microsoft.azuretools.utils.AzureUIRefreshEvent;
 import com.microsoft.intellij.AzurePlugin;
 import com.microsoft.intellij.activitylog.ActivityLogToolWindowFactory;
 import com.microsoft.intellij.docker.utils.AzureDockerUIResources;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -273,6 +273,6 @@ public final class AzureDeploymentProgressNotification {
             postEventProperties.put("PublishError", ee.getMessage());
             notifyProgress(descriptionTask, startDate, url, 100, "Error: %s", ee.getMessage());
         }
-        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.DockerContainer, null, "Deploy", postEventProperties);
+        AppInsightsClient.createByType(AppInsightsClient.EventType.DockerContainer, null, "Deploy", postEventProperties);
     }
 }

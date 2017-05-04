@@ -387,7 +387,7 @@ public class PluginUtil {
 					if (!oldSubList.contains(sub)) {
 						Bundle bundle = Activator.getDefault().getBundle();
 						if (bundle != null) {
-							AppInsightsCustomEvent.create(eventName, bundle.getVersion().toString());
+							AppInsightsClient.create(eventName, bundle.getVersion().toString());
 						}
 						break;
 					}

@@ -17,39 +17,37 @@
  * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH 
  * THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.microsoft.azuretools.core.ui;
+package com.microsoft.azuretools.core.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.common.NotDefinedException;
+import org.eclipse.swt.widgets.Event;
 
-import com.microsoft.azuretools.core.Activator;
-import com.microsoft.azuretools.core.ui.commoncontrols.Messages;
-import com.microsoft.azuretools.core.ui.commoncontrols.NewCertificateDialog;
-import com.microsoft.azuretools.core.ui.commoncontrols.NewCertificateDialogData;
-import com.microsoft.azuretools.core.utils.AzureAbstractHandler;
-import com.microsoft.azuretools.core.utils.PluginUtil;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
 
-/**
- * This class creates new self signed certificates.
- */
-public class WANewCertificate extends AzureAbstractHandler {
+public abstract class AzureAbstractHandler extends AbstractHandler {
 
-	public Object onExecute(ExecutionEvent event) throws ExecutionException {
+	public abstract Object onExecute(ExecutionEvent event) throws ExecutionException;
+
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+
+		final Map<String, String> properties = new HashMap<>();
 		try {
-			NewCertificateDialogData data = new NewCertificateDialogData();
-			/*
-			 * third parameter is jdkPath
-			 * as its toolbar button, do not refer any project for JDK path
-			 * just pass empty string.
-			 */
-			NewCertificateDialog dialog = new NewCertificateDialog(PluginUtil.getParentShell(), data, "");
-			// Open the dialog
-			dialog.open();
-		} catch (Exception e) {
-			PluginUtil.displayErrorDialogAndLog(PluginUtil.getParentShell(), Messages.newCertDlgCrtErTtl,
-												Messages.newCertMsg, e);
-			Activator.getDefault().log(Messages.newCertMsg, e);
+			properties.put("CategoryId", event.getCommand().getCategory().getId());
+			properties.put("Category", event.getCommand().getCategory().getName());
+			properties.put("CommandId", event.getCommand().getId());
+			properties.put("Text", event.getCommand().getName());
+			
+			AppInsightsClient.createByType(AppInsightsClient.EventType.MainMenu, event.getCommand().getName(),	null, properties);
+		} catch (NotDefinedException ignore) {
 		}
-		return null;
+
+		return onExecute(event);
 	}
 }

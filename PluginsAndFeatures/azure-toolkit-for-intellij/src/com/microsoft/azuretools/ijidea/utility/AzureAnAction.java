@@ -23,7 +23,8 @@
 package com.microsoft.azuretools.ijidea.utility;
 
 import com.intellij.openapi.actionSystem.*;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -51,13 +52,16 @@ public abstract class AzureAnAction extends AnAction {
     public abstract void onActionPerformed(AnActionEvent anActionEvent);
 
     @Override
-    public void actionPerformed(AnActionEvent anActionEvent) {
+    public final void actionPerformed(AnActionEvent anActionEvent) {
         final Map<String, String> properties = new HashMap<>();
         properties.put("Text", anActionEvent.getPresentation().getText());
         properties.put("Description", anActionEvent.getPresentation().getDescription());
         properties.put("Place", anActionEvent.getPlace());
         properties.put("ActionId", anActionEvent.getActionManager().getId(this));
-        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.MainMenu, anActionEvent.getPresentation().getText(), null, properties);
+        if (this instanceof TelemetryProperties) {
+            properties.putAll(((TelemetryProperties) this).toProperties());
+        }
+        AppInsightsClient.createByType(AppInsightsClient.EventType.Action, anActionEvent.getPresentation().getText(), null, properties);
 
         onActionPerformed(anActionEvent);
     }

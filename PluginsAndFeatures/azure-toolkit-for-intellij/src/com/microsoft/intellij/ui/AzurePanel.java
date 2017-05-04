@@ -28,8 +28,9 @@ import com.microsoft.azuretools.adauth.StringUtils;
 import com.microsoft.azuretools.azurecommons.util.GetHashMac;
 import com.microsoft.azuretools.azurecommons.util.ParserXMLUtility;
 import com.microsoft.azuretools.azurecommons.xmlhandling.DataOperations;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
+import com.microsoft.azuretools.telemetry.AppInsightsConstants;
 import com.microsoft.intellij.AzurePlugin;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
 import com.microsoft.intellij.util.PluginHelper;
 import com.microsoft.intellij.util.PluginUtil;
 import org.w3c.dom.Document;
@@ -98,12 +99,14 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
                 if (StringUtils.isNullOrEmpty(oldPrefVal) || Boolean.valueOf(oldPrefVal) != acceptTelemetry) {
                     // Boolean.valueOf(oldPrefVal) != acceptTelemetry means user changes his mind.
                     // Either from Agree to Deny, or from Deny to Agree.
-                    AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Telemetry, "", acceptTelemetry ? "Agree" : "Deny", null);
+                    final String action = acceptTelemetry ? AppInsightsConstants.Allow : AppInsightsConstants.Deny;
+                    AppInsightsClient.createByType(AppInsightsClient.EventType.Telemetry, "", action, null);
                 }
             } else {
                 AzurePlugin.copyResourceFile(message("dataFileName"), dataFile);
                 setValues(dataFile);
-                AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Telemetry, "Load", checkBox1.isSelected() ? "Agree" : "Deny", null);
+                final String action = checkBox1.isSelected() ? AppInsightsConstants.Allow : AppInsightsConstants.Deny;
+                AppInsightsClient.createByType(AppInsightsClient.EventType.Telemetry, AppInsightsConstants.LoadPlugin, action, null);
             }
         } catch (Exception ex) {
             AzurePlugin.log(ex.getMessage(), ex);

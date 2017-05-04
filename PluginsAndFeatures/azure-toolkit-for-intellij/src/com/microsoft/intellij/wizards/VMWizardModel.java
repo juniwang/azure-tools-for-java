@@ -33,7 +33,7 @@ import com.microsoft.azure.management.network.PublicIPAddress;
 import com.microsoft.azure.management.resources.Location;
 import com.microsoft.azure.management.storage.StorageAccount;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
-import com.microsoft.intellij.ui.components.TelemetryProperties;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import com.microsoft.intellij.wizards.createarmvm.MachineSettingsStep;
 import com.microsoft.intellij.wizards.createarmvm.SelectImageStep;
 import com.microsoft.intellij.wizards.createarmvm.SettingsStep;
@@ -301,7 +301,6 @@ public class VMWizardModel extends WizardModel implements TelemetryProperties {
             properties.put("SubscriptionName", this.getSubscription().getSubscriptionName());
             properties.put("SubscriptionId", this.getSubscription().getSubscriptionId());
         }
-
         if (this.getName() != null) properties.put("Name", this.getName());
         if (this.getRegion() != null) properties.put("Region", this.getRegion().name());
         return properties;

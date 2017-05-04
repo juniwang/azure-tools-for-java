@@ -24,8 +24,9 @@ package com.microsoft.intellij.ui.components;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.microsoft.azuretools.telemetry.AppInsightsClient;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
 import com.microsoft.azuretools.authmanage.models.SubscriptionDetail;
-import com.microsoft.intellij.util.AppInsightsEventHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -123,8 +124,9 @@ public abstract class AzureDialogWrapper extends DialogWrapper implements Teleme
         String action = "OK";
         properties.put("Window", this.getClass().getSimpleName());
         properties.put("Title", this.getTitle());
-        properties.putAll(toProperties());
-
+        if (this instanceof TelemetryProperties) {
+            properties.putAll(((TelemetryProperties) this).toProperties());
+        }
 
         switch (code) {
             case HELP_CODE:
@@ -141,7 +143,7 @@ public abstract class AzureDialogWrapper extends DialogWrapper implements Teleme
                 return;
         }
 
-        AppInsightsEventHelper.createEvent(AppInsightsEventHelper.EventType.Dialog, this.getClass().getSimpleName(), action, properties);
+        AppInsightsClient.createByType(AppInsightsClient.EventType.Dialog, this.getClass().getSimpleName(), action, properties);
     }
 
     @Override

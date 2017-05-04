@@ -125,9 +125,6 @@ public class ServerExplorerToolWindowFactory implements ToolWindowFactory, Prope
         DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) treePath.getLastPathComponent();
         Node node = (Node) treeNode.getUserObject();
 
-        final Map<String, String> properties = new HashMap<>();
-        properties.put("Node", node.getName());
-
         // delegate click to the node's click action if this is a left button click
         if (SwingUtilities.isLeftMouseButton(e)) {
             // if the node in question is in a "loading" state then we

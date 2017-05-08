@@ -46,11 +46,7 @@ import com.microsoft.azure.hdinsight.sdk.common.HttpResponse;
 import com.microsoft.azure.hdinsight.spark.common.SparkBatchSubmission;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.azuretools.azurecommons.helpers.StringHelper;
-<<<<<<< HEAD
-import com.microsoft.azuretools.core.telemetry.AppInsightsCustomEvent;
-=======
 import com.microsoft.azuretools.telemetry.AppInsightsClient;
->>>>>>> d1edbb161ea40404f373dd66c2194e4eee9ec7b8
 import com.microsoft.azuretools.hdinsight.util.Messages;
 
 public class SparkSubmissionToolWindowView extends ViewPart {
@@ -90,11 +86,7 @@ public class SparkSubmissionToolWindowView extends ViewPart {
                     @Override
                     public void run() {
                         if (!StringHelper.isNullOrWhiteSpace(connectionUrl)) {
-<<<<<<< HEAD
-                        	AppInsightsCustomEvent.create(Messages.SparkSubmissionStopButtionClickEvent, null);
-=======
                         	AppInsightsClient.create(Messages.SparkSubmissionStopButtionClickEvent, null);
->>>>>>> d1edbb161ea40404f373dd66c2194e4eee9ec7b8
                             try {
                                 HttpResponse deleteResponse = SparkBatchSubmission.getInstance().killBatchJob(connectionUrl + "/livy/batches", batchId);
                                 if (deleteResponse.getCode() == 201 || deleteResponse.getCode() == 200) {

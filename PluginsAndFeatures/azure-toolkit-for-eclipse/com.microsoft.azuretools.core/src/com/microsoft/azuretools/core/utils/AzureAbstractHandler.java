@@ -44,7 +44,7 @@ public abstract class AzureAbstractHandler extends AbstractHandler {
 			properties.put("CommandId", event.getCommand().getId());
 			properties.put("Text", event.getCommand().getName());
 			
-			AppInsightsClient.createByType(AppInsightsClient.EventType.MainMenu, event.getCommand().getName(),	null, properties);
+			AppInsightsClient.createByType(AppInsightsClient.EventType.Action, event.getCommand().getName(),	null, properties);
 		} catch (NotDefinedException ignore) {
 		}
 

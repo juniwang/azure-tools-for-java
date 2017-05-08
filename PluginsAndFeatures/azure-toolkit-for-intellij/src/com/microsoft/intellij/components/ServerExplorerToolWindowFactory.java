@@ -58,7 +58,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -281,7 +280,7 @@ public class ServerExplorerToolWindowFactory implements ToolWindowFactory, Prope
                     }
                     break;
             }
-            if (treeModelMap.get(project)!= null) {
+            if (treeModelMap.get(project) != null) {
                 treeModelMap.get(project).reload(treeNode);
             }
         }

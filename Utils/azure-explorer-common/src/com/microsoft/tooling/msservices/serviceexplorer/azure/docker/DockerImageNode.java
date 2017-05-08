@@ -27,6 +27,7 @@ import com.microsoft.azure.docker.model.DockerHost;
 import com.microsoft.azure.docker.model.DockerImage;
 import com.microsoft.azure.docker.ops.AzureDockerContainerOps;
 import com.microsoft.azure.docker.ops.AzureDockerImageOps;
+<<<<<<< HEAD
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
 import com.microsoft.tooling.msservices.serviceexplorer.AzureRefreshableNode;
@@ -40,6 +41,21 @@ import java.net.URI;
 import java.util.Map;
 
 public class DockerImageNode extends AzureRefreshableNode {
+=======
+import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
+import com.microsoft.azuretools.telemetry.AppInsightsConstants;
+import com.microsoft.azuretools.telemetry.TelemetryProperties;
+import com.microsoft.tooling.msservices.components.DefaultLoader;
+import com.microsoft.tooling.msservices.serviceexplorer.AzureRefreshableNode;
+import com.microsoft.tooling.msservices.serviceexplorer.Node;
+import com.microsoft.tooling.msservices.serviceexplorer.NodeActionEvent;
+import com.microsoft.tooling.msservices.serviceexplorer.azure.AzureNodeActionPromptListener;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class DockerImageNode extends AzureRefreshableNode implements TelemetryProperties{
+>>>>>>> d1edbb161ea40404f373dd66c2194e4eee9ec7b8
   //TODO: Replace the icons with the real Docker host icons
   private static final String DOCKER_IMAGE_ICON_PATH = "DockerInstance_16.png";
 
@@ -102,6 +118,17 @@ public class DockerImageNode extends AzureRefreshableNode {
     super.loadActions();
   }
 
+<<<<<<< HEAD
+=======
+  @Override
+  public Map<String, String> toProperties() {
+    final Map<String, String> properties = new HashMap<>();
+    properties.put(AppInsightsConstants.SubscriptionId, this.dockerHost.sid);
+    properties.put(AppInsightsConstants.Region, this.dockerHost.hostVM.region);
+    return properties;
+  }
+
+>>>>>>> d1edbb161ea40404f373dd66c2194e4eee9ec7b8
   public class DeleteDockerImageAction extends AzureNodeActionPromptListener {
     public DeleteDockerImageAction() {
       super(DockerImageNode.this,

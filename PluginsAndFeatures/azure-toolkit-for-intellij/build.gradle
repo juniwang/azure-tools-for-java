@@ -20,10 +20,11 @@ plugins {
 }
 
 group 'com.microsoft.azuretools'
+//version '1.6'
 
 compileJava {
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 }
 
 tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
@@ -32,9 +33,8 @@ apply plugin: 'org.jetbrains.intellij'
 
 intellij {
     pluginName 'azure-toolkit-for-intellij'
-    version intellij_version
-    plugins dep_plugins
-	downloadSources Boolean.valueOf(sources)
+    version project.hasProperty("intellij_version") ? intellij_version : 'IU-2017.1'
+    plugins project.hasProperty("dep_plugins") ? dep_plugins : 'org.intellij.scala:2017.1.15'
 }
 
 sourceSets {
@@ -45,9 +45,8 @@ sourceSets {
 }
 
 repositories {
-    maven {url uri('../../.repository')} // to snap to the private maven repo on Jenkins if any
-    mavenLocal()
     mavenCentral()
+    mavenLocal()
 }
 
 configurations {
@@ -55,7 +54,8 @@ configurations {
 }
 
 dependencies {
-    compile fileTree(dir: '../AddLibrary/AzureLibraries/com.microsoft.azuretools.sdk/dependencies', include: ['applicationinsights-management-1.0.3.jar'])
+//    compile fileTree(dir: '../../Utils/azuretools-core/lib', include: ['azure-keyvault-1.0.0-beta5-SNAPSHOT.jar', 'azure-keyvault-webkey-1.0.0-beta5-SNAPSHOT.jar'])
+    compile fileTree(dir: '../AddLibrary/AzureLibraries/com.microsoft.azuretools.sdk/dependencies', include: ['applicationinsights-core-1.0.3.jar', 'applicationinsights-management-1.0.3.jar', 'applicationinsights-web-1.0.3.jar', 'annotation-detector-3.0.4.jar'])
     compile 'com.microsoft.azuretools:azuretools-core:3.0.1'
     compile 'com.microsoft.azuretools:azure-explorer-common:3.0.1'
     compile 'com.microsoft.azuretools:hdinsight-node-common:3.0.1'

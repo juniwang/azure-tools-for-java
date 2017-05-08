@@ -34,10 +34,10 @@ import com.intellij.ui.table.TableView;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ListTableModel;
 import com.intellij.util.ui.PlatformColors;
-import com.microsoft.azuretools.azurecommons.deploy.DeploymentEventArgs;
-import com.microsoft.azuretools.azurecommons.deploy.DeploymentEventListener;
 import com.microsoft.intellij.AzurePlugin;
 import com.microsoft.intellij.util.PluginUtil;
+import com.microsoft.azuretools.azurecommons.deploy.DeploymentEventArgs;
+import com.microsoft.azuretools.azurecommons.deploy.DeploymentEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

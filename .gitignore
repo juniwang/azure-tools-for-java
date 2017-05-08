@@ -1,7 +1,10 @@
 # Java class files
-*.class 
+*.class
+*.publishsettings
 
 # generated files
 bin/
+target/
 
-*.publishsettings
+# IDE settings
+.idea/

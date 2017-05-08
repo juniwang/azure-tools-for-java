@@ -23,6 +23,7 @@
 package com.microsoft.intellij.helpers;
 
 import com.microsoft.intellij.AzurePlugin;
+import com.microsoft.tooling.msservices.components.DefaultLoader;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;

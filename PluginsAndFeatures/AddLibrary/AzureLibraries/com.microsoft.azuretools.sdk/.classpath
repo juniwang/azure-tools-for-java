@@ -3,6 +3,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/adal4j-1.1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/adapter-rxjava-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/annotation-detector-3.0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/api-annotations-0.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/applicationinsights-core-1.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/applicationinsights-management-1.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/applicationinsights-web-1.0.3.jar"/>
@@ -24,6 +25,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/azure-mgmt-storage-1.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/azure-mgmt-trafficmanager-1.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/azure-storage-4.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/client-runtime-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons-codec-1.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons-io-2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons-lang3-3.4.jar"/>
@@ -34,6 +36,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/guava-20.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/httpclient-4.3.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/httpcore-4.3.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jackson-annotations-2.7.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jackson-core-2.7.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jackson-core-asl-1.9.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jackson-databind-2.7.2.jar"/>
@@ -54,13 +57,11 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/okio-1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/retrofit-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/rxjava-1.2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/slf4j-api-1.7.12.jar"/>
 	<classpathentry exported="true" kind="lib" path="azure-1.0.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/azure-client-authentication-1.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/azure-client-runtime-1.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/jackson-annotations-2.7.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/slf4j-api-1.7.22.jar"/>
-	<classpathentry kind="lib" path="dependencies/client-runtime-1.0.2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

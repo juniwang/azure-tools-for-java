@@ -27,5 +27,6 @@ public final class AppInsightsConstants {
     public static String Deny = "Deny";
     public static String LoadPlugin = "Load";
     public static String SubscriptionId = "SubscriptionId";
+    public static String SubscriptionName = "SubscriptionName";
     public static String Region = "Region";
 }
